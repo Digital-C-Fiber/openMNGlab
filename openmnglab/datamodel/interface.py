@@ -34,16 +34,19 @@ class IDataScheme(ABC):
         If they are not compatible, the implementation either raises an exception containing details or returns ``False``.
 
         :param other: The other datas cheme to check the compatibility against
-        :return: True if the data schemes are compatible
+        :raise DataSchemeCompatibilityError: If the schemes are not compatible to each other and detailed information is available
+        :return: ``True`` if the data schemes are compatible
         """
         ...
 
     @abstractmethod
     def verify(self, data: object) -> bool:
         """
-        Verifies that a data object conforms to the schema defined by this instance
+        Verifies that a data object conforms to the schema defined by this instance.
+        May raise an exception containing more information why the data does not conform to this scheme
 
         :param data: The object to check
+        :raise DataSchemeConformityError: If data does not conform to the scheme and detailed information is available
         :return: True if the data object conforms to this schema
         """
         ...
