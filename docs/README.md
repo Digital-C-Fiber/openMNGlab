@@ -21,5 +21,5 @@ To build the documentation without make, first run Sphinx apidoc to generate the
 
 ```shell
 poetry run sphinx-apidoc -o "source/apidoc" "../openmnglab"
-poetry run sphinx-build $target source build
+poetry run sphinx-build -M $target source build
 ```
