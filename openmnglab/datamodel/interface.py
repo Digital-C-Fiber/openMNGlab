@@ -10,8 +10,9 @@ class IDataContainer(ABC, Generic[T_co]):
     """
     A structures carrying data between processing stages
     """
-    @abstractmethod
+
     @property
+    @abstractmethod
     def data(self) -> T_co:
         """
         :return: Primary datastructure stored in this container
