@@ -1,8 +1,8 @@
 from abc import ABC
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Sequence
 
 from openmnglab.datamodel.interface import IDataScheme
-from openmnglab.functions.interface import IFunction, IFunctionDefinition
+from openmnglab.functions.interface import IFunction, IFunctionDefinition, ISourceFunction
 from openmnglab.util.hashing import Hash
 
 
@@ -12,7 +12,7 @@ class DefaultFunctionBase(IFunction, ABC):
         return True
 
 
-class SourceFunctionBase(DefaultFunctionBase, ABC):
+class SourceFunctionBase(DefaultFunctionBase, ISourceFunction, ABC):
 
     def set_input(self):
         """Does nothing as source functions don't accept any input"""
@@ -40,9 +40,9 @@ class FunctionDefinitionBase(IFunctionDefinition, ABC):
         return hashgen.digest()
 
     @property
-    def consumes(self) -> Optional[Iterable[IDataScheme]]:
+    def consumes(self) -> Optional[Sequence[IDataScheme]]:
         return None
 
     @property
-    def produces(self) -> Optional[Iterable[IDataScheme]]:
+    def produces(self) -> Optional[Sequence[IDataScheme]]:
         return None

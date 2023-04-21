@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 from typing import TypeVar, Generic, Optional
 
 from openmnglab.datamodel.interface import IDataContainer
-from openmnglab.functions.interface import IFunctionDefinition
+from openmnglab.functions.interface import IFunctionDefinition, ISourceFunctionDefinition
 from openmnglab.planning.plan.interface import IExecutionPlan
 
 DCT = TypeVar('DCT', bound=IDataContainer)
@@ -30,7 +30,7 @@ class IExecutionPlanner(ABC):
     def add_function(self, function: IFunctionDefinition, *inp_data: IProxyData) -> Optional[tuple[IProxyData, ...]]:
         ...
 
-    def add_source(self, function: IFunctionDefinition) -> tuple[IProxyData, ...]:
+    def add_source(self, function: ISourceFunctionDefinition) -> tuple[IProxyData, ...]:
         return self.add_function(function)
 
     def add_stage(self, function: IFunctionDefinition, input_0: IProxyData, *other_inputs: IProxyData) -> tuple[
