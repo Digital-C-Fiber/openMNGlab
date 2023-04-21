@@ -27,12 +27,12 @@ class IPlannedFunction(IPlannedElement, ABC):
 
     @property
     @abstractmethod
-    def input(self) -> Collection[IPlannedData]:
+    def data_in(self) -> Collection[IPlannedData]:
         ...
 
     @property
     @abstractmethod
-    def output(self) -> Collection[IPlannedData]:
+    def data_out(self) -> Collection[IPlannedData]:
         ...
 
 

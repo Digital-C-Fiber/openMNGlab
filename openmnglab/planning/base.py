@@ -20,6 +20,7 @@ def check_input(expected_schemes: Collection[IDataScheme], actual_schemes: Colle
         except DataSchemeCompatibilityError as ds_compat_err:
             raise FunctionArgumentSchemaError(pos) from ds_compat_err
 
+
 @dataclass
 class ExecutionPlan(IExecutionPlan):
     functions: dict[bytes, IPlannedFunction]
@@ -40,18 +41,16 @@ class PlannerBase(IExecutionPlanner, ABC, Generic[_FuncT, _DataT]):
         return ExecutionPlan(self._functions.copy(), self._proxy_data.copy())
 
     @abstractmethod
-    def _add_function(self,function: IFunctionDefinition, *input: _DataT) -> Optional[tuple[IProxyData]]:
+    def _add_function(self, function: IFunctionDefinition, *inp_data: _DataT) -> Optional[tuple[IProxyData]]:
         ...
 
-    def add_function(self, function: IFunctionDefinition, *input: IProxyData) -> Optional[tuple[IProxyData]]:
-        return self._add_function(function, *self._proxy_data_to_concrete(*input))
+    def add_function(self, function: IFunctionDefinition, *inp_data: IProxyData) -> Optional[tuple[IProxyData]]:
+        return self._add_function(function, *self._proxy_data_to_concrete(*inp_data))
 
-    def _proxy_data_to_concrete(self, *input: IProxyData) -> Iterable[_DataT]:
-        for pos, inp in enumerate(input):
+    def _proxy_data_to_concrete(self, *inp_data: IProxyData) -> Iterable[_DataT]:
+        for pos, inp in enumerate(inp_data):
             concrete_data = self._proxy_data.get(inp.calculated_hash)
             if concrete_data is None:
                 raise PlanningError(
                     f"Argument at position {pos} with hash {inp.calculated_hash.hex()} is not part of this plan and therefore cannot be used as an argument in it")
             yield concrete_data
-
-

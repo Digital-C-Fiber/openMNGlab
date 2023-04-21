@@ -26,7 +26,7 @@ class IProxyData(IPlannedElement, ABC, Generic[DCT]):
 class IExecutionPlanner(ABC):
 
     @abstractmethod
-    def add_function(self, function: IFunctionDefinition, *input: IProxyData) -> Optional[tuple[IProxyData]]:
+    def add_function(self, function: IFunctionDefinition, *inp_data: IProxyData) -> Optional[tuple[IProxyData]]:
         ...
 
     @abstractmethod
