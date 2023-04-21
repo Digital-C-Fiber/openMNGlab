@@ -41,8 +41,8 @@ class FunctionDefinitionBase(IFunctionDefinition, ABC):
 
     @property
     def consumes(self) -> Optional[Iterable[IDataScheme]]:
-        return
+        return None
 
     @property
     def produces(self) -> Optional[Iterable[IDataScheme]]:
-        return
+        return None
