@@ -1,20 +1,21 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Mapping, Iterable
+from typing import Mapping, Iterable, Collection
 
+from openmnglab.datamodel.interface import IDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
 from openmnglab.planning.interface import IProxyData, IPlannedElement
 
 
-class IExecutionPlan(ABC):
-
+class IPlannedData(IPlannedElement, ABC):
     @property
     @abstractmethod
-    def functions(self) -> Mapping[bytes, IPlannedFunction]:
+    def schema(self) -> IDataScheme:
         ...
 
     @property
     @abstractmethod
-    def proxy_data(self) -> Mapping[bytes, IProxyData]:
+    def produced_by(self) -> IPlannedFunction:
         ...
 
 
@@ -26,10 +27,23 @@ class IPlannedFunction(IPlannedElement, ABC):
 
     @property
     @abstractmethod
-    def input(self) -> Iterable:
+    def input(self) -> Collection[IPlannedData]:
         ...
 
     @property
     @abstractmethod
-    def output(self) -> Iterable:
+    def output(self) -> Collection[IPlannedData]:
+        ...
+
+
+class IExecutionPlan(ABC):
+
+    @property
+    @abstractmethod
+    def functions(self) -> Mapping[bytes, IPlannedFunction]:
+        ...
+
+    @property
+    @abstractmethod
+    def proxy_data(self) -> Mapping[bytes, IPlannedData]:
         ...

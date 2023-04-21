@@ -21,17 +21,7 @@ class IPlannedElement(ABC):
 
 
 class IProxyData(IPlannedElement, ABC, Generic[DCT]):
-
-    @property
-    @abstractmethod
-    def schema(self) -> IDataScheme:
-        ...
-
-    @property
-    @abstractmethod
-    def produced_by(self) -> IPlannedFunction:
-        ...
-
+    ...
 
 class IExecutionPlanner(ABC):
 
