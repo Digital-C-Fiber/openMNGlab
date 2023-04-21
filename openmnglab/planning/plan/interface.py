@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Mapping, Iterable
 
 from openmnglab.functions.interface import IFunctionDefinition
-from openmnglab.planning.interface import IProxyData
+from openmnglab.planning.interface import IProxyData, IPlannedElement
 
 
 class IExecutionPlan(ABC):
@@ -15,18 +15,6 @@ class IExecutionPlan(ABC):
     @property
     @abstractmethod
     def proxy_data(self) -> Mapping[bytes, IProxyData]:
-        ...
-
-
-class IPlannedElement(ABC):
-    @property
-    @abstractmethod
-    def calculated_hash(self) -> bytes:
-        ...
-
-    @property
-    @abstractmethod
-    def depth(self) -> int:
         ...
 
 

@@ -3,9 +3,21 @@ from typing import TypeVar, Generic, Optional
 
 from openmnglab.datamodel.interface import IDataScheme, IDataContainer
 from openmnglab.functions.interface import IFunctionDefinition
-from openmnglab.planning.plan.interface import IExecutionPlan, IPlannedElement, IPlannedFunction
+from openmnglab.planning.plan.interface import IExecutionPlan, IPlannedFunction
 
 DCT = TypeVar('DCT', bound=IDataContainer)
+
+
+class IPlannedElement(ABC):
+    @property
+    @abstractmethod
+    def calculated_hash(self) -> bytes:
+        ...
+
+    @property
+    @abstractmethod
+    def depth(self) -> int:
+        ...
 
 
 class IProxyData(IPlannedElement, ABC, Generic[DCT]):
