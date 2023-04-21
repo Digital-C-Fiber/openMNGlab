@@ -50,6 +50,11 @@ class IFunctionDefinition(ABC):
 
     @property
     @abstractmethod
+    def identifying_hash(self) -> bytes:
+        ...
+
+    @property
+    @abstractmethod
     def consumes(self) -> Optional[Iterable[IDataScheme]]:
         ...
 

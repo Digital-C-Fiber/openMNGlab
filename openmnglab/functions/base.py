@@ -3,6 +3,7 @@ from typing import Optional, Iterable
 
 from openmnglab.datamodel.interface import IDataScheme
 from openmnglab.functions.interface import IFunction, IFunctionDefinition
+from openmnglab.util.hashing import Hash
 
 
 class DefaultFunctionBase(IFunction, ABC):
@@ -30,6 +31,13 @@ class FunctionDefinitionBase(IFunctionDefinition, ABC):
     @property
     def config_hash(self) -> bytes:
         return bytes()
+
+    @property
+    def identifying_hash(self) -> bytes:
+        hashgen = Hash()
+        hashgen.str(self.identifier)
+        hashgen.update(self.config_hash)
+        return hashgen.digest()
 
     @property
     def consumes(self) -> Optional[Iterable[IDataScheme]]:
