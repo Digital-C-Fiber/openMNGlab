@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Mapping, Iterable, Collection
+from typing import Mapping, Iterable, Collection, Sequence
 
 from openmnglab.datamodel.interface import IDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
@@ -27,12 +27,12 @@ class IPlannedFunction(IPlannedElement, ABC):
 
     @property
     @abstractmethod
-    def data_in(self) -> Collection[IPlannedData]:
+    def data_in(self) -> Sequence[IPlannedData]:
         ...
 
     @property
     @abstractmethod
-    def data_out(self) -> Collection[IPlannedData]:
+    def data_out(self) -> Sequence[IPlannedData]:
         ...
 
 

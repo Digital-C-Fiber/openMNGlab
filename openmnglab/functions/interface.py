@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Sequence
 
 from openmnglab.datamodel.interface import IDataContainer, IDataScheme
 
@@ -36,6 +36,9 @@ class IFunction(ABC):
         ...
 
 
+
+
+
 class IFunctionDefinition(ABC):
 
     @property
@@ -55,12 +58,12 @@ class IFunctionDefinition(ABC):
 
     @property
     @abstractmethod
-    def consumes(self) -> Optional[Iterable[IDataScheme]]:
+    def consumes(self) -> Optional[Sequence[IDataScheme]]:
         ...
 
     @property
     @abstractmethod
-    def produces(self) -> Optional[Iterable[IDataScheme]]:
+    def produces(self) -> Optional[Sequence[IDataScheme]]:
         ...
 
     @abstractmethod
