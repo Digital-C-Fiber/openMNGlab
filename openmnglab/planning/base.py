@@ -6,7 +6,8 @@ from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
 from openmnglab.datamodel.interface import IDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
 from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
-from openmnglab.planning.interface import IExecutionPlan, IExecutionPlanner, IPlannedFunction, IProxyData
+from openmnglab.planning.interface import IExecutionPlanner, IProxyData
+from openmnglab.planning.plan.interface import IExecutionPlan, IPlannedFunction
 
 
 @dataclass
