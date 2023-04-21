@@ -36,7 +36,7 @@ class PlannerBase(IExecutionPlanner, IExecutionPlan, ABC):
         for pos, inp in enumerate(input):
             if inp.calculated_hash not in self.proxy_data:
                 raise PlanningError(
-                    f"Argument at position {pos} with hash {inp.calculated_hash} is not part of this plan and therefore cannot be used as an argument in it")
+                    f"Argument at position {pos} with hash {inp.calculated_hash.hex()} is not part of this plan and therefore cannot be used as an argument in it")
         self._check_input(tuple(function.consumes), tuple(inp.schema for inp in input))
 
     @staticmethod
