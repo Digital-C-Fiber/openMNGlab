@@ -5,12 +5,7 @@ from openmnglab.datamodel.interface import IDataScheme, IDataContainer
 from openmnglab.functions.interface import IFunctionDefinition
 
 
-class IPlannedFunction(ABC):
-    @property
-    @abstractmethod
-    def definition(self) -> IFunctionDefinition:
-        ...
-
+class IPlannedElement(ABC):
     @property
     @abstractmethod
     def calculated_hash(self) -> bytes:
@@ -19,6 +14,13 @@ class IPlannedFunction(ABC):
     @property
     @abstractmethod
     def depth(self) -> int:
+        ...
+
+
+class IPlannedFunction(IPlannedElement, ABC):
+    @property
+    @abstractmethod
+    def definition(self) -> IFunctionDefinition:
         ...
 
     @property
@@ -35,7 +37,7 @@ class IPlannedFunction(ABC):
 DCT = TypeVar('DCT', bound=IDataContainer)
 
 
-class IProxyData(ABC, Generic[DCT]):
+class IProxyData(IPlannedElement, ABC, Generic[DCT]):
 
     @property
     @abstractmethod
@@ -45,11 +47,6 @@ class IProxyData(ABC, Generic[DCT]):
     @property
     @abstractmethod
     def produced_by(self) -> IPlannedFunction:
-        ...
-
-    @property
-    @abstractmethod
-    def calculated_hash(self) -> bytes:
         ...
 
 
@@ -64,6 +61,7 @@ class IExecutionPlan(ABC):
     @abstractmethod
     def proxy_data(self) -> Mapping[bytes, IProxyData]:
         ...
+
 
 class IExecutionPlanner(ABC):
 
