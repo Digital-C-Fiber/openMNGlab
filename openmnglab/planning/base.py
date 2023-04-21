@@ -1,14 +1,24 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Collection
+from typing import Collection, TypeVar, Generic, Optional, Iterable
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
 from openmnglab.datamodel.interface import IDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
 from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
 from openmnglab.planning.interface import IExecutionPlanner, IProxyData
-from openmnglab.planning.plan.interface import IExecutionPlan, IPlannedFunction
+from openmnglab.planning.plan.interface import IExecutionPlan, IPlannedFunction, IPlannedData
 
+
+def check_input(expected_schemes: Collection[IDataScheme], actual_schemes: Collection[IDataScheme]):
+    if len(expected_schemes) != len(actual_schemes):
+        raise InvalidFunctionArgumentCountError(len(expected_schemes), len(actual_schemes))
+    for pos, (expected_scheme, actual_scheme) in enumerate(zip(expected_schemes, actual_schemes)):
+        try:
+            if not expected_scheme.is_compatible(actual_scheme):
+                raise DataSchemeCompatibilityError("Expected scheme is not compatible with actual scheme")
+        except DataSchemeCompatibilityError as ds_compat_err:
+            raise FunctionArgumentSchemaError(pos) from ds_compat_err
 
 @dataclass
 class ExecutionPlan(IExecutionPlan):
@@ -16,37 +26,32 @@ class ExecutionPlan(IExecutionPlan):
     proxy_data: dict[bytes, IProxyData]
 
 
-class PlannerBase(IExecutionPlanner, IExecutionPlan, ABC):
+_FuncT = TypeVar('_FuncT', bound=IPlannedFunction)
+_DataT = TypeVar('_DataT', bound=IPlannedData)
+
+
+class PlannerBase(IExecutionPlanner, ABC, Generic[_FuncT, _DataT]):
 
     def __init__(self):
-        self._functions: dict[bytes, IPlannedFunction] = dict()
-        self._proxy_data: dict[bytes, IProxyData] = dict()
-
-    @property
-    def functions(self) -> dict[bytes, IPlannedFunction]:
-        return self._functions
-
-    @property
-    def proxy_data(self) -> dict[bytes, IProxyData]:
-        return self._proxy_data
+        self._functions: dict[bytes, _FuncT] = dict()
+        self._proxy_data: dict[bytes, _DataT] = dict()
 
     def get_plan(self) -> ExecutionPlan:
-        return ExecutionPlan(self.functions.copy(), self.proxy_data.copy())
+        return ExecutionPlan(self._functions.copy(), self._proxy_data.copy())
 
-    def verify_args(self, function: IFunctionDefinition, *input: IProxyData):
+    @abstractmethod
+    def _add_function(self,function: IFunctionDefinition, *input: _DataT) -> Optional[tuple[IProxyData]]:
+        ...
+
+    def add_function(self, function: IFunctionDefinition, *input: IProxyData) -> Optional[tuple[IProxyData]]:
+        return self._add_function(function, *self._proxy_data_to_concrete(*input))
+
+    def _proxy_data_to_concrete(self, *input: IProxyData) -> Iterable[_DataT]:
         for pos, inp in enumerate(input):
-            if inp.calculated_hash not in self.proxy_data:
+            concrete_data = self._proxy_data.get(inp.calculated_hash)
+            if concrete_data is None:
                 raise PlanningError(
                     f"Argument at position {pos} with hash {inp.calculated_hash.hex()} is not part of this plan and therefore cannot be used as an argument in it")
-        self._check_input(tuple(function.consumes), tuple(inp.schema for inp in input))
+            yield concrete_data
 
-    @staticmethod
-    def _check_input(expected_schemes: Collection[IDataScheme], actual_schemes: Collection[IDataScheme]):
-        if len(expected_schemes) != len(actual_schemes):
-            raise InvalidFunctionArgumentCountError(len(expected_schemes), len(actual_schemes))
-        for pos, (expected_scheme, actual_scheme) in enumerate(zip(expected_schemes, actual_schemes)):
-            try:
-                if not expected_scheme.is_compatible(actual_scheme):
-                    raise DataSchemeCompatibilityError("Expected scheme is not compatible with actual scheme")
-            except DataSchemeCompatibilityError as ds_compat_err:
-                raise FunctionArgumentSchemaError(pos) from ds_compat_err
+
