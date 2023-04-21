@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Iterable, Sequence, Literal
+from typing import Optional, Iterable, Sequence, Literal, TypeVarTuple, Generic
 
 from openmnglab.datamodel.interface import IDataContainer, IDataScheme
 
@@ -43,7 +43,10 @@ class ISourceFunction(IFunction, ABC):
         ...
 
 
-class IFunctionDefinition(ABC):
+Prods = TypeVarTuple('Prods')
+
+
+class IFunctionDefinition(ABC, Generic[*Prods]):
 
     @property
     @abstractmethod
@@ -75,7 +78,7 @@ class IFunctionDefinition(ABC):
         ...
 
 
-class ISourceFunctionDefinition(IFunctionDefinition, ABC):
+class ISourceFunctionDefinition(Generic[*Prods], IFunctionDefinition[*Prods], ABC):
 
     @property
     @abstractmethod

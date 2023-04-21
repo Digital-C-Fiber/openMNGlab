@@ -1,8 +1,8 @@
 from abc import ABC
-from typing import Optional, Iterable, Sequence
+from typing import Optional, Sequence, Generic
 
 from openmnglab.datamodel.interface import IDataScheme
-from openmnglab.functions.interface import IFunction, IFunctionDefinition, ISourceFunction
+from openmnglab.functions.interface import IFunction, IFunctionDefinition, ISourceFunction, Prods
 from openmnglab.util.hashing import Hash
 
 
@@ -19,7 +19,7 @@ class SourceFunctionBase(DefaultFunctionBase, ISourceFunction, ABC):
         pass
 
 
-class FunctionDefinitionBase(IFunctionDefinition, ABC):
+class FunctionDefinitionBase(Generic[*Prods], IFunctionDefinition[*Prods], ABC):
 
     def __init__(self, identifier: str):
         self._identifier = identifier

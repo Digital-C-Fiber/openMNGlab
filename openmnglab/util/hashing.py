@@ -14,7 +14,7 @@ class Hash:
     def int(self, i: int):
         self.update(struct.pack("<q", i))
 
-    def update(self, b:  bytes | bytearray | memoryview | array | mmap):
+    def update(self, b: bytes | bytearray | memoryview | array | mmap):
         self.hash.update(b)
 
     def digest(self) -> bytes:

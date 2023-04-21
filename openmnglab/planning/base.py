@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Collection, TypeVar, Generic, Optional, Iterable
+from typing import Collection, TypeVar, Generic, Optional, Iterable, Mapping
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
 from openmnglab.datamodel.interface import IDataScheme
@@ -37,8 +37,8 @@ class ProxyData(IProxyData):
 
 @dataclass
 class ExecutionPlan(IExecutionPlan):
-    functions: dict[bytes, IPlannedFunction]
-    proxy_data: dict[bytes, IProxyData]
+    functions: Mapping[bytes, IPlannedFunction]
+    proxy_data: Mapping[bytes, IProxyData]
 
 
 _FuncT = TypeVar('_FuncT', bound=IPlannedFunction)
