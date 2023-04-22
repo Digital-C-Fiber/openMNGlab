@@ -1,12 +1,12 @@
 from typing import Mapping, Optional, Iterable
 
 from openmnglab.datamodel.interface import IDataContainer
-from openmnglab.execution.exceptions import FunctionInputError, FunctionExecutionError, FunctionOutputError, \
-    FunctionReturnCountMissmatch
+from openmnglab.execution.exceptions import FunctionInputError, FunctionExecutionError, FunctionReturnCountMissmatch
 from openmnglab.execution.interface import IExecutor
 from openmnglab.functions.interface import IFunction
 from openmnglab.planning.interface import IProxyData
 from openmnglab.planning.plan.interface import IExecutionPlan, IPlannedData
+
 
 def _func_setinput(func: IFunction, *inp: IDataContainer):
     try:
@@ -14,11 +14,13 @@ def _func_setinput(func: IFunction, *inp: IDataContainer):
     except Exception as e:
         raise FunctionInputError("failed to set input of function") from e
 
+
 def _func_exec(func: IFunction) -> Optional[Iterable[IDataContainer]]:
     try:
         return func.execute()
     except Exception as e:
         raise FunctionExecutionError("function failed to execute") from e
+
 
 class SingleThreadedExecutor(IExecutor):
     def __init__(self, plan: IExecutionPlan):

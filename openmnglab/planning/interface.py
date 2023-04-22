@@ -33,7 +33,8 @@ class IExecutionPlanner(ABC):
     def add_source(self, function: ISourceFunctionDefinition[*Prods]) -> tuple[*Prods]:
         return self.add_function(function)
 
-    def add_stage(self, function: IFunctionDefinition[*Prods], input_0: IProxyData, *other_inputs: IProxyData) -> tuple[*Prods]:
+    def add_stage(self, function: IFunctionDefinition[*Prods], input_0: IProxyData, *other_inputs: IProxyData) -> tuple[
+        *Prods]:
         return self.add_function(function, input_0, *other_inputs)
 
     @abstractmethod
