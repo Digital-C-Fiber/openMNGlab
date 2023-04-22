@@ -1,16 +1,14 @@
 from abc import abstractmethod, ABC
-from typing import Iterable, TypeVar, Generic, Mapping, Optional
+from typing import TypeVar, Generic, Optional
 
-from openmnglab.datamodel.interface import IDataScheme, IDataContainer
-from openmnglab.functions.interface import IFunctionDefinition
+from openmnglab.datamodel.interface import IDataContainer
+from openmnglab.functions.interface import IFunctionDefinition, ISourceFunctionDefinition, Prods
+from openmnglab.planning.plan.interface import IExecutionPlan
+
+DCT = TypeVar('DCT', bound=IDataContainer)
 
 
-class IPlannedFunction(ABC):
-    @property
-    @abstractmethod
-    def definition(self) -> IFunctionDefinition:
-        ...
-
+class IPlannedElement(ABC):
     @property
     @abstractmethod
     def calculated_hash(self) -> bytes:
@@ -21,55 +19,23 @@ class IPlannedFunction(ABC):
     def depth(self) -> int:
         ...
 
-    @property
-    @abstractmethod
-    def input(self) -> Iterable:
-        ...
 
-    @property
-    @abstractmethod
-    def output(self) -> Iterable:
-        ...
+class IProxyData(IPlannedElement, ABC, Generic[DCT]):
+    ...
 
-
-DCT = TypeVar('DCT', bound=IDataContainer)
-
-
-class IProxyData(ABC, Generic[DCT]):
-
-    @property
-    @abstractmethod
-    def schema(self) -> IDataScheme:
-        ...
-
-    @property
-    @abstractmethod
-    def produced_by(self) -> IPlannedFunction:
-        ...
-
-    @property
-    @abstractmethod
-    def calculated_hash(self) -> bytes:
-        ...
-
-
-class IExecutionPlan(ABC):
-
-    @property
-    @abstractmethod
-    def functions(self) -> Mapping[bytes, IPlannedFunction]:
-        ...
-
-    @property
-    @abstractmethod
-    def proxy_data(self) -> Mapping[bytes, IProxyData]:
-        ...
 
 class IExecutionPlanner(ABC):
 
     @abstractmethod
-    def add_function(self, function: IFunctionDefinition, *input: IProxyData) -> Optional[tuple[IDataScheme]]:
+    def add_function(self, function: IFunctionDefinition[*Prods], *inp_data: IProxyData) -> Optional[tuple[*Prods]]:
         ...
+
+    def add_source(self, function: ISourceFunctionDefinition[*Prods]) -> tuple[*Prods]:
+        return self.add_function(function)
+
+    def add_stage(self, function: IFunctionDefinition[*Prods], input_0: IProxyData, *other_inputs: IProxyData) -> tuple[
+        *Prods]:
+        return self.add_function(function, input_0, *other_inputs)
 
     @abstractmethod
     def get_plan(self) -> IExecutionPlan:

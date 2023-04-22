@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Sequence, Literal, TypeVarTuple, Generic
 
 from openmnglab.datamodel.interface import IDataContainer, IDataScheme
 
@@ -36,7 +36,17 @@ class IFunction(ABC):
         ...
 
 
-class IFunctionDefinition(ABC):
+class ISourceFunction(IFunction, ABC):
+
+    @abstractmethod
+    def set_input(self):
+        ...
+
+
+Prods = TypeVarTuple('Prods')
+
+
+class IFunctionDefinition(ABC, Generic[*Prods]):
 
     @property
     @abstractmethod
@@ -50,14 +60,31 @@ class IFunctionDefinition(ABC):
 
     @property
     @abstractmethod
-    def consumes(self) -> Optional[Iterable[IDataScheme]]:
+    def identifying_hash(self) -> bytes:
         ...
 
     @property
     @abstractmethod
-    def produces(self) -> Optional[Iterable[IDataScheme]]:
+    def consumes(self) -> Optional[Sequence[IDataScheme]]:
+        ...
+
+    @property
+    @abstractmethod
+    def produces(self) -> Optional[Sequence[IDataScheme]]:
         ...
 
     @abstractmethod
     def new_function(self) -> IFunction:
+        ...
+
+
+class ISourceFunctionDefinition(Generic[*Prods], IFunctionDefinition[*Prods], ABC):
+
+    @property
+    @abstractmethod
+    def consumes(self) -> Literal[None]:
+        ...
+
+    @abstractmethod
+    def new_function(self) -> ISourceFunction:
         ...
