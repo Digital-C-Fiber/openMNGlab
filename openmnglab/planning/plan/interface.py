@@ -7,12 +7,14 @@ from openmnglab.datamodel.interface import IDataScheme, IDataContainer
 from openmnglab.functions.interface import IFunctionDefinition
 
 
-class IPlannedElement(ABC):
+class IHashIdentifiedElement(ABC):
     @property
     @abstractmethod
     def calculated_hash(self) -> bytes:
         ...
 
+
+class IPlannedElement(IHashIdentifiedElement, ABC):
     @property
     @abstractmethod
     def depth(self) -> int:
