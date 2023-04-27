@@ -1,11 +1,22 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Mapping, Sequence
+from typing import Mapping, Sequence, TypeVar, Generic
 
-from openmnglab.datamodel.interface import IDataScheme
+from openmnglab.datamodel.interface import IDataScheme, IDataContainer
 from openmnglab.functions.interface import IFunctionDefinition
-from openmnglab.planning.interface import IPlannedElement
+
+
+class IPlannedElement(ABC):
+    @property
+    @abstractmethod
+    def calculated_hash(self) -> bytes:
+        ...
+
+    @property
+    @abstractmethod
+    def depth(self) -> int:
+        ...
 
 
 class IPlannedData(IPlannedElement, ABC):
@@ -48,3 +59,10 @@ class IExecutionPlan(ABC):
     @abstractmethod
     def proxy_data(self) -> Mapping[bytes, IPlannedData]:
         ...
+
+
+DCT = TypeVar('DCT', bound=IDataContainer)
+
+
+class IProxyData(IPlannedElement, ABC, Generic[DCT]):
+    ...

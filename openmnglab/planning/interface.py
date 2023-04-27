@@ -1,27 +1,8 @@
 from abc import abstractmethod, ABC
-from typing import TypeVar, Generic, Optional
+from typing import Optional
 
-from openmnglab.datamodel.interface import IDataContainer
 from openmnglab.functions.interface import IFunctionDefinition, ISourceFunctionDefinition, Prods
-from openmnglab.planning.plan.interface import IExecutionPlan
-
-DCT = TypeVar('DCT', bound=IDataContainer)
-
-
-class IPlannedElement(ABC):
-    @property
-    @abstractmethod
-    def calculated_hash(self) -> bytes:
-        ...
-
-    @property
-    @abstractmethod
-    def depth(self) -> int:
-        ...
-
-
-class IProxyData(IPlannedElement, ABC, Generic[DCT]):
-    ...
+from openmnglab.planning.plan.interface import IExecutionPlan, IProxyData
 
 
 class IExecutionPlanner(ABC):
