@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Mapping, Sequence, TypeVar, Generic
+from typing import Mapping, Sequence
 
-from openmnglab.datamodel.interface import IDataScheme, IDataContainer
+from openmnglab.datamodel.interface import IDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
 from openmnglab.shared import IHashIdentifiedElement
 
@@ -52,8 +52,3 @@ class IExecutionPlan(ABC):
         ...
 
 
-DCT = TypeVar('DCT', bound=IDataContainer)
-
-
-class IProxyData(IHashIdentifiedElement, ABC, Generic[DCT]):
-    ...

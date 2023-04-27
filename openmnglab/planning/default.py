@@ -6,7 +6,8 @@ from openmnglab.datamodel.interface import IDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
 from openmnglab.planning.base import PlannerBase, check_input, ProxyData
 from openmnglab.planning.exceptions import PlanningError
-from openmnglab.planning.plan.interface import IPlannedFunction, IPlannedData, IProxyData
+from openmnglab.planning.plan.interface import IPlannedFunction, IPlannedData
+from openmnglab.planning.interface import IProxyData
 from openmnglab.util.hashing import Hash
 
 

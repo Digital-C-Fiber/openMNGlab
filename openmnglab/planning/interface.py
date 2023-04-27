@@ -1,8 +1,12 @@
-from abc import abstractmethod, ABC
-from typing import Optional
+from __future__ import annotations
 
+from abc import abstractmethod, ABC
+from typing import Optional, TypeVar, Generic
+
+from openmnglab.datamodel.interface import IDataContainer
 from openmnglab.functions.interface import IFunctionDefinition, ISourceFunctionDefinition, Prods
-from openmnglab.planning.plan.interface import IExecutionPlan, IProxyData
+from openmnglab.planning.plan.interface import IExecutionPlan
+from openmnglab.shared import IHashIdentifiedElement
 
 
 class IExecutionPlanner(ABC):
@@ -21,3 +25,10 @@ class IExecutionPlanner(ABC):
     @abstractmethod
     def get_plan(self) -> IExecutionPlan:
         ...
+
+
+DCT = TypeVar('DCT', bound=IDataContainer)
+
+
+class IProxyData(IHashIdentifiedElement, ABC, Generic[DCT]):
+    ...

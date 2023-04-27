@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Mapping, Optional
 
 from openmnglab.datamodel.interface import IDataContainer
-from openmnglab.planning.plan.interface import DCT, IProxyData
+from openmnglab.planning.interface import DCT, IProxyData
 
 
 class IExecutor(ABC):
