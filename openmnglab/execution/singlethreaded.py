@@ -14,9 +14,10 @@ def _func_setinput(func: IFunction, *inp: IDataContainer):
         raise FunctionInputError("failed to set input of function") from e
 
 
-def _func_exec(func: IFunction) -> Optional[Iterable[IDataContainer]]:
+def _func_exec(func: IFunction) -> Iterable[IDataContainer]:
     try:
-        return func.execute()
+        ret = func.execute()
+        return ret if ret is not None else tuple()
     except Exception as e:
         raise FunctionExecutionError("function failed to execute") from e
 
