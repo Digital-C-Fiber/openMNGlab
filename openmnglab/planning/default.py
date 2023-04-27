@@ -6,12 +6,12 @@ from openmnglab.datamodel.interface import IDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
 from openmnglab.planning.base import PlannerBase, check_input, ProxyData
 from openmnglab.planning.exceptions import PlanningError
-from openmnglab.planning.plan.interface import IPlannedFunction, IPlannedData
+from openmnglab.planning.plan.interface import IStage, IPlannedData
 from openmnglab.planning.interface import IProxyData
 from openmnglab.util.hashing import Hash
 
 
-class _PlannedFunction(IPlannedFunction):
+class _Stage(IStage):
     def __init__(self, definition: IFunctionDefinition, *data_in: _PlannedData):
         hashgen = Hash()
         hashgen.update(definition.config_hash)
@@ -49,10 +49,10 @@ class _PlannedData(IPlannedData):
     depth: int
     calculated_hash: bytes
     schema: IDataScheme
-    produced_by: _PlannedFunction
+    produced_by: _Stage
 
     @staticmethod
-    def from_function(func: _PlannedFunction, scheme: IDataScheme, pos: int) -> _PlannedData:
+    def from_function(func: _Stage, scheme: IDataScheme, pos: int) -> _PlannedData:
         depth = func.depth + 1
         hashgen = Hash()
         hashgen.int(pos)
@@ -60,11 +60,11 @@ class _PlannedData(IPlannedData):
         return _PlannedData(depth, hashgen.digest(), scheme, func)
 
 
-class DefaultPlanner(PlannerBase[_PlannedFunction, _PlannedData]):
+class DefaultPlanner(PlannerBase[_Stage, _PlannedData]):
 
     def _add_function(self, function: IFunctionDefinition, *inp_data: _PlannedData) -> tuple[IProxyData, ...]:
         check_input(function.consumes, tuple(d.schema for d in inp_data))
-        planned_func = _PlannedFunction(function, *inp_data)
+        planned_func = _Stage(function, *inp_data)
         if planned_func.calculated_hash in self._functions:
             raise PlanningError("A function with the same hash is already planned")
         self._functions[planned_func.calculated_hash] = planned_func

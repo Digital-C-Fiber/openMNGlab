@@ -22,7 +22,7 @@ class IPlannedData(IPlannedElement, ABC):
         ...
 
 
-class IPlannedFunction(IPlannedElement, ABC):
+class IStage(IPlannedElement, ABC):
     @property
     @abstractmethod
     def definition(self) -> IFunctionDefinition:
@@ -43,7 +43,7 @@ class IExecutionPlan(ABC):
 
     @property
     @abstractmethod
-    def functions(self) -> Mapping[bytes, IPlannedFunction]:
+    def stages(self) -> Mapping[bytes, IStage]:
         ...
 
     @property

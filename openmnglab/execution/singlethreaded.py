@@ -36,7 +36,7 @@ class SingleThreadedExecutor(IExecutor):
         return proxy_data.calculated_hash in self._data
 
     def execute(self):
-        for planned_func in sorted(self._plan.functions.values(), key=lambda x: x.depth):
+        for planned_func in sorted(self._plan.stages.values(), key=lambda x: x.depth):
             input_values = tuple(self._data[dependency.calculated_hash] for dependency in planned_func.data_in)
             func = planned_func.definition.new_function()
             _func_setinput(func, *input_values)

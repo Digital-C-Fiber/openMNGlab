@@ -8,7 +8,7 @@ from openmnglab.datamodel.interface import IDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
 from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
 from openmnglab.planning.interface import IExecutionPlanner, IProxyData
-from openmnglab.planning.plan.interface import IExecutionPlan, IPlannedFunction, IPlannedData, IPlannedElement
+from openmnglab.planning.plan.interface import IExecutionPlan, IStage, IPlannedData, IPlannedElement
 
 
 def check_input(expected_schemes: Optional[Collection[IDataScheme]], actual_schemes: Optional[Collection[IDataScheme]]):
@@ -38,16 +38,16 @@ class ProxyData(IProxyData):
 
 
 class ExecutionPlan(IExecutionPlan):
-    def __init__(self, functions: Iterable[IPlannedFunction] | Mapping[bytes, IPlannedFunction],
+    def __init__(self, functions: Iterable[IStage] | Mapping[bytes, IStage],
                  data: Iterable[IPlannedData] | Mapping[bytes, IPlannedData]):
         def to_mapping(param: Iterable[IPlannedElement] | Mapping[bytes, IPlannedElement]):
             return param if isinstance(param, Mapping) else {element.calculated_hash: element for element in param}
 
-        self._functions: Mapping[bytes, IPlannedFunction] = to_mapping(functions)
+        self._functions: Mapping[bytes, IStage] = to_mapping(functions)
         self._proxy_data: Mapping[bytes, IPlannedData] = to_mapping(data)
 
     @property
-    def functions(self) -> Mapping[bytes, IPlannedFunction]:
+    def stages(self) -> Mapping[bytes, IStage]:
         return self._functions
 
     @property
@@ -55,7 +55,7 @@ class ExecutionPlan(IExecutionPlan):
         return self._proxy_data
 
 
-_FuncT = TypeVar('_FuncT', bound=IPlannedFunction)
+_FuncT = TypeVar('_FuncT', bound=IStage)
 _DataT = TypeVar('_DataT', bound=IPlannedData)
 
 
