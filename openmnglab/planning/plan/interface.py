@@ -66,5 +66,5 @@ class IExecutionPlan(ABC):
 DCT = TypeVar('DCT', bound=IDataContainer)
 
 
-class IProxyData(IPlannedElement, ABC, Generic[DCT]):
+class IProxyData(IHashIdentifiedElement, ABC, Generic[DCT]):
     ...

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import Collection, TypeVar, Generic, Optional, Iterable, Mapping
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
@@ -26,14 +25,17 @@ def check_input(expected_schemes: Optional[Collection[IDataScheme]], actual_sche
             raise FunctionArgumentSchemaError(pos) from ds_compat_err
 
 
-@dataclass(frozen=True)
 class ProxyData(IProxyData):
-    calculated_hash: bytes
-    depth: int
+    def __init__(self, planned_hash: bytes):
+        self._planned_hash = planned_hash
+
+    @property
+    def calculated_hash(self) -> bytes:
+        return self._planned_hash
 
     @staticmethod
     def copy_from(other: IProxyData) -> ProxyData:
-        return ProxyData(other.calculated_hash, other.depth)
+        return ProxyData(other.calculated_hash)
 
 
 class ExecutionPlan(IExecutionPlan):
