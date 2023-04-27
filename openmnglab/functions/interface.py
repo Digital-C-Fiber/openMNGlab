@@ -12,7 +12,7 @@ class IFunction(ABC):
     ======================
     * :meth:`set_input` **should not validate the data**, but only store it internally so subsequent calls to :meth:`execute` or :meth:`validate_input` can access it.
     * Implementations should assume that they have an *exclusive copy of the data* to work on and should not copy input data defensively
-    * Implementations may perform additional validations for the data in :meth:`validate_input` for debugging purposes, but there is no guarantee that the method is called by the execution layer.
+    * Implementations may perform additional validations for the data in :meth:`validate_input` for debugging purposes, but there is no guarantee that the method is called by the integration layer.
     """
 
     @abstractmethod
