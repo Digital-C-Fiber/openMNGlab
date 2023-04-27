@@ -5,13 +5,7 @@ from typing import Mapping, Sequence, TypeVar, Generic
 
 from openmnglab.datamodel.interface import IDataScheme, IDataContainer
 from openmnglab.functions.interface import IFunctionDefinition
-
-
-class IHashIdentifiedElement(ABC):
-    @property
-    @abstractmethod
-    def calculated_hash(self) -> bytes:
-        ...
+from openmnglab.shared import IHashIdentifiedElement
 
 
 class IPlannedElement(IHashIdentifiedElement, ABC):
@@ -25,11 +19,6 @@ class IPlannedData(IPlannedElement, ABC):
     @property
     @abstractmethod
     def schema(self) -> IDataScheme:
-        ...
-
-    @property
-    @abstractmethod
-    def produced_by(self) -> IPlannedFunction:
         ...
 
 
