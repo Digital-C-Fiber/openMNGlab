@@ -48,7 +48,7 @@ class IExecutionPlan(ABC):
 
     @property
     @abstractmethod
-    def proxy_data(self) -> Mapping[bytes, IPlannedData]:
+    def planned_data(self) -> Mapping[bytes, IPlannedData]:
         ...
 
 

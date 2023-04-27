@@ -51,7 +51,7 @@ class ExecutionPlan(IExecutionPlan):
         return self._functions
 
     @property
-    def proxy_data(self) -> Mapping[bytes, IPlannedData]:
+    def planned_data(self) -> Mapping[bytes, IPlannedData]:
         return self._proxy_data
 
 
