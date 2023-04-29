@@ -4,8 +4,8 @@ from openmnglab.datamodel.interface import IDataContainer
 from openmnglab.execution.exceptions import FunctionInputError, FunctionExecutionError, FunctionReturnCountMissmatch
 from openmnglab.execution.interface import IExecutor
 from openmnglab.functions.interface import IFunction
-from openmnglab.planning.interface import IProxyData
 from openmnglab.planning.plan.interface import IExecutionPlan, IPlannedData
+from openmnglab.planning.interface import IProxyData
 
 
 def _func_setinput(func: IFunction, *inp: IDataContainer):
@@ -15,9 +15,10 @@ def _func_setinput(func: IFunction, *inp: IDataContainer):
         raise FunctionInputError("failed to set input of function") from e
 
 
-def _func_exec(func: IFunction) -> Optional[Iterable[IDataContainer]]:
+def _func_exec(func: IFunction) -> Iterable[IDataContainer]:
     try:
-        return func.execute()
+        ret = func.execute()
+        return ret if ret is not None else tuple()
     except Exception as e:
         raise FunctionExecutionError("function failed to execute") from e
 
@@ -35,7 +36,7 @@ class SingleThreadedExecutor(IExecutor):
         return proxy_data.calculated_hash in self._data
 
     def execute(self):
-        for planned_func in sorted(self._plan.functions.values(), key=lambda x: x.depth):
+        for planned_func in sorted(self._plan.stages.values(), key=lambda x: x.depth):
             input_values = tuple(self._data[dependency.calculated_hash] for dependency in planned_func.data_in)
             func = planned_func.definition.new_function()
             _func_setinput(func, *input_values)

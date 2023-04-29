@@ -5,7 +5,14 @@ from typing import Mapping, Sequence
 
 from openmnglab.datamodel.interface import IDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
-from openmnglab.planning.interface import IPlannedElement
+from openmnglab.shared import IHashIdentifiedElement
+
+
+class IPlannedElement(IHashIdentifiedElement, ABC):
+    @property
+    @abstractmethod
+    def depth(self) -> int:
+        ...
 
 
 class IPlannedData(IPlannedElement, ABC):
@@ -14,13 +21,8 @@ class IPlannedData(IPlannedElement, ABC):
     def schema(self) -> IDataScheme:
         ...
 
-    @property
-    @abstractmethod
-    def produced_by(self) -> IPlannedFunction:
-        ...
 
-
-class IPlannedFunction(IPlannedElement, ABC):
+class IStage(IPlannedElement, ABC):
     @property
     @abstractmethod
     def definition(self) -> IFunctionDefinition:
@@ -41,10 +43,12 @@ class IExecutionPlan(ABC):
 
     @property
     @abstractmethod
-    def functions(self) -> Mapping[bytes, IPlannedFunction]:
+    def stages(self) -> Mapping[bytes, IStage]:
         ...
 
     @property
     @abstractmethod
-    def proxy_data(self) -> Mapping[bytes, IPlannedData]:
+    def planned_data(self) -> Mapping[bytes, IPlannedData]:
         ...
+
+
