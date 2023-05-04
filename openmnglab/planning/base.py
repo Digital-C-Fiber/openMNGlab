@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import Collection, TypeVar, Generic, Optional, Iterable, Mapping
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
@@ -9,7 +8,7 @@ from openmnglab.datamodel.interface import IDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
 from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
 from openmnglab.planning.interface import IExecutionPlanner, IProxyData
-from openmnglab.planning.plan.interface import IExecutionPlan, IPlannedFunction, IPlannedData
+from openmnglab.planning.plan.interface import IExecutionPlan, IStage, IPlannedData, IPlannedElement
 
 
 def check_input(expected_schemes: Optional[Collection[IDataScheme]], actual_schemes: Optional[Collection[IDataScheme]]):
@@ -25,23 +24,38 @@ def check_input(expected_schemes: Optional[Collection[IDataScheme]], actual_sche
             raise FunctionArgumentSchemaError(pos) from ds_compat_err
 
 
-@dataclass(frozen=True)
 class ProxyData(IProxyData):
-    calculated_hash: bytes
-    depth: int
+    def __init__(self, planned_hash: bytes):
+        self._planned_hash = planned_hash
+
+    @property
+    def calculated_hash(self) -> bytes:
+        return self._planned_hash
 
     @staticmethod
     def copy_from(other: IProxyData) -> ProxyData:
-        return ProxyData(other.calculated_hash, other.depth)
+        return ProxyData(other.calculated_hash)
 
 
-@dataclass
 class ExecutionPlan(IExecutionPlan):
-    functions: Mapping[bytes, IPlannedFunction]
-    proxy_data: Mapping[bytes, IProxyData]
+    def __init__(self, functions: Iterable[IStage] | Mapping[bytes, IStage],
+                 data: Iterable[IPlannedData] | Mapping[bytes, IPlannedData]):
+        def to_mapping(param: Iterable[IPlannedElement] | Mapping[bytes, IPlannedElement]):
+            return param if isinstance(param, Mapping) else {element.calculated_hash: element for element in param}
+
+        self._functions: Mapping[bytes, IStage] = to_mapping(functions)
+        self._proxy_data: Mapping[bytes, IPlannedData] = to_mapping(data)
+
+    @property
+    def stages(self) -> Mapping[bytes, IStage]:
+        return self._functions
+
+    @property
+    def planned_data(self) -> Mapping[bytes, IPlannedData]:
+        return self._proxy_data
 
 
-_FuncT = TypeVar('_FuncT', bound=IPlannedFunction)
+_FuncT = TypeVar('_FuncT', bound=IStage)
 _DataT = TypeVar('_DataT', bound=IPlannedData)
 
 
