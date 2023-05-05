@@ -1,18 +1,17 @@
 from abc import ABC
-from typing import Optional, Sequence, Generic
+from typing import Generic
 
-from openmnglab.datamodel.interface import IDataScheme
-from openmnglab.functions.interface import IFunction, IFunctionDefinition, ISourceFunction, Prods
+from openmnglab.functions.interface import IFunction, IFunctionDefinition, ISourceFunction, Prods, \
+    IStaticFunctionDefinition, ISourceFunctionDefinition
 from openmnglab.util.hashing import Hash
 
-
-class DefaultFunctionBase(IFunction, ABC):
+class FunctionBase(IFunction, ABC):
 
     def validate_input(self) -> bool:
         return True
 
 
-class SourceFunctionBase(DefaultFunctionBase, ISourceFunction, ABC):
+class SourceFunctionBase(FunctionBase, ISourceFunction, ABC):
 
     def set_input(self):
         """Does nothing as source functions don't accept any input"""
@@ -39,10 +38,12 @@ class FunctionDefinitionBase(Generic[*Prods], IFunctionDefinition[*Prods], ABC):
         hashgen.update(self.config_hash)
         return hashgen.digest()
 
-    @property
-    def consumes(self) -> Optional[Sequence[IDataScheme]]:
-        return None
 
-    @property
-    def produces(self) -> Optional[Sequence[IDataScheme]]:
-        return None
+class StaticFunctionDefinitionBase(Generic[*Prods], FunctionDefinitionBase[*Prods], IStaticFunctionDefinition[*Prods],
+                                   ABC):
+    ...
+
+
+class SourceFunctionDefinitionBase(Generic[*Prods], StaticFunctionDefinitionBase[*Prods],
+                                   ISourceFunctionDefinition[*Prods], ABC):
+    ...

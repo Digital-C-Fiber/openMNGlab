@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC
 from typing import TypeVar, Generic
 
 import pandas as pd
@@ -7,7 +8,8 @@ import pandera as pa
 import quantities as pq
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError, DataSchemeConformityError
-from openmnglab.datamodel.interface import IDataContainer, IDataScheme
+from openmnglab.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme, \
+    IStaticDataScheme
 
 TPandas = TypeVar('TPandas', pd.Series, pd.DataFrame)
 
@@ -43,7 +45,7 @@ class PandasContainer(IDataContainer[TPandas], Generic[TPandas]):
 TPandasScheme = TypeVar("TPandasScheme", pa.DataFrameSchema, pa.SeriesSchema)
 
 
-class PandasDataScheme(IDataScheme, Generic[TPandasScheme]):
+class PandasDataScheme(Generic[TPandasScheme], ABC):
 
     def __init__(self, schema: TPandasScheme):
         if not isinstance(schema, (pa.DataFrameSchema, pa.SeriesSchema)):
@@ -51,18 +53,32 @@ class PandasDataScheme(IDataScheme, Generic[TPandasScheme]):
                 f"Argument 'model' must be either a pandas series or a dataframe, is {type(schema).__qualname__}")
         self._schema = schema
 
-    def is_compatible(self, other: IDataScheme) -> bool:
-        if not isinstance(other, PandasDataScheme):
-            raise DataSchemeCompatibilityError(
-                f"Other data scheme of type {type(other).__qualname__} is not a pandas data scheme")
-        return self._schema == other._schema
 
-    def verify(self, data: IDataContainer) -> bool:
-        if not isinstance(data, PandasContainer):
+class PandasInputDataScheme(Generic[TPandasScheme], PandasDataScheme[TPandasScheme], IInputDataScheme):
+
+    def accepts(self, output_data_scheme: IOutputDataScheme) -> bool:
+        if not isinstance(output_data_scheme, PandasDataScheme):
+            raise DataSchemeCompatibilityError(
+                f"Other data scheme of type {type(output_data_scheme).__qualname__} is not a pandas data scheme")
+        return self._schema == output_data_scheme._schema
+
+    def transform(self, data_container: IDataContainer) -> IDataContainer:
+        return data_container
+
+
+class PandasOutputDataScheme(Generic[TPandasScheme], PandasDataScheme[TPandasScheme], IOutputDataScheme):
+
+    def validate(self, data_container: IDataContainer) -> bool:
+        if not isinstance(data_container, PandasContainer):
             raise DataSchemeConformityError(
-                f"PandasDataScheme expects a PandasContainer for validation but got an object of type {type(data).__qualname__}")
+                f"PandasDataScheme expects a PandasContainer for validation but got an object of type {type(data_container).__qualname__}")
         try:
-            _ = self._schema.validate(data.data)
+            _ = self._schema.validate(data_container.data)
             return True
         except Exception as e:
             raise DataSchemeConformityError("Pandera model validation failed") from e
+
+
+class PandasStaticDataScheme(Generic[TPandasScheme], PandasInputDataScheme[TPandasScheme],
+                             PandasOutputDataScheme[TPandasScheme], IStaticDataScheme):
+    ...
