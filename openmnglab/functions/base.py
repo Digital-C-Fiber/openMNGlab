@@ -5,6 +5,7 @@ from openmnglab.functions.interface import IFunction, IFunctionDefinition, ISour
     IStaticFunctionDefinition, ISourceFunctionDefinition
 from openmnglab.util.hashing import Hash
 
+
 class FunctionBase(IFunction, ABC):
 
     def validate_input(self) -> bool:

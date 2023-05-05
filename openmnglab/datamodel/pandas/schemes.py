@@ -1,6 +1,6 @@
 from pandera import Column, Index, DataFrameSchema, SeriesSchema, MultiIndex
 
-from openmnglab.datamodel.pandas.model import PandasDataScheme, PandasStaticDataScheme
+from openmnglab.datamodel.pandas.model import PandasStaticDataScheme
 
 TRACK = "track"
 SPIKE_TS = "spike_ts"
