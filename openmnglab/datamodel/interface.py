@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from io import BytesIO
 from typing import TypeVar, Generic
 
 T_co = TypeVar('T_co', covariant=True)
@@ -17,6 +18,10 @@ class IDataContainer(ABC, Generic[T_co]):
         """
         :return: Primary datastructure stored in this container
         """
+        ...
+
+    @abstractmethod
+    def deep_copy(self) -> IDataContainer[T_co]:
         ...
 
 
@@ -40,7 +45,7 @@ class IDataScheme(ABC):
         ...
 
     @abstractmethod
-    def verify(self, data: object) -> bool:
+    def verify(self, data: IDataContainer) -> bool:
         """
         Verifies that a data object conforms to the schema defined by this instance.
         May raise an exception containing more information why the data does not conform to this scheme
