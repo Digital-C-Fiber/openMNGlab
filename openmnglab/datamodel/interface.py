@@ -61,7 +61,7 @@ class IInputDataScheme(ABC):
         ...
 
     @abstractmethod
-    def transform(self, data_container) -> IDataContainer:
+    def transform(self, data_container: IDataContainer) -> IDataContainer:
         """Transform a data container to fit this scheme
 
         Modifies the contents of the data container so they fit an anonymous data scheme which is actually accepted by the function.

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Collection, TypeVar, Generic, Optional, Iterable, Mapping
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
-from openmnglab.datamodel.interface import IDataScheme, IInputDataScheme, IOutputDataScheme
+from openmnglab.datamodel.interface import IInputDataScheme, IOutputDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
 from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
 from openmnglab.planning.interface import IExecutionPlanner, IProxyData
