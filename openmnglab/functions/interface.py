@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Iterable, Sequence, Literal, TypeVarTuple, Generic
 
-from openmnglab.datamodel.interface import IDataContainer, IDataScheme
+from openmnglab.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme
 
 
 class IFunction(ABC):
@@ -65,12 +65,11 @@ class IFunctionDefinition(ABC, Generic[*Prods]):
 
     @property
     @abstractmethod
-    def consumes(self) -> Optional[Sequence[IDataScheme]]:
+    def consumes(self) -> Optional[Sequence[IInputDataScheme] | IInputDataScheme]:
         ...
 
-    @property
     @abstractmethod
-    def produces(self) -> Optional[Sequence[IDataScheme]]:
+    def production_for(self, *inputs: IInputDataScheme) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
         ...
 
     @abstractmethod
@@ -78,12 +77,24 @@ class IFunctionDefinition(ABC, Generic[*Prods]):
         ...
 
 
-class ISourceFunctionDefinition(Generic[*Prods], IFunctionDefinition[*Prods], ABC):
-
+class IStaticFunctionDefinition(Generic[*Prods], IFunctionDefinition[*Prods], ABC):
     @property
     @abstractmethod
-    def consumes(self) -> Literal[None]:
+    def produces(self) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
         ...
+
+    def production_for(self, *_: IInputDataScheme) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
+        return self.produces
+
+
+class ISourceFunctionDefinition(Generic[*Prods], IStaticFunctionDefinition[*Prods], ABC):
+
+    @property
+    def consumes(self) -> Literal[None]:
+        return None
+
+    def production_for(self) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
+        return self.produces
 
     @abstractmethod
     def new_function(self) -> ISourceFunction:

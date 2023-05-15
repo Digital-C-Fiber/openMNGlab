@@ -4,21 +4,23 @@ from abc import ABC, abstractmethod
 from typing import Collection, TypeVar, Generic, Optional, Iterable, Mapping
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
-from openmnglab.datamodel.interface import IDataScheme
+from openmnglab.datamodel.interface import IInputDataScheme, IOutputDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
 from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
 from openmnglab.planning.interface import IExecutionPlanner, IProxyData
 from openmnglab.planning.plan.interface import IExecutionPlan, IStage, IPlannedData, IPlannedElement
 
 
-def check_input(expected_schemes: Optional[Collection[IDataScheme]], actual_schemes: Optional[Collection[IDataScheme]]):
-    expected_schemes = expected_schemes if expected_schemes is not None else tuple()
-    actual_schemes = actual_schemes if actual_schemes is not None else tuple()
+def check_input(expected_schemes: Optional[Collection[IInputDataScheme]], actual_schemes: Optional[Collection[IOutputDataScheme]]):
+    expected_schemes: Collection[IInputDataScheme] = expected_schemes if expected_schemes is not None else tuple()
+    actual_schemes: Collection[IOutputDataScheme] = actual_schemes if actual_schemes is not None else tuple()
     if len(expected_schemes) != len(actual_schemes):
         raise InvalidFunctionArgumentCountError(len(expected_schemes), len(actual_schemes))
     for pos, (expected_scheme, actual_scheme) in enumerate(zip(expected_schemes, actual_schemes)):
+        expected_scheme: IInputDataScheme
+        actual_scheme: IOutputDataScheme
         try:
-            if not expected_scheme.is_compatible(actual_scheme):
+            if not expected_scheme.accepts(actual_scheme):
                 raise DataSchemeCompatibilityError("Expected scheme is not compatible with actual scheme")
         except DataSchemeCompatibilityError as ds_compat_err:
             raise FunctionArgumentSchemaError(pos) from ds_compat_err
