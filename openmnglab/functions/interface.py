@@ -65,11 +65,11 @@ class IFunctionDefinition(ABC, Generic[*Prods]):
 
     @property
     @abstractmethod
-    def consumes(self) -> Optional[Sequence[IInputDataScheme], IInputDataScheme]:
+    def consumes(self) -> Optional[Sequence[IInputDataScheme] | IInputDataScheme]:
         ...
 
     @abstractmethod
-    def production_for(self, *inputs: IInputDataScheme) -> Optional[Sequence[IOutputDataScheme], IOutputDataScheme]:
+    def production_for(self, *inputs: IInputDataScheme) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
         ...
 
     @abstractmethod
@@ -80,10 +80,10 @@ class IFunctionDefinition(ABC, Generic[*Prods]):
 class IStaticFunctionDefinition(Generic[*Prods], IFunctionDefinition[*Prods], ABC):
     @property
     @abstractmethod
-    def produces(self) -> Optional[Sequence[IOutputDataScheme], IOutputDataScheme]:
+    def produces(self) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
         ...
 
-    def production_for(self, *_: IInputDataScheme) -> Optional[Sequence[IOutputDataScheme], IOutputDataScheme]:
+    def production_for(self, *_: IInputDataScheme) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
         return self.produces
 
 
@@ -93,7 +93,7 @@ class ISourceFunctionDefinition(Generic[*Prods], IStaticFunctionDefinition[*Prod
     def consumes(self) -> Literal[None]:
         return None
 
-    def production_for(self) -> Optional[Sequence[IOutputDataScheme], IOutputDataScheme]:
+    def production_for(self) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
         return self.produces
 
     @abstractmethod
