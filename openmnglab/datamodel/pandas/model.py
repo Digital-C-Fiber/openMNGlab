@@ -53,6 +53,10 @@ class PandasDataScheme(Generic[TPandasScheme], ABC):
                 f"Argument 'model' must be either a pandas series or a dataframe, is {type(schema).__qualname__}")
         self._schema = schema
 
+    @property
+    def pandera_schema(self) -> TPandasScheme:
+        return self._schema
+
 
 class PandasInputDataScheme(Generic[TPandasScheme], PandasDataScheme[TPandasScheme], IInputDataScheme):
 
