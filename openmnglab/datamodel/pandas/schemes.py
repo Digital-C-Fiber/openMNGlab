@@ -1,3 +1,5 @@
+import numpy as np
+from pandas import Interval, IntervalDtype
 from pandera import Column, Index, DataFrameSchema, SeriesSchema, MultiIndex
 
 from openmnglab.datamodel.pandas.model import PandasStaticDataScheme
@@ -15,7 +17,7 @@ CONT_REC = "continuous recording"
 
 
 def time_waveform() -> PandasStaticDataScheme[SeriesSchema]:
-    return PandasStaticDataScheme(SeriesSchema(float, index=Index(float)))
+    return PandasStaticDataScheme(SeriesSchema(np.float32, index=Index(float)))
 
 
 def int_list() -> PandasStaticDataScheme[SeriesSchema]:
@@ -29,6 +31,9 @@ def float_list() -> PandasStaticDataScheme[SeriesSchema]:
 def str_float_list() -> PandasStaticDataScheme[SeriesSchema]:
     return PandasStaticDataScheme(SeriesSchema(str, index=Index(float)))
 
+def generic_interval_list() -> PandasStaticDataScheme[SeriesSchema]:
+    return PandasStaticDataScheme(SeriesSchema(IntervalDtype))
+
 
 def related_spikes() -> PandasStaticDataScheme[DataFrameSchema]:
     return PandasStaticDataScheme(DataFrameSchema({
@@ -39,9 +44,7 @@ def related_spikes() -> PandasStaticDataScheme[DataFrameSchema]:
         name="related spikes"))
 
 
-def sorted_spikes() -> PandasStaticDataScheme[DataFrameSchema]:
-    return PandasStaticDataScheme(DataFrameSchema({
-        SPIKE_TS: Column(float),
-    },
+def sorted_spikes() -> PandasStaticDataScheme[SeriesSchema]:
+    return PandasStaticDataScheme(SeriesSchema(float,
         index=MultiIndex(indexes=[Index(str, name=TRACK), Index(int, name=TRACK_SPIKE_IDX)]),
-        name="sorted spikes"))
+        name=SPIKE_TS))
