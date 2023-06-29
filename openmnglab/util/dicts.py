@@ -6,9 +6,8 @@ _VT_co = TypeVar('_VT_co', covariant=True)
 
 def get_any_key(dct: Mapping[_KT, _VT_co], *keys: _KT) -> Optional[_KT]:
     for key in keys:
-        candidate = dct.get(key)
-        if candidate is not None:
-            return candidate
+        if key in dct.keys():
+            return key
     return None
 
 

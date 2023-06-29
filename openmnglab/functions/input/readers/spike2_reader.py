@@ -1,5 +1,6 @@
 import re
 from dataclasses import dataclass
+from itertools import chain
 from pathlib import Path
 from typing import Optional, Any, Mapping, Sequence, OrderedDict
 
@@ -17,33 +18,27 @@ from openmnglab.util.dicts import get_any
 
 @dataclass
 class Spike2Channel:
-    channel_unit: pq.Quantity = pq.dimensionless
-    time_unit: pq.Quantity = pq.s
-    chan_num: Optional[int] = None
-    struct_name: Optional[str] = None
-    chan_name: Optional[str] = None
-    rename_to: Optional[str] = None
-    code_mapping: Optional[Mapping[int,str]] = None
-    code_column_name: Optional[str] = None
+    ident: int | str
+    unit: pq.Quantity = pq.dimensionless
+    idx_unit: pq.Quantity = pq.s
+    name: Optional[str] = None
+    read_codes: bool = False
+    code_map: Optional[Mapping[int,str]] = None
+    codes_label: Optional[str] = None
 
-    @property
-    def read_codes(self) -> bool:
-        return self.code_column_name is not None
-    
 
 class Spike2ReaderFunc(SourceFunctionBase):
     _channel_regex = re.compile(r"_Ch(\d*)")
 
-    def __init__(self, path: str | Path, cont_signals: Optional[OrderedDict[str | int, pq.Quantity]] = None,
-                 markers: Optional[Sequence[str | int]] = None,
-                 text: Optional[Sequence[str | int]] = None,
-                 renames: Optional[Mapping[str | int, str]] = None, matstruct_prefix=""):
-        self._cont_signals = cont_signals if cont_signals is not None else dict()
-        self._markers = markers
-        self._renames = renames if renames is not None else dict()
+    def __init__(self, path: str | Path, cont_signals: Optional[Sequence[Spike2Channel]] = None,
+                 markers: Optional[Sequence[Spike2Channel]] = None,
+                 text: Optional[Sequence[Spike2Channel]] = None,
+                 matstruct_prefix=""):
+        self._cont_signals = cont_signals if cont_signals is not None else tuple()
+        self._markers = markers if markers is not None else tuple()
+        self._text_structs = text if text is not None else tuple()
         self._path = path
         self._matstruct_prefix = matstruct_prefix
-        self._text_structs = text
 
     @classmethod
     def _get_chan_identifier(cls, matlab_struct_name: str) -> str | int:
@@ -53,15 +48,14 @@ class Spike2ReaderFunc(SourceFunctionBase):
     def _read_spike2mat_structs(self) -> dict[str | int, dict[str, Any]]:
         matfile = pymat.read_mat(self._path)
         structs = dict()
-        chan_idents = set(self._cont_signals.keys())
-        chan_idents.update(self._text_structs)
-        chan_idents.update(self._markers)
+        chan_idents: dict[str|int, Spike2Channel] = {v.ident: v for v in chain(self._cont_signals, self._text_structs, self._markers)}
         for matname, struct in matfile.items():
             struct_key = self._get_chan_identifier(matname)
-            if matname.startswith(self._matstruct_prefix) and 'title' in struct and (
-                    struct_key in chan_idents or str(struct['title']) in chan_idents):
-                struct['title'] = get_any(self._renames, str(struct['title']), struct_key, default=str(struct['title']))
-            structs[struct_key] = struct
+            if matname.startswith(self._matstruct_prefix) and 'title' in struct:
+                candidate: Optional[Spike2Channel] = get_any(chan_idents, str(struct['title']), struct_key)
+                if candidate is not None:
+                    struct['title'] = candidate.name if candidate.name is not None else struct['title']
+                    structs[candidate.ident] = struct
         return structs
 
     @staticmethod
@@ -95,13 +89,13 @@ class Spike2ReaderFunc(SourceFunctionBase):
     def execute(self) -> list[PandasContainer, ...]:
         mat_structs = self._read_spike2mat_structs()
         ret_list = list()
-        for struct_key, cont_sig_unit in self._cont_signals.items():
-            series = self._load_sig_chan(mat_structs[struct_key])
-            ret_list.append(PandasContainer(series, {series.name: cont_sig_unit, series.index.name: pq.s}))
-        for struct_key in self._markers:
-            marker = self._load_marker_chan(mat_structs[struct_key])
-            ret_list.append(PandasContainer(marker, {marker.name: pq.s}))
-        for struct_key in self._text_structs:
-            text = self._load_text_chan(mat_structs[struct_key])
-            ret_list.append(PandasContainer(text, {text.name: pq.dimensionless, text.index.name: pq.s}))
+        for sig_channel in self._cont_signals:
+            series = self._load_sig_chan(mat_structs[sig_channel.ident])
+            ret_list.append(PandasContainer(series, {series.name: sig_channel.unit, series.index.name: sig_channel.idx_unit}))
+        for marker_channel in self._markers:
+            marker = self._load_marker_chan(mat_structs[marker_channel.ident])
+            ret_list.append(PandasContainer(marker, {marker.name: marker_channel.unit}))
+        for txt_channel in self._text_structs:
+            text = self._load_text_chan(mat_structs[txt_channel.ident])
+            ret_list.append(PandasContainer(text, {text.name: txt_channel.unit, text.index.name: txt_channel.idx_unit}))
         return ret_list
