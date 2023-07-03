@@ -7,7 +7,7 @@ import pandas as pd
 import pandera as pa
 import quantities as pq
 
-from openmnglab.model.datamodel.exceptions import DataSchemeCompatibilityError, DataSchemeConformityError
+from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError, DataSchemeConformityError
 from openmnglab.model.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme, \
     IStaticDataScheme
 from openmnglab.datamodel.pandas.verification import compare_schemas

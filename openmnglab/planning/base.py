@@ -3,10 +3,10 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Collection, TypeVar, Generic, Optional, Iterable, Mapping
 
-from openmnglab.model.datamodel.exceptions import DataSchemeCompatibilityError
+from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
 from openmnglab.model.datamodel.interface import IInputDataScheme, IOutputDataScheme
 from openmnglab.model.functions.interface import IFunctionDefinition
-from openmnglab.model.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
+from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
 from openmnglab.model.planning.interface import IExecutionPlanner, IProxyData
 from openmnglab.model.planning.plan.interface import IExecutionPlan, IStage, IPlannedData, IPlannedElement
 

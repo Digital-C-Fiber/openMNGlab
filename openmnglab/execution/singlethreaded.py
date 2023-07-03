@@ -1,7 +1,7 @@
 from typing import Mapping, Iterable
 
 from openmnglab.model.datamodel.interface import IDataContainer
-from openmnglab.model.execution.exceptions import FunctionInputError, FunctionExecutionError, FunctionReturnCountMissmatch
+from openmnglab.execution.exceptions import FunctionInputError, FunctionExecutionError, FunctionReturnCountMissmatch
 from openmnglab.model.execution.interface import IExecutor
 from openmnglab.model.functions.interface import IFunction
 from openmnglab.model.planning.interface import IProxyData

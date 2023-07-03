@@ -9,7 +9,7 @@ import quantities as pq
 from pandas import DataFrame, DatetimeTZDtype, PeriodDtype, SparseDtype, IntervalDtype, CategoricalDtype, StringDtype, \
     BooleanDtype
 
-from openmnglab.model.datamodel.exceptions import DataSchemeCompatibilityError
+from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
 from openmnglab.model.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme
 from openmnglab.datamodel.pandas.model import PandasOutputDataScheme, PandasInputDataScheme, \
     PandasDataScheme
