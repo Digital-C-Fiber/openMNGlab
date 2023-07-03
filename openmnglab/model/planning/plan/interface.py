@@ -5,7 +5,7 @@ from typing import Mapping, Sequence
 
 from openmnglab.model.datamodel.interface import IOutputDataScheme
 from openmnglab.model.functions.interface import IFunctionDefinition
-from openmnglab.shared import IHashIdentifiedElement
+from openmnglab.model.shared import IHashIdentifiedElement
 
 
 class IPlannedElement(IHashIdentifiedElement, ABC):
