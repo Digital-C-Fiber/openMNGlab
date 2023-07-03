@@ -13,7 +13,7 @@ from openmnglab.datamodel.pandas.model import PandasOutputDataScheme
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.model.functions.interface import IFunction
 from openmnglab.functions.processing.funcs.windowing import WindowingFunc
-from openmnglab.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IProxyData
 from openmnglab.util.hashing import Hash
 
 

@@ -10,7 +10,7 @@ from openmnglab.datamodel.pandas.model import PandasInputDataScheme, PandasOutpu
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.principle_components import ComponentFunc, PRINCIPLE_COMPONENTS
 from openmnglab.functions.processing.interval_data import IntervalDataInputSchema
-from openmnglab.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IProxyData
 
 
 class GeneralDiffList(PandasInputDataScheme[pa.DataFrameSchema]):

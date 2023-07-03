@@ -8,7 +8,7 @@ from openmnglab.datamodel.pandas.model import PandasDataScheme
 from openmnglab.datamodel.pandas.schemes import time_waveform, str_float_list, sorted_spikes
 from openmnglab.functions.base import SourceFunctionDefinitionBase
 from openmnglab.functions.input.readers.funcs.dapsys_reader import DapsysReaderFunc
-from openmnglab.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IProxyData
 from openmnglab.util.hashing import Hash
 
 

@@ -3,9 +3,9 @@ from __future__ import annotations
 from openmnglab.model.datamodel.interface import IOutputDataScheme
 from openmnglab.model.functions.interface import IFunctionDefinition
 from openmnglab.planning.base import PlannerBase, check_input, ProxyData
-from openmnglab.planning.exceptions import PlanningError
-from openmnglab.planning.interface import IProxyData
-from openmnglab.planning.plan.interface import IStage, IPlannedData
+from openmnglab.model.planning.exceptions import PlanningError
+from openmnglab.model.planning.interface import IProxyData
+from openmnglab.model.planning.plan.interface import IStage, IPlannedData
 from openmnglab.util.hashing import Hash
 
 

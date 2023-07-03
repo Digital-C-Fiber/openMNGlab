@@ -5,7 +5,7 @@ from typing import Optional, TypeVar, Generic
 
 from openmnglab.model.datamodel.interface import IDataContainer
 from openmnglab.model.functions.interface import IFunctionDefinition, ISourceFunctionDefinition, Prods
-from openmnglab.planning.plan.interface import IExecutionPlan
+from openmnglab.model.planning.plan.interface import IExecutionPlan
 from openmnglab.shared import IHashIdentifiedElement
 
 

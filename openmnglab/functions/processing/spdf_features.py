@@ -9,7 +9,7 @@ from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.spdf_features import SPDF_FEATURES, FeatureFunc
 from openmnglab.functions.processing.principle_components import PrincipleComponentsInputScheme
 from openmnglab.functions.processing.interval_data import IntervalDataInputSchema
-from openmnglab.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IProxyData
 
 
 class SPDFFeaturesBaseSchema(PandasDataScheme[pa.DataFrameSchema], ABC):
