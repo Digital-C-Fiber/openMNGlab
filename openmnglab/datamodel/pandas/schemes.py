@@ -14,6 +14,9 @@ RESP_IDX = "resp_idx"
 TRACK_SPIKE_IDX = "track_spike_idx"
 TIMESTAMP = "timestamp"
 CONT_REC = "continuous recording"
+GLOBAL_STIM_ID = "global stim id"
+STIM_TYPE = "global stim name"
+STIM_TYPE_ID = "stime type id"
 
 
 def time_waveform() -> PandasStaticDataScheme[SeriesSchema]:
@@ -34,6 +37,8 @@ def str_float_list() -> PandasStaticDataScheme[SeriesSchema]:
 def generic_interval_list() -> PandasStaticDataScheme[SeriesSchema]:
     return PandasStaticDataScheme(SeriesSchema(IntervalDtype))
 
+def stimulus_list() -> PandasStaticDataScheme[SeriesSchema]:
+    return PandasStaticDataScheme(SeriesSchema(float, index=MultiIndex(indexes=[Index(int, name=GLOBAL_STIM_ID), Index(str, name=STIM_TYPE), Index(int, name=STIM_TYPE_ID)]), name=STIM_TS))
 
 def related_spikes() -> PandasStaticDataScheme[DataFrameSchema]:
     return PandasStaticDataScheme(DataFrameSchema({
@@ -46,5 +51,5 @@ def related_spikes() -> PandasStaticDataScheme[DataFrameSchema]:
 
 def sorted_spikes() -> PandasStaticDataScheme[SeriesSchema]:
     return PandasStaticDataScheme(SeriesSchema(float,
-        index=MultiIndex(indexes=[Index(str, name=TRACK), Index(int, name=TRACK_SPIKE_IDX)]),
+        index=MultiIndex(indexes=[Index(int, name=GLOBAL_STIM_ID), Index(str, name=TRACK), Index(int, name=TRACK_SPIKE_IDX)]),
         name=SPIKE_TS))

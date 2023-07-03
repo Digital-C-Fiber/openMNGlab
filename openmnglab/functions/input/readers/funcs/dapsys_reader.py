@@ -7,11 +7,13 @@ import pandas as pd
 import quantities as pq
 from numba import njit
 from numpy import float32, float64
-from pydapsys import File, StreamType, WaveformPage, Stream, TextPage, Folder
+from pydapsys import File, StreamType, WaveformPage, Stream, TextPage, Folder, PageType
 
 from openmnglab.datamodel.pandas.model import PandasContainer
-from openmnglab.datamodel.pandas.schemes import TIMESTAMP, CONT_REC, STIM_TS, STIM_LBL, SPIKE_TS, TRACK, TRACK_SPIKE_IDX
+from openmnglab.datamodel.pandas.schemes import TIMESTAMP, CONT_REC, STIM_TS, STIM_LBL, SPIKE_TS, TRACK, \
+    TRACK_SPIKE_IDX, GLOBAL_STIM_ID, STIM_TYPE_ID
 from openmnglab.functions.base import SourceFunctionBase
+from openmnglab.util.dicts import get_and_incr
 
 
 @njit
@@ -63,26 +65,37 @@ class DapsysReaderFunc(SourceFunctionBase):
         return pd.Series(data=values, index=pd.Index(data=timestamps, copy=False, name=TIMESTAMP),
                          name=CONT_REC, copy=False)
 
-    def get_main_pulses(self, file: File) -> pd.Series:
+    def get_main_pulses(self, file: File) -> tuple[pd.Series, dict]:
         self._log.debug("processing stimuli")
         path = f"{self._stim_folder}/pulses"
         stream: Stream = file.toc.path(path)
         values = np.empty(len(stream.page_ids), dtype=float64)
+        lbl_id = np.empty(len(stream.page_ids), dtype=np.uint)
         labels = [""] * len(stream.page_ids)
+        counter = dict()
         self._log.debug("reading stimuli")
+        id_map = dict()
         for i, page in enumerate(
                 file.pages[page_id] for page_id in stream.page_ids):
             page: TextPage
             values[i] = page.timestamp_a
             labels[i] = page.text
+            lbl_id[i] = get_and_incr(counter, page.text)
+            n = page.id + 1
+            while file.pages[n].type != PageType.Waveform:
+                n += 1
+            id_map[n] = i
         self._log.debug("finished stimuli")
-        return pd.Series(data=labels, copy=False, index=pd.Index(data=values, copy=False, name=STIM_TS),
-                         name=STIM_LBL)
+        return pd.Series(data=values, copy=False,
+                         index=pd.MultiIndex.from_arrays([np.arange(len(stream.page_ids)), labels, lbl_id],
+                                                         names=[GLOBAL_STIM_ID, STIM_LBL, STIM_TYPE_ID]),
+                         name=STIM_TS), id_map
 
-    def get_tracks_for_responses(self, file: File) -> pd.Series:
+    def get_tracks_for_responses(self, file: File, idmap: dict) -> pd.Series:
         self._log.debug("processing tracks")
         tracks: Folder = file.toc.path(f"{self._stim_folder}/{self._responses}")
         all_responses = tracks.f.get("Tracks for all Responses", None)
+
         if self._tracks is None or all_responses is None:
             if self._tracks is None:
                 self._log.info("Should not load any tracks (Tracks is None)")
@@ -98,6 +111,7 @@ class DapsysReaderFunc(SourceFunctionBase):
         self._log.info(f"loading {len(streams)} tracks")
         n_responses = sum(len(s.page_ids) for s in streams)
         response_timestamps = np.empty(n_responses, dtype=float64)
+        responding_to = np.empty(n_responses, dtype=int)
         track_response_number = np.empty(n_responses, dtype=int)
         track_labels = list()
         n = 0
@@ -108,11 +122,12 @@ class DapsysReaderFunc(SourceFunctionBase):
                 stim: TextPage
                 response_timestamps[n] = stim.timestamp_a
                 track_response_number[n] = i
+                responding_to[n] = idmap[stim.reference_id]
                 n += 1
         self._log.debug("streams finished")
         return pd.Series(data=response_timestamps, copy=False, name=SPIKE_TS,
-                         index=pd.MultiIndex.from_arrays([track_labels, track_response_number],
-                                                         names=(TRACK, TRACK_SPIKE_IDX)))
+                         index=pd.MultiIndex.from_arrays([responding_to, track_labels, track_response_number],
+                                                         names=(GLOBAL_STIM_ID, TRACK, TRACK_SPIKE_IDX)))
 
     def execute(self) -> tuple[PandasContainer[pd.Series], PandasContainer[pd.Series], PandasContainer[pd.Series]]:
         self._log.info("Executing function")
@@ -121,11 +136,11 @@ class DapsysReaderFunc(SourceFunctionBase):
         self._log.info("Loading continuous recording")
         cont_rec = self.get_continuous_recording(dapsys_file)
         self._log.info("Loading pulses")
-        pulses = self.get_main_pulses(dapsys_file)
+        pulses, idmap = self.get_main_pulses(dapsys_file)
         self._log.info("Loading tracks")
-        tracks = self.get_tracks_for_responses(dapsys_file)
+        tracks = self.get_tracks_for_responses(dapsys_file, idmap)
         self._log.info("Processing finished")
         return PandasContainer(cont_rec, {CONT_REC: pq.V, TIMESTAMP: pq.s}), \
-            PandasContainer(pulses, {STIM_TS: pq.s, STIM_LBL: pq.dimensionless}), \
+            PandasContainer(pulses, {GLOBAL_STIM_ID: pq.dimensionless, STIM_TYPE_ID: pq.dimensionless, STIM_TS: pq.s, STIM_LBL: pq.dimensionless}), \
             PandasContainer(tracks,
-                            {SPIKE_TS: pq.s, TRACK: pq.dimensionless, TRACK_SPIKE_IDX: pq.dimensionless})
+                            {GLOBAL_STIM_ID: pq.dimensionless, SPIKE_TS: pq.s, TRACK: pq.dimensionless, TRACK_SPIKE_IDX: pq.dimensionless})

@@ -17,6 +17,12 @@ def get_any_key(map: Mapping[_KT, _VT_co], *keys: _KT) -> Optional[_KT]:
     return None
 
 
+def get_and_incr(dct: dict[_KT, int], key: _KT) -> int:
+    n = dct.get(key, 0)
+    dct[key] = n + 1
+    return n
+
+
 def get_any(map: Mapping[_KT, _VT_co], *keys: _KT, default: Optional[_VT_co] = None) -> Optional[_VT_co]:
     """
     Gets any value mapped by one of the existing keys if it exists in the mapping

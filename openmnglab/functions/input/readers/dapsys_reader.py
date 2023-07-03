@@ -5,7 +5,7 @@ import pandas as pd
 from pandera import SeriesSchema, DataFrameSchema
 
 from openmnglab.datamodel.pandas.model import PandasDataScheme
-from openmnglab.datamodel.pandas.schemes import time_waveform, str_float_list, sorted_spikes
+from openmnglab.datamodel.pandas.schemes import time_waveform, str_float_list, sorted_spikes, stimulus_list
 from openmnglab.functions.base import SourceFunctionDefinitionBase
 from openmnglab.functions.input.readers.funcs.dapsys_reader import DapsysReaderFunc
 from openmnglab.model.planning.interface import IProxyData
@@ -40,7 +40,7 @@ class DapsysReader(SourceFunctionDefinitionBase[IProxyData[pd.Series], IProxyDat
     @property
     def produces(self) -> tuple[
         PandasDataScheme[SeriesSchema], PandasDataScheme[SeriesSchema], PandasDataScheme[DataFrameSchema]]:
-        return time_waveform(), str_float_list(), sorted_spikes()
+        return time_waveform(), stimulus_list(), sorted_spikes()
 
     def new_function(self) -> DapsysReaderFunc:
         return DapsysReaderFunc(self._file, self._stim_folder, main_pulse=self._main_pulse,
