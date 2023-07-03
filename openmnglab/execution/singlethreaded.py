@@ -1,11 +1,11 @@
 from typing import Mapping, Iterable
 
-from openmnglab.datamodel.interface import IDataContainer
+from openmnglab.model.datamodel.interface import IDataContainer
 from openmnglab.execution.exceptions import FunctionInputError, FunctionExecutionError, FunctionReturnCountMissmatch
-from openmnglab.execution.interface import IExecutor
-from openmnglab.functions.interface import IFunction
-from openmnglab.planning.interface import IProxyData
-from openmnglab.planning.plan.interface import IExecutionPlan, IPlannedData
+from openmnglab.model.execution.interface import IExecutor
+from openmnglab.model.functions.interface import IFunction
+from openmnglab.model.planning.interface import IProxyData
+from openmnglab.model.planning.plan.interface import IExecutionPlan, IPlannedData
 
 
 def _func_setinput(func: IFunction, *inp: IDataContainer):
