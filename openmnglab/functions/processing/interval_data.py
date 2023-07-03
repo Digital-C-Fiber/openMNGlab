@@ -15,7 +15,7 @@ from openmnglab.datamodel.pandas.model import PandasOutputDataScheme, PandasInpu
     PandasDataScheme
 from openmnglab.datamodel.pandas.schemes import generic_interval_list
 from openmnglab.functions.base import FunctionDefinitionBase
-from openmnglab.functions.interface import IFunction
+from openmnglab.model.functions.interface import IFunction
 from openmnglab.functions.processing.funcs.interval_data import IntervalDataFunc, LEVEL_COLUMN
 from openmnglab.planning.interface import IProxyData
 from openmnglab.util.hashing import Hash

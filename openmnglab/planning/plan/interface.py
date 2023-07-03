@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Mapping, Sequence
 
 from openmnglab.model.datamodel.interface import IOutputDataScheme
-from openmnglab.functions.interface import IFunctionDefinition
+from openmnglab.model.functions.interface import IFunctionDefinition
 from openmnglab.shared import IHashIdentifiedElement
 
 

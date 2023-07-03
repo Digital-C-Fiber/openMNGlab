@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Generic
 
-from openmnglab.functions.interface import IFunction, IFunctionDefinition, ISourceFunction, Prods, \
+from openmnglab.model.functions.interface import IFunction, IFunctionDefinition, ISourceFunction, Prods, \
     IStaticFunctionDefinition, ISourceFunctionDefinition
 from openmnglab.util.hashing import Hash
 
