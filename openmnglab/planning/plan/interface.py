@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Mapping, Sequence
 
-from openmnglab.datamodel.interface import IOutputDataScheme
+from openmnglab.model.datamodel.interface import IOutputDataScheme
 from openmnglab.functions.interface import IFunctionDefinition
 from openmnglab.shared import IHashIdentifiedElement
 

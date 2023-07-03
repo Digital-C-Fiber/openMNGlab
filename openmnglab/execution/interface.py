@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Mapping, Optional
 
-from openmnglab.datamodel.interface import IDataContainer
+from openmnglab.model.datamodel.interface import IDataContainer
 from openmnglab.planning.interface import DCT, IProxyData
 
 

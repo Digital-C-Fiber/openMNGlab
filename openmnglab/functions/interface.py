@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Iterable, Sequence, Literal, TypeVarTuple, Generic
 
-from openmnglab.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme
+from openmnglab.model.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme
 
 
 class IFunction(ABC):

@@ -3,8 +3,8 @@ from abc import ABC
 import pandera as pa
 from pandas import DataFrame
 
-from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
-from openmnglab.datamodel.interface import IOutputDataScheme
+from openmnglab.model.datamodel.exceptions import DataSchemeCompatibilityError
+from openmnglab.model.datamodel.interface import IOutputDataScheme
 from openmnglab.datamodel.pandas.model import PandasInputDataScheme, PandasOutputDataScheme, \
     PandasDataScheme
 from openmnglab.functions.base import FunctionDefinitionBase

@@ -5,6 +5,7 @@ from openmnglab.functions.interface import IFunction, IFunctionDefinition, ISour
     IStaticFunctionDefinition, ISourceFunctionDefinition
 from openmnglab.util.hashing import Hash
 
+PandasSelector = str | int
 
 class FunctionBase(IFunction, ABC):
 

@@ -7,8 +7,8 @@ from pandas import DataFrame, DatetimeTZDtype, CategoricalDtype, PeriodDtype, Sp
     StringDtype, BooleanDtype
 from pandera import SeriesSchema
 
-from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
-from openmnglab.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme
+from openmnglab.model.datamodel.exceptions import DataSchemeCompatibilityError
+from openmnglab.model.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme
 from openmnglab.datamodel.pandas.model import PandasOutputDataScheme
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.interface import IFunction

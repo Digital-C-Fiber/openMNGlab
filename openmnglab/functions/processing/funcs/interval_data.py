@@ -6,7 +6,7 @@ import numpy as np
 import quantities as pq
 from pandas import Series, DataFrame, MultiIndex
 
-from openmnglab.datamodel.interface import IDataContainer
+from openmnglab.model.datamodel.interface import IDataContainer
 from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.functions.base import FunctionBase
 from openmnglab.functions.helpers.general import get_interval_locs, slice_diffs_flat_np, slice_derivs_flat_np
