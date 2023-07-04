@@ -9,7 +9,7 @@ from pandas import Series, DataFrame
 from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.functions.base import FunctionBase
 from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
-from openmnglab.functions.processing.funcs.principle_components import PRINCIPLE_COMPONENTS
+from openmnglab.functions.processing.funcs.waveform_components import PRINCIPLE_COMPONENTS
 
 SPDF_FEATURES = tuple((f"F{i + 1}" for i in range(24)))
 

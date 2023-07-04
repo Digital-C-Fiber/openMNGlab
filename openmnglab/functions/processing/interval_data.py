@@ -101,10 +101,20 @@ class IntervalDataOutputSchema(IntervalDataBaseSchema, PandasOutputDataScheme):
 
 
 class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
+    """Extracts the data of intervals from a continuous series. Also calculates derivatives or differences between the values.
+    Can re-base the timestamps to their relative offset. A derivative is a diff divided by the change of time."""
 
     def __init__(self, first_level: int, *levels: int,
                  derivative_base: Optional[pq.Quantity] = None, interval: Optional[float] = None,
                  use_time_offsets=True):
+        """
+
+        :param first_level: first level (diff or derivative) to include in the output data frame
+        :param levels: additional levels to include in the output data frame
+        :param derivative_base: quantity to base the time of the derivative on. If None, will calculate the diffs
+        :param interval: The sampling interval of the signal. If this is not given, the interval will be approximated by calculating the diff of the first two samples.
+        :param use_time_offsets: if True, will use the offset the index timestamps to the start of each interval. USE ONLY WITH REGULARLY SAMPLED SGINALS!
+        """
         super().__init__("openmnglab.windowdata")
         self._levels = tuple((first_level, *levels))
         self._derivatives = derivative_base is not None
@@ -139,7 +149,8 @@ class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
             idx = pa.MultiIndex([*window_intervals.pandera_schema.index.indexes, data.pandera_schema.index])
         return IntervalDataOutputSchema(idx, *self._levels),
 
-    def new_function(self) -> IFunction:
+    def new_function(self) -> IntervalDataFunc:
         return IntervalDataFunc(self._levels,
                                 derivatives=self._derivatives,
-                                derivative_change=self._derivate_change, use_time_offsets=self._use_time_offsets, interval=self._interval)
+                                derivative_change=self._derivate_change, use_time_offsets=self._use_time_offsets,
+                                interval=self._interval)

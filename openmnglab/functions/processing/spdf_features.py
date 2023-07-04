@@ -7,7 +7,7 @@ from openmnglab.datamodel.pandas.model import PandasDataScheme, PandasOutputData
 from openmnglab.datamodel.pandas.verification import compare_index
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.spdf_features import SPDF_FEATURES, FeatureFunc
-from openmnglab.functions.processing.principle_components import PrincipleComponentsInputScheme
+from openmnglab.functions.processing.waveform_components import PrincipleComponentsInputScheme
 from openmnglab.functions.processing.interval_data import IntervalDataInputSchema
 from openmnglab.model.planning.interface import IProxyData
 
@@ -25,6 +25,7 @@ class SPDFFeatureOutputSchema(SPDFFeaturesBaseSchema, PandasOutputDataScheme):
 
 
 class SPDFFeatures(FunctionDefinitionBase[IProxyData[DataFrame]]):
+    """Calculates the SPDF features of waveforms based on their components and waveforms."""
     def __init__(self):
         super().__init__("omngl.spdffeatures")
 

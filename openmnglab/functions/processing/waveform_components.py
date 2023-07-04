@@ -8,30 +8,9 @@ from openmnglab.model.datamodel.interface import IOutputDataScheme
 from openmnglab.datamodel.pandas.model import PandasInputDataScheme, PandasOutputDataScheme, \
     PandasDataScheme
 from openmnglab.functions.base import FunctionDefinitionBase
-from openmnglab.functions.processing.funcs.principle_components import ComponentFunc, PRINCIPLE_COMPONENTS
+from openmnglab.functions.processing.funcs.waveform_components import WaveformComponentsFunc, PRINCIPLE_COMPONENTS
 from openmnglab.functions.processing.interval_data import IntervalDataInputSchema
 from openmnglab.model.planning.interface import IProxyData
-
-
-class GeneralDiffList(PandasInputDataScheme[pa.DataFrameSchema]):
-
-    def __init__(self):
-        super().__init__(pa.DataFrameSchema())
-
-    def accepts(self, output_data_scheme: IOutputDataScheme) -> bool:
-        super_accepts = super().accepts(output_data_scheme)
-        output_data_scheme: PandasOutputDataScheme
-        if isinstance(output_data_scheme.pandera_schema.index, pa.MultiIndex):
-            num_idx = output_data_scheme.pandera_schema.index.indexes[-1]
-        else:
-            num_idx = output_data_scheme.pandera_schema.index
-
-        if not pa.dtypes.is_numeric(num_idx.dtype):
-            raise DataSchemeCompatibilityError(
-                f'Index (or last index of a multiindex) must be numeric, is "{num_idx.dtype}"')
-
-        return super_accepts
-
 
 class PrincipleComponentsBaseScheme(PandasDataScheme[pa.DataFrameSchema], ABC):
     def __init__(self):
@@ -52,13 +31,16 @@ class PrincipleComponentsDynamicOutputScheme(PrincipleComponentsBaseScheme, Pand
         self.pandera_schema.index = index
 
 
-class PrincipleComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
+class WaveformComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
+    """
+    Calculates the components of waveforms. Takes an IntervalData dataframe with the base signal and the first level as input.
+    """
     def __init__(self):
         super().__init__("openmnglab.principlecomponents")
 
     @property
     def consumes(self) -> tuple[IntervalDataInputSchema]:
-        return IntervalDataInputSchema(0, 1, 2),
+        return IntervalDataInputSchema(0, 1),
 
     @staticmethod
     def production_for(diffs: PandasInputDataScheme[pa.DataFrameSchema]) -> tuple[
@@ -66,5 +48,5 @@ class PrincipleComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
         return PrincipleComponentsDynamicOutputScheme(diffs.pandera_schema.index),
 
     @staticmethod
-    def new_function() -> ComponentFunc:
-        return ComponentFunc()
+    def new_function() -> WaveformComponentsFunc:
+        return WaveformComponentsFunc()

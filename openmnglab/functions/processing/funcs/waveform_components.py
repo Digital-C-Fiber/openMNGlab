@@ -6,6 +6,7 @@ from pandas import DataFrame
 
 from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.functions.base import FunctionBase
+from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
 
 
 def get_zerocorssings(vals: np.ndarray) -> np.ndarray:
@@ -81,7 +82,7 @@ def get_principle_components_alt1(idx: np.ndarray, diff1: np.ndarray):
     return p1, p2, p3, p4, p5, p6
 
 
-class ComponentFunc(FunctionBase):
+class WaveformComponentsFunc(FunctionBase):
     def __init__(self):
         self._diffs: PandasContainer[DataFrame] = None
 
@@ -91,7 +92,7 @@ class ComponentFunc(FunctionBase):
         components = np.empty((6, len(grpby)), dtype=self._diffs.data.index.levels[-1].dtype)
         for i, (loc, group) in enumerate(grpby):
             lvl_vals = group.index.get_level_values(-1)
-            diff1 = group['level 1 diff'].values
+            diff1 = group[LEVEL_COLUMN[1]].values
             components[:, i] = get_principle_components_alt1(lvl_vals, diff1)
         return components
 
