@@ -3,13 +3,29 @@ from __future__ import annotations
 from typing import Optional
 
 import numpy as np
+import pandas as pd
 import quantities as pq
 from pandas import Series, DataFrame, MultiIndex
 
-from openmnglab.model.datamodel.interface import IDataContainer
 from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.functions.base import FunctionBase
 from openmnglab.functions.helpers.general import get_interval_locs, slice_diffs_flat_np, slice_derivs_flat_np
+from openmnglab.model.datamodel.interface import IDataContainer
+
+
+def offset_timestamps(cont_sig_ts, intervals):
+    total_len = 0
+    n = len(intervals[0])
+    for i in range(n):
+        total_len += intervals[1, i] - intervals[0, i]
+    new_ts = np.empty(total_len, dtype=np.float64)
+    c_pos = 0
+    for i in range(n):
+        start_i, stop_i = intervals[0, i], intervals[1, i]
+        slice = cont_sig_ts[start_i:stop_i]
+        new_ts[c_pos:c_pos+len(slice)] = slice - slice[0]
+        c_pos += len(slice)
+    return new_ts
 
 
 def extend_values(base, extend_by, total):
@@ -29,6 +45,12 @@ def extend_numpy_by_repeat(original: np.ndarray, repeat_each_element: np.ndarray
         extended_i += repeat_each_element[original_i]
     return extended_array
 
+def extend_multiindex_f(base: list[np.ndarray], ranges: np.ndarray, extension):
+    repeats = ranges[1] - ranges[0]
+    n = np.sum(repeats)
+    multiidx = [extend_numpy_by_repeat(orig_arr, repeats, n) for orig_arr in base]
+    multiidx.append(extension)
+    return multiidx
 
 def extend_multiindex(base: list[np.ndarray], ranges: np.ndarray):
     repeats = ranges[1] - ranges[0]
@@ -47,12 +69,13 @@ def extend_multiindex(base: list[np.ndarray], ranges: np.ndarray):
 class IntervalDataFunc(FunctionBase):
     def __init__(self, levels: tuple[int, ...],
                  derivatives: bool,
-                 derivative_change: Optional[pq.Quantity]):
+                 derivative_change: Optional[pq.Quantity], use_time_offsets=True):
         self._levels = levels
         self._window_intervals: PandasContainer[Series] = None
         self._recording: PandasContainer[Series] = None
         self._derivative_mode = derivatives
         self._derivative_time_base = derivative_change
+        self._use_time_offsets = use_time_offsets
 
     def build_unitdict(self):
         intervals = self._window_intervals.data
@@ -93,11 +116,21 @@ class IntervalDataFunc(FunctionBase):
                 scaler = current_unit.rescale(desired_unit).magnitude
                 diffs[1:] *= scaler
 
-        multiindex_codes = extend_multiindex(intervals.index.codes, interval_ranges)
+        if self._use_time_offsets:
+            offset_ts = offset_timestamps(recording.index.values, interval_ranges)
+            multiidx = MultiIndex.from_arrays([offset_ts])
+            multiindex_codes = extend_multiindex_f(intervals.index.codes, interval_ranges, multiidx.codes[0])
+            new_multiindex = MultiIndex(levels=(*intervals.index.levels, multiidx.levels[0]),
+                                        names=[*intervals.index.names,
+                                               recording.index.name], codes=multiindex_codes)
+        else:
+            # calculate the codes of the multiindex in relation to the actual timestamp array. This way, we can just re-use the timestamps from the recording,
+            # without copying them.
+            multiindex_codes = extend_multiindex(intervals.index.codes, interval_ranges)
 
-        new_multiindex = MultiIndex(levels=(*intervals.index.levels, recording.index),
-                                    names=[*intervals.index.names,
-                                           recording.index.name], codes=multiindex_codes)
+            new_multiindex = MultiIndex(levels=(*intervals.index.levels, recording.index),
+                                        names=[*intervals.index.names,
+                                               recording.index.name], codes=multiindex_codes)
         return PandasContainer(DataFrame(data=diffs.T,
                                          columns=[LEVEL_COLUMN[i] for i in self._levels], index=new_multiindex),
                                units=self.build_unitdict()),
