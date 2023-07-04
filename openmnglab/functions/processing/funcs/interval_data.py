@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Optional
 
 import numpy as np
-import pandas as pd
 import quantities as pq
 from pandas import Series, DataFrame, MultiIndex
 
@@ -23,7 +22,7 @@ def offset_timestamps(cont_sig_ts, intervals):
     for i in range(n):
         start_i, stop_i = intervals[0, i], intervals[1, i]
         slice = cont_sig_ts[start_i:stop_i]
-        new_ts[c_pos:c_pos+len(slice)] = slice - slice[0]
+        new_ts[c_pos:c_pos + len(slice)] = slice - slice[0]
         c_pos += len(slice)
     return new_ts
 
@@ -45,12 +44,14 @@ def extend_numpy_by_repeat(original: np.ndarray, repeat_each_element: np.ndarray
         extended_i += repeat_each_element[original_i]
     return extended_array
 
+
 def extend_multiindex_f(base: list[np.ndarray], ranges: np.ndarray, extension):
     repeats = ranges[1] - ranges[0]
     n = np.sum(repeats)
     multiidx = [extend_numpy_by_repeat(orig_arr, repeats, n) for orig_arr in base]
     multiidx.append(extension)
     return multiidx
+
 
 def extend_multiindex(base: list[np.ndarray], ranges: np.ndarray):
     repeats = ranges[1] - ranges[0]
@@ -69,13 +70,14 @@ def extend_multiindex(base: list[np.ndarray], ranges: np.ndarray):
 class IntervalDataFunc(FunctionBase):
     def __init__(self, levels: tuple[int, ...],
                  derivatives: bool,
-                 derivative_change: Optional[pq.Quantity], use_time_offsets=True):
+                 derivative_change: Optional[pq.Quantity], interval: Optional[float] = None, use_time_offsets=True):
         self._levels = levels
         self._window_intervals: PandasContainer[Series] = None
         self._recording: PandasContainer[Series] = None
         self._derivative_mode = derivatives
         self._derivative_time_base = derivative_change
         self._use_time_offsets = use_time_offsets
+        self._interval = interval
 
     def build_unitdict(self):
         intervals = self._window_intervals.data
@@ -117,10 +119,14 @@ class IntervalDataFunc(FunctionBase):
                 diffs[1:] *= scaler
 
         if self._use_time_offsets:
-            offset_ts = offset_timestamps(recording.index.values, interval_ranges)
-            multiidx = MultiIndex.from_arrays([offset_ts])
-            multiindex_codes = extend_multiindex_f(intervals.index.codes, interval_ranges, multiidx.codes[0])
-            new_multiindex = MultiIndex(levels=(*intervals.index.levels, multiidx.levels[0]),
+            interval_lens = interval_ranges[1] - interval_ranges[0]
+            code_cut = np.arange(interval_lens.max())
+            interval = self._interval if self._interval is not None else recording.index.values[1] - \
+                                                                         recording.index.values[0]
+            index_values = code_cut * interval
+            codes = np.concatenate([code_cut[:l] for l in interval_lens])
+            multiindex_codes = extend_multiindex_f(intervals.index.codes, interval_ranges, codes)
+            new_multiindex = MultiIndex(levels=(*intervals.index.levels, index_values),
                                         names=[*intervals.index.names,
                                                recording.index.name], codes=multiindex_codes)
         else:

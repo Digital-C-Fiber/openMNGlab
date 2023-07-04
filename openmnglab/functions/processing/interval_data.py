@@ -10,13 +10,13 @@ from pandas import DataFrame, DatetimeTZDtype, PeriodDtype, SparseDtype, Interva
     BooleanDtype
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
-from openmnglab.model.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme
 from openmnglab.datamodel.pandas.model import PandasOutputDataScheme, PandasInputDataScheme, \
     PandasDataScheme
 from openmnglab.datamodel.pandas.schemes import generic_interval_list
 from openmnglab.functions.base import FunctionDefinitionBase
-from openmnglab.model.functions.interface import IFunction
 from openmnglab.functions.processing.funcs.interval_data import IntervalDataFunc, LEVEL_COLUMN
+from openmnglab.model.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme
+from openmnglab.model.functions.interface import IFunction
 from openmnglab.model.planning.interface import IProxyData
 from openmnglab.util.hashing import Hash
 
@@ -103,11 +103,14 @@ class IntervalDataOutputSchema(IntervalDataBaseSchema, PandasOutputDataScheme):
 class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
 
     def __init__(self, first_level: int, *levels: int,
-                 derivative_base: Optional[pq.Quantity] = None):
+                 derivative_base: Optional[pq.Quantity] = None, interval: Optional[float] = None,
+                 use_time_offsets=True):
         super().__init__("openmnglab.windowdata")
         self._levels = tuple((first_level, *levels))
         self._derivatives = derivative_base is not None
         self._derivate_change = derivative_base
+        self._interval = interval
+        self._use_time_offsets = use_time_offsets
 
     @property
     def config_hash(self) -> bytes:
@@ -139,4 +142,4 @@ class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
     def new_function(self) -> IFunction:
         return IntervalDataFunc(self._levels,
                                 derivatives=self._derivatives,
-                                derivative_change=self._derivate_change)
+                                derivative_change=self._derivate_change, use_time_offsets=self._use_time_offsets, interval=self._interval)
