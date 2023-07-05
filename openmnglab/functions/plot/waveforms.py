@@ -18,6 +18,29 @@ from openmnglab.util.seaborn import Theme
 class WaveformPlot(StaticFunctionDefinitionBase[IProxyData[plt.Figure]]):
     """Function to plot waveforms. Can either plot average waveforms or each for its own.
     Multi-plots can be created by using the col and row parameters which are passed to the underlying seaborn function.
+
+    In: IntervalData with normalized timestamps
+
+    Out: figure based on the configuration
+
+    Common use-cases
+    ----------------
+    * Use  ``col`` or ``row`` to ``TRACK`` to seperate the tracks into columns or rows
+    * To plot all waveforms on top of each other, use ``mode="individual"``. Set parameter ``alpha`` to adjust the opacity of individual waveforms.
+        - Use  ``col`` or ``row`` to ``GOBAL_STIM_ID`` to plot responses based on the stimulus id in columns or rows respectively
+
+    :param mode: "average" prints the average of the waveforms and their standard deviation, "individual" plots all waveforms individually
+    :param selector: function to filter the incoming dataframe (e.g. plotting only a subset of waveforms)
+    :param column: column of the signal
+    :param fig_args: additional arguments to pass to plt.figure(). Only active when col and row are both None
+    :param alpha: Alpha channel for the lines. Only  active when mode is individual. Smaller values will make each individual line more transparent
+    :param row: index or column to create supblot rows
+    :param theme: custom theme passed to seaborn
+    :param col: index or column name to create subplot columns
+    :param color_dict: dictionary mapping from track names to mpl-compatible color definitions
+    :param time_col: index or column for the timestamps
+    :param stim_idx: index to differentiate individual stimuli by
+    :param sns_args: additional arguments passed to seaborn
     """
 
     def __init__(self, mode: WaveformPlotMode | str = WaveformPlotMode.AVERAGE,
@@ -27,21 +50,7 @@ class WaveformPlot(StaticFunctionDefinitionBase[IProxyData[plt.Figure]]):
                  col: Optional[str] = None,
                  color_dict: Optional[dict[str, str]] = None,
                  time_col: str = TIMESTAMP, stim_idx: str = GLOBAL_STIM_ID, **sns_args):
-        """
 
-        :param mode: average prints the average of the waveforms and their standard deviation, individual plots all waveforms individually
-        :param selector: function to filter the incoming dataframe (e.g. plotting only a subset of waveforms)
-        :param column: column of the signal
-        :param fig_args: additional arguments to pass to plt.figure(). Only active when col and row are both None
-        :param alpha: Alpha channel for the lines. Only  active when mode is individual. Smaller values will make each individual line more transparent
-        :param row: index or column to create supblot rows
-        :param theme: custom theme passed to seaborn
-        :param col: index or column name to create subplot columns
-        :param color_dict: dictionary mapping from track names to mpl-compatible color definitions
-        :param time_col: index or column for the timestamps
-        :param stim_idx: index to differentiate individual stimuli by
-        :param sns_args: additional arguments passed to seaborn
-        """
         super().__init__("omnglab.plotting.waveform")
         self.mode = mode if isinstance(mode, WaveformPlotMode) else WaveformPlotMode(mode.lower())
         self.selector = selector
