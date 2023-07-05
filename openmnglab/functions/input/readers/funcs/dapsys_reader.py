@@ -25,10 +25,9 @@ def _kernel_offset_assign(target: np.array, calc_add, calc_mul, pos_offset, n):
 class DapsysReaderFunc(SourceFunctionBase):
     def __init__(self, file: str | Path, stim_folder: str, main_pulse: Optional[str] = "Main Pulse",
                  continuous_recording: Optional[str] = "Continuous Recording", responses="responses",
-                 tracks: Optional[Sequence[str] | str] = "all", segment_interpolation_strategy="zero"):
+                 tracks: Optional[Sequence[str] | str] = "all"):
         self._log = logging.getLogger("DapsysReaderFunc")
         self._file = file
-        self._interpol_strategy = segment_interpolation_strategy
         self._stim_folder = stim_folder
         self._main_pulse = main_pulse
         self._continuous_recording = continuous_recording

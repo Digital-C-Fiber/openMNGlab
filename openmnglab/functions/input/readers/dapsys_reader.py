@@ -15,10 +15,18 @@ from openmnglab.util.hashing import Hash
 class DapsysReader(SourceFunctionDefinitionBase[IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series]]):
     def __init__(self, file: str | Path, stim_folder: str, main_pulse: Optional[str] = "Main Pulse",
                  continuous_recording: Optional[str] = "Continuous Recording", responses="responses",
-                 tracks: Optional[Sequence[str] | str] = "all", segment_interpolation_strategy="none"):
+                 tracks: Optional[Sequence[str] | str] = "all"):
+        """
+        Create a new DapsysReader function definition
+        :param file: Path to the DAPSYS file
+        :param stim_folder: The stimulator folder inside the DAPSYS file (i.e. "NI Pulse Stimulator")
+        :param main_pulse: Name of the main pulse, defaults to "Main Pulse"
+        :param continuous_recording: Name of the continuous recording, defaults to "Continuous Recording"
+        :param responses: Name of the folder containing the responses, defaults to "responses"
+        :param tracks: Define which tracks to load from the file. Tracks must be present in the "Tracks for all Responses" folder. "all" loads all tracks found in that subfolder.
+        """
         super().__init__("net.codingchipmunk.dapsysreader")
         self._file = file
-        self._interpol_strategy = segment_interpolation_strategy
         self._stim_folder = stim_folder
         self._main_pulse = main_pulse
         self._continuous_recording = continuous_recording
@@ -29,7 +37,6 @@ class DapsysReader(SourceFunctionDefinitionBase[IProxyData[pd.Series], IProxyDat
     def config_hash(self) -> bytes:
         hasher = Hash()
         hasher.path(self._file)
-        hasher.str(self._interpol_strategy)
         hasher.str(self._stim_folder)
         hasher.str(self._main_pulse)
         hasher.str(self._continuous_recording)
@@ -45,5 +52,4 @@ class DapsysReader(SourceFunctionDefinitionBase[IProxyData[pd.Series], IProxyDat
     def new_function(self) -> DapsysReaderFunc:
         return DapsysReaderFunc(self._file, self._stim_folder, main_pulse=self._main_pulse,
                                 continuous_recording=self._continuous_recording,
-                                responses=self._responses, tracks=self._tracks,
-                                segment_interpolation_strategy=self._interpol_strategy)
+                                responses=self._responses, tracks=self._tracks)
