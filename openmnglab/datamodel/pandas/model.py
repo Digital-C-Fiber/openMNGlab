@@ -39,6 +39,14 @@ class PandasContainer(IDataContainer[TPandas], Generic[TPandas]):
     def units(self) -> dict[str, pq.Quantity]:
         return self._units
 
+    def __repr__(self):
+        index_names = (self.data.index.name,) if not isinstance(self.data.index, pd.MultiIndex) else (idx.name for idx in self.data.index.levels)
+        col_names = (self.data.name,) if isinstance(self.data, pd.Series) else self.data.columns
+        units = ",".join((f"'{col}':{self.units[col].dimensionality}" for col in (*index_names, *col_names)))
+        return f"""PandasContainer @{id(self)}
+Units: {units}
+{repr(self.data)}"""
+
     def deep_copy(self) -> PandasContainer[TPandas]:
         return PandasContainer(self.data.copy(), self.units.copy())
 
