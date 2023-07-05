@@ -2,6 +2,8 @@ import hashlib
 import struct
 from array import array
 from mmap import mmap
+from os import PathLike
+from pathlib import Path
 from typing import Self, Any
 
 try:
@@ -13,6 +15,14 @@ except ImportError as _:
 class Hash:
     def __init__(self):
         self._hash = hashlib.sha3_224()
+
+    def path(self, d: Path | PathLike | bytes | str) -> Self:
+        d = str(d) if isinstance(d, (Path, PathLike)) else d
+        if isinstance(d, str):
+            return self.str(d)
+        elif isinstance(d, bytes):
+            return self.update(d)
+        return self
 
     def str(self, s: str) -> Self:
         self.update(s.encode("UTF8"))
@@ -31,6 +41,8 @@ class Hash:
             self.dynamic(k, fail=fail)
             self.dynamic(v, fail=fail)
         return self
+
+
 
     def dynamic(self, v: Any, fail=True) -> Self:
         if isinstance(v, int):
