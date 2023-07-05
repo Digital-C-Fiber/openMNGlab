@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from openmnglab.datamodel.interface import IOutputDataScheme
-from openmnglab.functions.interface import IFunctionDefinition
+from openmnglab.model.datamodel.interface import IOutputDataScheme
+from openmnglab.model.functions.interface import IFunctionDefinition
 from openmnglab.planning.base import PlannerBase, check_input, ProxyData
 from openmnglab.planning.exceptions import PlanningError
-from openmnglab.planning.interface import IProxyData
-from openmnglab.planning.plan.interface import IStage, IPlannedData
+from openmnglab.model.planning.interface import IProxyData
+from openmnglab.model.planning.plan.interface import IStage, IPlannedData
 from openmnglab.util.hashing import Hash
 
 
@@ -16,7 +16,7 @@ class Stage(IStage):
         for inp in data_in:
             hashgen.update(inp.calculated_hash)
         self._calculated_hash = hashgen.digest()
-        self._depth = max(*data_in, default=0, key=lambda x: x.depth)
+        self._depth = max((d.depth for d in data_in), default=0)
         self._definition = definition
         self._data_in = data_in
         self._data_out = tuple(PlannedData.from_function(self, out, i) for i, out in
@@ -69,17 +69,17 @@ class PlannedData(IPlannedData):
 
     @property
     def calculated_hash(self) -> bytes:
-        return self.calculated_hash
+        return self._calculated_hash
 
 
 class DefaultPlanner(PlannerBase[Stage, PlannedData]):
 
     def _add_function(self, function: IFunctionDefinition, *inp_data: PlannedData) -> tuple[IProxyData, ...]:
         check_input(function.consumes, tuple(d.schema for d in inp_data))
-        planned_func = Stage(function, *inp_data)
-        if planned_func.calculated_hash in self._functions:
+        stage = Stage(function, *inp_data)
+        if stage.calculated_hash in self._functions:
             raise PlanningError("A function with the same hash is already planned")
-        self._functions[planned_func.calculated_hash] = planned_func
-        for prod in planned_func.data_out:
+        self._functions[stage.calculated_hash] = stage
+        for prod in stage.data_out:
             self._data[prod.calculated_hash] = prod
-        return tuple(ProxyData.copy_from(o) for o in planned_func.data_out)
+        return tuple(ProxyData.copy_from(o) for o in stage.data_out)
