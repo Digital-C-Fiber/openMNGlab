@@ -25,7 +25,13 @@ class SPDFFeatureOutputSchema(SPDFFeaturesBaseSchema, PandasOutputDataScheme):
 
 
 class SPDFFeatures(FunctionDefinitionBase[IProxyData[DataFrame]]):
-    """Calculates the SPDF features of waveforms based on their components and waveforms."""
+    """Calculates the SPDF features of waveforms based on their components and waveforms.
+
+    In: [WaveformComponents, IntervalData with levels 0,1,2] WaveformComponents and IntervalData must have the same base multiindex
+    
+    Out: Dataframe with the features, indexed by the same index as the WaveformComponents input. F4 will always be None.
+
+    """
     def __init__(self):
         super().__init__("omngl.spdffeatures")
 

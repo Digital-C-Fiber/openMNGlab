@@ -42,8 +42,21 @@ class DynamicIndexIntervalScheme(PandasOutputDataScheme[SeriesSchema]):
 
 
 class Windowing(FunctionDefinitionBase[IProxyData[DataFrame]]):
+    """Takes a set of values and transforms them based on a fixed window.
+
+    In: series of numbers
+
+    Out: Series of pd.Interval, with the same index as the input series.
+
+    :param offset_low: quantity of low offset
+    :param offset_high: quantity of high offset
+    :param name: name of the returned series
+    :param closed: how the interval is closed / open
+    """
+
     def __init__(self, offset_low: pq.Quantity, offset_high: pq.Quantity, name: str,
                  closed: Literal["left", "right", "both", "neither"] = "right"):
+
         FunctionDefinitionBase.__init__(self, "openmnglab.windowing")
         assert (isinstance(offset_low, pq.Quantity))
         assert (isinstance(offset_high, pq.Quantity))
