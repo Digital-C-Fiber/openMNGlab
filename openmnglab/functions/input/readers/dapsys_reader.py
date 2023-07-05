@@ -31,19 +31,17 @@ class DapsysReader(SourceFunctionDefinitionBase[IProxyData[pd.Series], IProxyDat
           pd.Series[[GLOBAL_STIM_ID: int, TRACK: str, TRACK_SPIKE_IDX: int], float]
 
 
-
+    :param file: Path to the DAPSYS file
+    :param stim_folder: The stimulator folder inside the DAPSYS file (i.e. "NI Pulse Stimulator")
+    :param main_pulse: Name of the main pulse, defaults to "Main Pulse"
+    :param continuous_recording: Name of the continuous recording, defaults to "Continuous Recording"
+    :param responses: Name of the folder containing the responses, defaults to "responses"
+    :param tracks: Define which tracks to load from the file. Tracks must be present in the "Tracks for all Responses" folder. "all" loads all tracks found in that subfolder.
     """
     def __init__(self, file: str | Path, stim_folder: str, main_pulse: Optional[str] = "Main Pulse",
                  continuous_recording: Optional[str] = "Continuous Recording", responses="responses",
                  tracks: Optional[Sequence[str] | str] = "all"):
-        """
-        :param file: Path to the DAPSYS file
-        :param stim_folder: The stimulator folder inside the DAPSYS file (i.e. "NI Pulse Stimulator")
-        :param main_pulse: Name of the main pulse, defaults to "Main Pulse"
-        :param continuous_recording: Name of the continuous recording, defaults to "Continuous Recording"
-        :param responses: Name of the folder containing the responses, defaults to "responses"
-        :param tracks: Define which tracks to load from the file. Tracks must be present in the "Tracks for all Responses" folder. "all" loads all tracks found in that subfolder.
-        """
+
         super().__init__("net.codingchipmunk.dapsysreader")
         self._file = file
         self._stim_folder = stim_folder

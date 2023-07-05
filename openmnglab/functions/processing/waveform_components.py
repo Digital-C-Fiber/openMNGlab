@@ -33,7 +33,12 @@ class PrincipleComponentsDynamicOutputScheme(PrincipleComponentsBaseScheme, Pand
 
 class WaveformComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
     """
-    Calculates the components of waveforms. Takes an IntervalData dataframe with the base signal and the first level as input.
+    Calculates the components of waveforms.
+
+    In: Interval data with level 0 and 1.
+
+    Out: Dataframe with the waveform components, columns are named based on PRINCIPLE_COMPONENTS constant.
+         Index is taken from the input series non-timestamp multiindex.
     """
     def __init__(self):
         super().__init__("openmnglab.principlecomponents")
