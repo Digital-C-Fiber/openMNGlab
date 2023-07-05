@@ -2,6 +2,11 @@ import quantities as pq
 
 
 def rescale_pq(base: pq.Quantity, *quant: pq.Quantity) -> tuple[pq.Quantity, ...]:
+    """Rescales quantities to a certain base quantity
+    :param base: the quantity to rescale to
+    :param quant: the quantities to rescale
+    :return: the rescaled quantities
+    """
     base_u = base.units
     t = tuple(quantity.rescale(base_u) for quantity in quant)
     return t

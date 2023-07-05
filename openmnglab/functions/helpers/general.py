@@ -13,8 +13,14 @@ def get_index_quantities(container: PandasContainer) -> dict[str, pq.Quantity]:
 
 
 def get_interval_locs(interval: pd.Interval, index: pd.Index):
+    """
+    returns the locs of an interval in an index
+    :param interval:
+    :param index:
+    :return:
+    """
     left_loc, right_loc = index.slice_locs(start=interval.left, end=interval.right)
-    # reduce right_loc by one, as slice_locs will always return the position of the next greater value beyond end (or an out of bounds position)
+    # temporarly reduce right_loc by one, as slice_locs will always return the position of the next greater value beyond end (or an out of bounds position)
     right_loc -= 1
     # STATE: index[left_loc] >= interval.left ; index[right_loc] >= interval.right
     # we can avoid the float comparison with the system epsilon by just checking if it is greater; has same effect as the epsilon is the smallest differentiateable value anyway.
