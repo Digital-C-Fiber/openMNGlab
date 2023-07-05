@@ -28,7 +28,7 @@ class DapsysReader(SourceFunctionDefinitionBase[IProxyData[pd.Series], IProxyDat
     @property
     def config_hash(self) -> bytes:
         hasher = Hash()
-        hasher.str(self._file)
+        hasher.path(self._file)
         hasher.str(self._interpol_strategy)
         hasher.str(self._stim_folder)
         hasher.str(self._main_pulse)
