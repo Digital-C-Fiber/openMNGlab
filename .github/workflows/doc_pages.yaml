@@ -20,14 +20,14 @@ jobs:
         uses: abatilo/actions-poetry@v2
       - name: Install Requirements
         run: poetry install --with=docs
-      - name: Build documentation
+      - name: Make documentation folders
         run: |
           mkdir gh-pages
           touch gh-pages/.nojekyll
-          cd docs/
-          poetry shell
-          make html
-          cp -r build/* ../gh-pages/
+      - name: Build documentation
+        run: |
+          poetry run sphinx-build -M html docs/source docs/build
+          cp -r docs/build/html/* gh-pages/
       - name: Deploy Documentation
         if: ${{ github.event_name == 'push' }}
         uses: JamesIves/github-pages-deploy-action@v4
