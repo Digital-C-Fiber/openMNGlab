@@ -10,6 +10,7 @@ from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.functions.base import FunctionBase
 from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
 from openmnglab.functions.processing.funcs.waveform_components import PRINCIPLE_COMPONENTS
+from openmnglab.util.pandas import index_names
 
 SPDF_FEATURES = tuple((f"F{i + 1}" for i in range(24)))
 
@@ -108,6 +109,8 @@ class FeatureFunc(FunctionBase):
         units[SPDF_FEATURES[21]] = pq.dimensionless
         units[SPDF_FEATURES[22]] = pq.dimensionless
         units[SPDF_FEATURES[23]] = pq.dimensionless
+        for index_name in index_names(self._components.data.index):
+            units[index_name] = self._components.units[index_name]
         return units
 
     def execute(self) -> tuple[PandasContainer[DataFrame]]:
