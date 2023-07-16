@@ -9,10 +9,17 @@ Welcome to OpenMNGLab's documentation!
    :maxdepth: 4
 
 .. autosummary::
-   :toctree: _autosummary
-   :template: custom-module-template.rst
+   :caption: API Reference
+   :toctree: apidoc/
    :recursive:
 
+   openmnglab
+   openmnglab.datamodel
+   openmnglab.execution
+   openmnglab.functions
+   openmnglab.planning
+   openmnglab.util
+   openmnglab.model
 
 
 
