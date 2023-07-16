@@ -4,6 +4,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 import os
 import sys
+import tomllib
+from pathlib import Path
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -12,7 +14,21 @@ project = 'OpenMNGLab'
 copyright = '2023, Peter Konradi'
 author = 'Peter Konradi'
 
+def get_pyproject_version():
+    with (Path("..")/".."/"pyproject.toml").open('rb') as f:
+        pyproject_toml = tomllib.load(f)
+    ver_str = pyproject_toml["tool"]["poetry"]["version"]
+    split_str = ver_str.split('.',2)
+    release = split_str[2] if len(split_str) == 3 else ''
+    version = ".".join(split_str[:2])
+    return version, release
+
+version, release = get_pyproject_version()
+print(version, release)
+
 sys.path.insert(0, os.path.abspath("../.."))
+
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
