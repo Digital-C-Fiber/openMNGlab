@@ -14,12 +14,6 @@ Welcome to OpenMNGLab's documentation!
    :recursive:
 
    openmnglab
-   openmnglab.datamodel
-   openmnglab.execution
-   openmnglab.functions
-   openmnglab.planning
-   openmnglab.util
-   openmnglab.model
 
 
 
