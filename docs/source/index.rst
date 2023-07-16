@@ -8,7 +8,9 @@ Welcome to OpenMNGLab's documentation!
 .. toctree::
    :maxdepth: 4
 
-   apidoc/openmnglab
+.. autosummary::
+   :toctree: _autosummary
+   :recursive:
 
 
 
