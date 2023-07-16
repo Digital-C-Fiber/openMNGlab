@@ -25,6 +25,7 @@ jobs:
           mkdir gh-pages
           touch gh-pages/.nojekyll
           cd docs/
+          poetry shell
           make html
           cp -r build/* ../gh-pages/
       - name: Deploy Documentation
