@@ -16,10 +16,15 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+      - name: Setup Pandoc
+        uses: nikeee/setup-pandoc@v1
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2
       - name: Install Requirements
         run: poetry install --with=docs
+      - name: Convert quickstart to ReST
+        run: |
+          poetry run jupyter nbconvert --to rst --output-dir docs/source/quickstart quickstart/quickstart.ipynb
       - name: Make documentation folders
         run: |
           mkdir gh-pages
