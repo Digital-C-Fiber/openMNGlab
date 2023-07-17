@@ -12,6 +12,7 @@ Welcome to OpenMNGLab's documentation!
    :hidden:
 
    overview/overview.rst
+   quickstart/index.rst
 
 .. autosummary::
    :caption: API Reference

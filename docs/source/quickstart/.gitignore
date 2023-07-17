@@ -1,0 +1,5 @@
+# we will ignore everything in here (because it should be generated from the quickstart ipynb), but the whitelisted index rst
+*
+*/*
+!.gitignore
+!index.rst
