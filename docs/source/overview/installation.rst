@@ -1,6 +1,5 @@
-************
 Installation
-************
+============
 
 OpenMNGLab is distributed on PyPI. Install it via pip::
 

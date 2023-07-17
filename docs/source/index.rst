@@ -5,6 +5,8 @@
 
 Welcome to OpenMNGLab's documentation!
 ======================================
+.. include::
+
 .. toctree::
    :maxdepth: 4
 
