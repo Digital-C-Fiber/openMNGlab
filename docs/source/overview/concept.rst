@@ -12,6 +12,7 @@ But that is enough to mimic an interface and, by convention, an interface in oMN
 as an abstract class that only contains abstract methods and properties and its name should start with a capital ``I`` to differentiate
 it from classes (i.e. ``ÌInterface``). How the model looks in detail is described here.
 
+.. _dataconcept:
 Data exchange
 --------------
 The pandas library serves as the primary way for functions to exchange data. Pandas series or data frames are wrapped in a container structure

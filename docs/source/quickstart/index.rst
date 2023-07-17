@@ -8,4 +8,4 @@ This chapter contains two guides to get you up and running with omngl. They have
     :hidden:
 
     quickstart
-
+    implementing_functions
