@@ -79,7 +79,7 @@ We will implement the constructor and specify the type annotations of our class:
 Now implement the (trivial) execution function. For the sake of demonstration, we will not simple return the chosen container, but will construct a new one with the chosen series.
 Remember that a `PandasContainer` requires a dictionary which contains the unit of each column and index of the contained pandas structure.
 
-.. warning::
+.. important::
     Always make sure to include a comma at the end of ``execute`` to return a tuple! Returning a single item not wrapped in a tuple is not supported at this time.
 
 .. code-block:: python
@@ -112,7 +112,7 @@ Test
 ^^^^^
 You should now test your function to make sure it works like intended:
 
-.. warning::
+.. important::::
     Always make sure to include a comma to unpack the result of ``execute``.
 
 .. code-block:: python
@@ -182,7 +182,8 @@ Function identification
 First thing to do is to choose a unique identifier for our function and initialize the super constructor with it, i.e. `openmgnlab.qs.serieschooser`.
 
 .. note::
-    For your own functions, it is a good idea to include something like your git username in the identifier to decrease the chance of a collision.
+    For your own functions include something like your git username in the identifier to decrease the chance of a collision.
+
 .. code-block:: python
 
     def __init__(self):
