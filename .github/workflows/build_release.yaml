@@ -1,13 +1,15 @@
 name: Build and release
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - "v*"
+  workflow_call:
+    inputs:
+      VERSION_TAG:
+        description: 'Tag to build the release from'
+        required: true
+        type: string
 
 jobs:
-  buildpub:
+  build-and-release:
+    needs: bump-version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,8 +28,8 @@ jobs:
         id: create_release
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          VERSION_TAG: ${{github.ref}}
         run: |
-            hub release create -d $([[ $VERSION_TAG =~ ^v[[:digit:]]*(\.[[:digit:]]*)?(\.[[:digit:]]*)?$ ]] && echo "-p") -a ./dist/openmnglab-${VERSION_TAG:1}*  $VERSION_TAG
+          export VERSION=$(poetry version -s)
+          hub release create -d $([[ $VERSION =~ ^[[:digit:]]*(\.[[:digit:]]*)?(\.[[:digit:]]*)?$ ]] || echo "-p") -a ./dist/*  ${{VERSION_TAG}}
         shell: bash
 
