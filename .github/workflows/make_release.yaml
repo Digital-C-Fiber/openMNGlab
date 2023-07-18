@@ -1,5 +1,11 @@
 name: Update Version and release
 on:
+  workflow_dispatch:
+    inputs:
+      BUMP_TO:
+        description: 'Poetry version (PEP 440 compliant version or bump rule)'
+        required: true
+        type: string
   workflow_call:
     inputs:
       BUMP_TO:
