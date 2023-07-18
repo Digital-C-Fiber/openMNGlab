@@ -1,4 +1,4 @@
-name: Make a new version and tag
+name: Update Version and release
 on:
   workflow_call:
     inputs:
@@ -10,6 +10,9 @@ on:
 jobs:
   bump-version:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{steps.bump_version.outputs.new_version}}
+      version_tag: ${{ steps.commit_tag.outputs.version_tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -23,9 +26,11 @@ jobs:
         id: bump_version
         run: echo "new_version=$(poetry version -s ${{ inputs.BUMP_TO }})" >> $GITHUB_OUTPUT
       - name: Add and Commit Version
+        id: commit_tag
         env:
-          VERSION_TAG: v${{ steps.bump_version.outputs.new_version}}
+          VERSION_TAG: v${{steps.bump_version.outputs.new_version}}
         run: |
+          echo "version_tag=$VERSION_TAG" >> $GITHUB_OUTPUT
           git add ./pyproject.toml
           git config --global user.name "Poetry Versioning Bot"
           git config --global user.email "versioningbot@digital-c-fiber.invalid"
@@ -34,5 +39,6 @@ jobs:
           git push origin HEAD:main
           git push origin $VERSION_TAG
         shell: bash
+
 
 
