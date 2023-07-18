@@ -2,7 +2,7 @@ name: Build and release
 on:
   workflow_call:
     inputs:
-      VERSION_TAG:
+      version_tag:
         description: 'Tag to build the release from'
         required: true
         type: string
@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{inputs.version_tag}}
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -30,6 +32,6 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
           export VERSION=$(poetry version -s)
-          hub release create -d $([[ $VERSION =~ ^[[:digit:]]*(\.[[:digit:]]*)?(\.[[:digit:]]*)?$ ]] || echo "-p") -a ./dist/*  ${{VERSION_TAG}}
+          hub release create -d $([[ $VERSION =~ ^[[:digit:]]*(\.[[:digit:]]*)?(\.[[:digit:]]*)?$ ]] || echo "-p") -a ./dist/*  ${{inputs.version_tag}}
         shell: bash
 

@@ -1,17 +1,23 @@
 name: Bump and tag Version
 on:
-  workflow_dispatch:
-    inputs:
-      BUMP_TO:
-        description: 'Poetry version (PEP 440 compliant version or bump rule)'
-        required: true
-        type: string
   workflow_call:
     inputs:
-      BUMP_TO:
+      bump_to:
         description: 'Poetry version (PEP 440 compliant version or bump rule)'
         required: true
         type: string
+      branch:
+        description: 'Branch to work on'
+        required: true
+        type: string
+        default: "main"
+    outputs:
+      version:
+        description: "The new version"
+        value: ${{jobs.bump-version.outputs.version}}
+      version_tag:
+        description: "The tag of the version"
+        value: ${{jobs.bump-version.outputs.version_tag}}
 
 jobs:
   bump-version:
@@ -22,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{inputs.branch}}
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -30,7 +38,7 @@ jobs:
         uses: abatilo/actions-poetry@v2
       - name: Bump version
         id: bump_version
-        run: echo "new_version=$(poetry version -s ${{ inputs.BUMP_TO }})" >> $GITHUB_OUTPUT
+        run: echo "new_version=$(poetry version -s ${{ inputs.bump_to }})" >> $GITHUB_OUTPUT
       - name: Add and Commit Version
         id: commit_tag
         env:
@@ -42,7 +50,7 @@ jobs:
           git config --global user.email "versioningbot@digital-c-fiber.invalid"
           git commit -m "Change version to $VERSION_TAG" --allow-empty
           git tag $VERSION_TAG
-          git push origin HEAD:main
+          git push origin HEAD
           git push origin $VERSION_TAG
         shell: bash
 
