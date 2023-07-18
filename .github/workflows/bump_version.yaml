@@ -1,4 +1,4 @@
-name: Update Version and release
+name: Bump and tag Version
 on:
   workflow_dispatch:
     inputs:
