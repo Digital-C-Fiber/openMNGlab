@@ -1,0 +1,26 @@
+name: Make a release
+on:
+  workflow_dispatch:
+    inputs:
+      bump_to:
+        description: 'Poetry version (PEP 440 compliant version or bump rule)'
+        required: true
+        type: string
+      branch:
+        description: 'Branch to work on'
+        required: true
+        type: string
+        default: "main"
+
+jobs:
+  bump-version:
+    uses: ./bump_version.yaml
+    with:
+      branch: ${{ inputs.branch }}
+      bump_to: ${{ inputs.bump_to }}
+  build-and-release:
+    needs: bump-version
+    uses: ./build_release.yaml
+    with:
+      version_tag: ${{needs.bump-version.outputs.version_tag}}
+
