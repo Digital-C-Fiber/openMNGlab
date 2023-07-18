@@ -3,7 +3,14 @@ name = "openmnglab"
 version = "0.1.0"
 description = "A Python framework for microneurography analysis"
 authors = ["Peter Konradi <codingchipmunk@posteo.net>"]
+license = "MIT"
 readme = "README.md"
+keywords = ["microneurography", "neurophysiology", "electrophysiology"]
+classifiers = ["Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers", "Intended Audience :: Science/Research",
+    "Intended Audience :: Healthcare Industry",
+    "Programming Language :: Python :: 3 :: Only",
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
