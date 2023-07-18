@@ -1,0 +1,33 @@
+name: Build and release
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+jobs:
+  buildpub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2
+      - name: Install Requirements
+        run: poetry install
+      - name: Build package
+        run: poetry build
+      - name: Create release
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          VERSION_TAG: ${{github.ref}}
+        run: |
+            hub release create -d $([[ $VERSION_TAG =~ ^v[[:digit:]]*(\.[[:digit:]]*)?(\.[[:digit:]]*)?$ ]] && echo "-p") -a ./dist/openmnglab-${VERSION_TAG:1}*  $VERSION_TAG
+        shell: bash
+
