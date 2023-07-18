@@ -14,13 +14,13 @@ on:
 
 jobs:
   bump-version:
-    uses: ./.github/workflows/bump_version.yaml@main
+    uses: ./.github/workflows/bump_version.yaml
     with:
       branch: ${{ inputs.branch }}
       bump_to: ${{ inputs.bump_to }}
   build-and-release:
     needs: bump-version
-    uses: ./.github/workflows/build_release.yaml@main
+    uses: ./.github/workflows/build_release.yaml
     with:
       version_tag: ${{needs.bump-version.outputs.version_tag}}
 
