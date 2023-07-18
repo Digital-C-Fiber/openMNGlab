@@ -32,7 +32,9 @@ sys.path.insert(0, os.path.abspath("../.."))
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosectionlabel', 'sphinx.ext.autosummary',
+extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.autosectionlabel',
+              'sphinx.ext.autosummary',
               'sphinx.ext.viewcode',
               'sphinx.ext.intersphinx',
               'sphinx.ext.napoleon',
@@ -42,9 +44,22 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 
-
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'sphinx_book_theme'
 html_static_path = ['_static']
+
+
+html_theme_options = {
+    "path_to_docs": "docs",
+    "repository_url": "https://github.com/Digital-C-Fiber/openMNGlab",
+    "repository_branch": "main",
+    "use_edit_page_button": True,
+    "use_source_button": True,
+    "use_issues_button": True,
+    # "use_repository_button": True,
+    "use_download_button": False,
+    "use_sidenotes": False,
+    "show_toc_level": 2,
+}
