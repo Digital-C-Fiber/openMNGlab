@@ -5,10 +5,21 @@
 
 Welcome to OpenMNGLab's documentation!
 ======================================
+.. include:: welcome.rst
+
 .. toctree::
    :maxdepth: 4
+   :hidden:
 
-   apidoc/openmnglab
+   overview/overview.rst
+   quickstart/index.rst
+
+.. autosummary::
+   :caption: API Reference
+   :toctree: apidoc/
+   :recursive:
+
+   openmnglab
 
 
 
