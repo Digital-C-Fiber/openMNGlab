@@ -1,0 +1,38 @@
+name: Make a new version and tag
+on:
+  workflow_call:
+    inputs:
+      BUMP_TO:
+        description: 'Poetry version (PEP 440 compliant version or bump rule)'
+        required: true
+        type: string
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2
+      - name: Bump version
+        id: bump_version
+        run: echo "new_version=$(poetry version -s ${{ inputs.BUMP_TO }})" >> $GITHUB_OUTPUT
+      - name: Add and Commit Version
+        env:
+          VERSION_TAG: v${{ steps.bump_version.outputs.new_version}}
+        run: |
+          git add ./pyproject.toml
+          git config --global user.name "Poetry Versioning Bot"
+          git config --global user.email "versioningbot@digital-c-fiber.invalid"
+          git commit -m "Change version to $VERSION_TAG" --allow-empty
+          git tag $VERSION_TAG
+          git push origin HEAD:main
+          git push origin $VERSION_TAG
+        shell: bash
+
+

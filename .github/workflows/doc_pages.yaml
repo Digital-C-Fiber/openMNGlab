@@ -1,7 +1,7 @@
 name: DocPages
 on:
-  push:
-    tags: "v*"
+  release:
+    types: [ published ]
   pull_request:
     branches:
       - main
@@ -34,7 +34,7 @@ jobs:
           poetry run sphinx-build -M html docs/source docs/build
           cp -r docs/build/html/* gh-pages/
       - name: Deploy Documentation
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'release' }}
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
