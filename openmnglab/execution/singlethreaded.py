@@ -18,7 +18,12 @@ def _func_setinput(func: IFunction, *inp: IDataContainer):
 def _func_exec(func: IFunction) -> Iterable[IDataContainer]:
     try:
         ret = func.execute()
-        return ret if ret is not None else tuple()
+        if ret is None:
+            return tuple()
+        elif isinstance(IDataContainer, ret):
+            return (ret,)
+        else:
+            return ret
     except Exception as e:
         raise FunctionExecutionError("function failed to execute") from e
 
