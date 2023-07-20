@@ -5,7 +5,7 @@ from typing import Collection, TypeVar, Generic, Optional, Iterable, Mapping
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
 from openmnglab.model.datamodel.interface import IInputDataScheme, IOutputDataScheme
-from openmnglab.model.functions.interface import IFunctionDefinition
+from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
 from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
 from openmnglab.model.planning.interface import IExecutionPlanner, IProxyData
 from openmnglab.model.planning.plan.interface import IExecutionPlan, IStage, IPlannedData, IPlannedElement
@@ -71,12 +71,11 @@ class PlannerBase(IExecutionPlanner, ABC, Generic[_FuncT, _DataT]):
         return ExecutionPlan(self._functions.copy(), self._data.copy())
 
     @abstractmethod
-    def _add_function(self, function: IFunctionDefinition, *inp_data: _DataT) -> tuple[IProxyData, ...]:
+    def _add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: _DataT) -> ProxyRet:
         ...
 
-    def add_function(self, function: IFunctionDefinition, *inp_data: IProxyData) -> Optional[tuple[IProxyData, ...]]:
-        result = self._add_function(function, *self._proxy_data_to_concrete(*inp_data))
-        return result if len(result) > 0 else None
+    def add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: IProxyData) -> ProxyRet:
+        return self._add_function(function, *self._proxy_data_to_concrete(*inp_data))
 
     def _proxy_data_to_concrete(self, *inp_data: IProxyData) -> Iterable[_DataT]:
         for pos, inp in enumerate(inp_data):

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from openmnglab.model.datamodel.interface import IOutputDataScheme
-from openmnglab.model.functions.interface import IFunctionDefinition
+from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
 from openmnglab.planning.base import PlannerBase, check_input, ProxyData
 from openmnglab.planning.exceptions import PlanningError
 from openmnglab.model.planning.interface import IProxyData
 from openmnglab.model.planning.plan.interface import IStage, IPlannedData
 from openmnglab.util.hashing import Hash
-from openmnglab.util.iterables import ensure_iterable
+from openmnglab.util.iterables import ensure_iterable, unpack_sequence
 
 
 class Stage(IStage):
@@ -75,7 +75,7 @@ class PlannedData(IPlannedData):
 
 class DefaultPlanner(PlannerBase[Stage, PlannedData]):
 
-    def _add_function(self, function: IFunctionDefinition, *inp_data: PlannedData) -> tuple[IProxyData, ...]:
+    def _add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: PlannedData) -> ProxyRet:
         check_input(function.consumes, tuple(d.schema for d in inp_data))
         stage = Stage(function, *inp_data)
         if stage.calculated_hash in self._functions:
@@ -83,4 +83,4 @@ class DefaultPlanner(PlannerBase[Stage, PlannedData]):
         self._functions[stage.calculated_hash] = stage
         for prod in stage.data_out:
             self._data[prod.calculated_hash] = prod
-        return tuple(ProxyData.copy_from(o) for o in stage.data_out)
+        return unpack_sequence(tuple(ProxyData.copy_from(o) for o in stage.data_out))
