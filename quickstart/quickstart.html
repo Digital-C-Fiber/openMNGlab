@@ -1,0 +1,691 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Run-along example &#8212; OpenMNGLab 0a1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'quickstart/quickstart';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Implementing a function" href="implementing_functions.html" />
+    <link rel="prev" title="Quickstart" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">OpenMNGLab 0a1 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../overview/overview.html">Overview</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview/installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview/concept.html">Concept</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Quickstart</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Run-along example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementing_functions.html">Implementing a function</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../apidoc/openmnglab.html">openmnglab</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../apidoc/openmnglab.datamodel.html">openmnglab.datamodel</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.datamodel.exceptions.html">openmnglab.datamodel.exceptions</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.datamodel.exceptions.DataSchemeCompatibilityError.html">openmnglab.datamodel.exceptions.DataSchemeCompatibilityError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.datamodel.exceptions.DataSchemeConformityError.html">openmnglab.datamodel.exceptions.DataSchemeConformityError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.datamodel.exceptions.DataSchemeError.html">openmnglab.datamodel.exceptions.DataSchemeError</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.datamodel.matplot.html">openmnglab.datamodel.matplot</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.datamodel.matplot.model.html">openmnglab.datamodel.matplot.model</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.datamodel.pandas.html">openmnglab.datamodel.pandas</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.datamodel.pandas.model.html">openmnglab.datamodel.pandas.model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.datamodel.pandas.schemes.html">openmnglab.datamodel.pandas.schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.datamodel.pandas.verification.html">openmnglab.datamodel.pandas.verification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../apidoc/openmnglab.execution.html">openmnglab.execution</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.execution.exceptions.html">openmnglab.execution.exceptions</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.execution.exceptions.ExecutionException.html">openmnglab.execution.exceptions.ExecutionException</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.execution.exceptions.FunctionError.html">openmnglab.execution.exceptions.FunctionError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.execution.exceptions.FunctionExecutionError.html">openmnglab.execution.exceptions.FunctionExecutionError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.execution.exceptions.FunctionInputError.html">openmnglab.execution.exceptions.FunctionInputError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.execution.exceptions.FunctionOutputError.html">openmnglab.execution.exceptions.FunctionOutputError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.execution.exceptions.FunctionReturnCountMissmatch.html">openmnglab.execution.exceptions.FunctionReturnCountMissmatch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.execution.exceptions.StageExecutionError.html">openmnglab.execution.exceptions.StageExecutionError</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.execution.singlethreaded.html">openmnglab.execution.singlethreaded</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.execution.singlethreaded.SingleThreadedExecutor.html">openmnglab.execution.singlethreaded.SingleThreadedExecutor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../apidoc/openmnglab.model.html">openmnglab.model</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.model.datamodel.html">openmnglab.model.datamodel</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.model.datamodel.interface.html">openmnglab.model.datamodel.interface</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.model.execution.html">openmnglab.model.execution</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.model.execution.interface.html">openmnglab.model.execution.interface</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.model.functions.html">openmnglab.model.functions</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.model.functions.interface.html">openmnglab.model.functions.interface</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.model.planning.html">openmnglab.model.planning</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.model.planning.interface.html">openmnglab.model.planning.interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.model.planning.plan.html">openmnglab.model.planning.plan</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.model.shared.html">openmnglab.model.shared</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.model.shared.IHashIdentifiedElement.html">openmnglab.model.shared.IHashIdentifiedElement</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../apidoc/openmnglab.planning.html">openmnglab.planning</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.planning.base.html">openmnglab.planning.base</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.planning.base.check_input.html">openmnglab.planning.base.check_input</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.planning.base.ExecutionPlan.html">openmnglab.planning.base.ExecutionPlan</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.planning.base.PlannerBase.html">openmnglab.planning.base.PlannerBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.planning.base.ProxyData.html">openmnglab.planning.base.ProxyData</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.planning.default.html">openmnglab.planning.default</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.planning.default.DefaultPlanner.html">openmnglab.planning.default.DefaultPlanner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.planning.default.PlannedData.html">openmnglab.planning.default.PlannedData</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.planning.default.Stage.html">openmnglab.planning.default.Stage</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.planning.exceptions.html">openmnglab.planning.exceptions</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.planning.exceptions.FunctionArgumentSchemaError.html">openmnglab.planning.exceptions.FunctionArgumentSchemaError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.planning.exceptions.FunctionArgumentsError.html">openmnglab.planning.exceptions.FunctionArgumentsError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.planning.exceptions.InvalidFunctionArgumentCountError.html">openmnglab.planning.exceptions.InvalidFunctionArgumentCountError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.planning.exceptions.PlanningError.html">openmnglab.planning.exceptions.PlanningError</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../apidoc/openmnglab.util.html">openmnglab.util</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.util.dicts.html">openmnglab.util.dicts</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-22"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.util.dicts.get_and_incr.html">openmnglab.util.dicts.get_and_incr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.util.dicts.get_any.html">openmnglab.util.dicts.get_any</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.util.dicts.get_any_key.html">openmnglab.util.dicts.get_any_key</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.util.dicts.group_dict.html">openmnglab.util.dicts.group_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.util.dicts.setfactory.html">openmnglab.util.dicts.setfactory</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.util.hashing.html">openmnglab.util.hashing</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.util.hashing.Hash.html">openmnglab.util.hashing.Hash</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.util.pandas.html">openmnglab.util.pandas</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.util.pandas.ensure_dataframe.html">openmnglab.util.pandas.ensure_dataframe</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.util.pandas.index_names.html">openmnglab.util.pandas.index_names</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.util.pandas.iterdfcols.html">openmnglab.util.pandas.iterdfcols</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.util.pandas.pandas_names.html">openmnglab.util.pandas.pandas_names</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../apidoc/openmnglab.util.seaborn.html">openmnglab.util.seaborn</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../apidoc/openmnglab.util.seaborn.Theme.html">openmnglab.util.seaborn.Theme</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/Digital-C-Fiber/openMNGlab/blob/main/docs/quickstart/quickstart.rst?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/Digital-C-Fiber/openMNGlab/edit/main/docs/quickstart/quickstart.rst" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/Digital-C-Fiber/openMNGlab/issues/new?title=Issue%20on%20page%20%2Fquickstart/quickstart.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Run-along example</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-planner">1. Create a planner</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-a-source-function">2. Add a source function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#execute-your-plan">3. Execute your plan</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#get-your-plan">3.1 Get your plan</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#create-your-executor-and-feed-it-the-plan">3.2 Create your executor and feed it the plan</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#get-your-data">3.3 get your data.</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-more-functions">4. Add more functions</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#execute-the-plan-and-the-figure">4.1 execute the plan (and the figure)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-save-the-figure">4.2 (optional) save the figure</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="run-along-example">
+<h1>Run-along example<a class="headerlink" href="#run-along-example" title="Permalink to this heading">#</a></h1>
+<p><strong>REQUIREMENTS</strong>: A DAPSYS file containing some sorted spikes In this
+example, you will load a DAPSYS file and plot the sorted spikes.</p>
+<section id="create-a-planner">
+<h2>1. Create a planner<a class="headerlink" href="#create-a-planner" title="Permalink to this heading">#</a></h2>
+<p>With planners you can compose your functions and data flow in a
+directed, acyclic graph (DAG). All planners should implement
+<code class="docutils literal notranslate"><span class="pre">openmnglab.model.planning.interface.IExecutionPlanner</span></code>. For ease of
+use, we will use the <code class="docutils literal notranslate"><span class="pre">DefaultPlanner</span></code> in this example.</p>
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openmnglab.planning</span> <span class="kn">import</span> <span class="n">DefaultPlanner</span>
+
+<span class="n">planner</span> <span class="o">=</span> <span class="n">DefaultPlanner</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="add-a-source-function">
+<h2>2. Add a source function<a class="headerlink" href="#add-a-source-function" title="Permalink to this heading">#</a></h2>
+<p>To do operations on data, you will first need to ingest data from at
+least one source function, implementing <code class="docutils literal notranslate"><span class="pre">ISourceFuntionDefinition</span></code>.
+Classes implementing that interface guarantee that they do not require
+any input. In this example, we will load a microneurography recording
+from a DAPSYS file using the <code class="docutils literal notranslate"><span class="pre">DapsysReader</span></code> function</p>
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">openmnglab.functions</span> <span class="kn">import</span> <span class="n">DapsysReader</span>
+
+<span class="c1"># we will use the pathlib API to define our path. This is generally nicer when working on cross-platform projects, as it is a uniform, platform-independent way to define paths.</span>
+<span class="c1"># REQUIRED: path to your DAPSYS file</span>
+<span class="n">MY_DAPSYS_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">/</span><span class="s1">&#39;to&#39;</span><span class="o">/</span><span class="s1">&#39;my&#39;</span><span class="o">/</span><span class="s1">&#39;dapsys&#39;</span><span class="o">/</span><span class="s1">&#39;file.dps&#39;</span>
+<span class="c1"># REQUIRED: The name of the stimulator folder inside your DAPSYS file.</span>
+<span class="n">DAPSYS_STIM_FOLDER</span> <span class="o">=</span> <span class="s2">&quot;NI Puls Stimulator&quot;</span>
+
+<span class="c1"># returns from the DapsysReader module. There is no data behind them, as we haven&#39;t executed the plan yet.</span>
+<span class="n">continuous_recording</span><span class="p">,</span> <span class="n">stimuli</span><span class="p">,</span> <span class="n">tracks</span> <span class="o">=</span> <span class="n">planner</span><span class="o">.</span><span class="n">add_source</span><span class="p">(</span><span class="n">DapsysReader</span><span class="p">(</span><span class="n">MY_DAPSYS_PATH</span><span class="p">,</span> <span class="n">DAPSYS_STIM_FOLDER</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Here, we got three returns from the <code class="docutils literal notranslate"><span class="pre">DapsysReader</span></code> function. This
+returns are proxy data objects - they represent a piece of data that has
+not yet been calculated. Internally, our <code class="docutils literal notranslate"><span class="pre">planner</span></code> keeps track of the
+proxy data objects and knows which dataschema is behind each one. This
+information is used to validate that functions only receive inputs with
+matching data schemes.</p>
+</section>
+<section id="execute-your-plan">
+<h2>3. Execute your plan<a class="headerlink" href="#execute-your-plan" title="Permalink to this heading">#</a></h2>
+<p>Normally, you would first completely build up your analysis flow. But
+for this example, we will execute it immediately to see if it works</p>
+<section id="get-your-plan">
+<h3>3.1 Get your plan<a class="headerlink" href="#get-your-plan" title="Permalink to this heading">#</a></h3>
+<p>To execute a plan, you will first have to get the plan object:</p>
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">my_awesome_plan</span> <span class="o">=</span> <span class="n">planner</span><span class="o">.</span><span class="n">get_plan</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="create-your-executor-and-feed-it-the-plan">
+<h3>3.2 Create your executor and feed it the plan<a class="headerlink" href="#create-your-executor-and-feed-it-the-plan" title="Permalink to this heading">#</a></h3>
+<p>To execute a plan, create an object implementing
+<code class="docutils literal notranslate"><span class="pre">openmnglab.model.execution.interface.IExecutor</span></code> and execute the plan.</p>
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openmnglab.execution</span> <span class="kn">import</span> <span class="n">SingleThreadedExecutor</span>
+
+<span class="n">executor</span> <span class="o">=</span> <span class="n">SingleThreadedExecutor</span><span class="p">(</span><span class="n">my_awesome_plan</span><span class="p">)</span>
+<span class="n">executor</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="get-your-data">
+<h3>3.3 get your data.<a class="headerlink" href="#get-your-data" title="Permalink to this heading">#</a></h3>
+<p>You can now use your proxy data tokens to retrieve the computed data
+containers. A data container implements
+<code class="docutils literal notranslate"><span class="pre">openmnglab.model.datamodel.interface.IDataContainer</span></code>. The primary
+data of a data container can always be accessed by the <code class="docutils literal notranslate"><span class="pre">data</span></code>
+property. Additional properties may be implemented by specific container
+types. In our case, a <code class="docutils literal notranslate"><span class="pre">PandasContainer</span></code> exposes its pandas data
+structure through said <code class="docutils literal notranslate"><span class="pre">data</span></code> property, but has the additional
+<code class="docutils literal notranslate"><span class="pre">units</span></code> property</p>
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">executor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tracks</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PandasContainer</span> <span class="o">@</span><span class="mi">140395669499792</span>
+<span class="n">Units</span><span class="p">:</span> <span class="s1">&#39;global stim id&#39;</span><span class="p">:</span><span class="n">dimensionless</span><span class="p">,</span><span class="s1">&#39;track&#39;</span><span class="p">:</span><span class="n">dimensionless</span><span class="p">,</span><span class="s1">&#39;track_spike_idx&#39;</span><span class="p">:</span><span class="n">dimensionless</span><span class="p">,</span><span class="s1">&#39;spike_ts&#39;</span><span class="p">:</span><span class="n">s</span>
+<span class="k">global</span> <span class="n">stim</span> <span class="nb">id</span>  <span class="n">track</span>   <span class="n">track_spike_idx</span>
+<span class="mi">0</span>               <span class="n">Track2</span>  <span class="mi">0</span>                    <span class="mf">22.96621</span>
+<span class="mi">1</span>               <span class="n">Track2</span>  <span class="mi">1</span>                    <span class="mf">26.96621</span>
+<span class="mi">2</span>               <span class="n">Track2</span>  <span class="mi">2</span>                    <span class="mf">30.96611</span>
+<span class="mi">3</span>               <span class="n">Track2</span>  <span class="mi">3</span>                    <span class="mf">34.96611</span>
+<span class="mi">4</span>               <span class="n">Track2</span>  <span class="mi">4</span>                    <span class="mf">38.96611</span>
+                                              <span class="o">...</span>
+<span class="mi">587</span>             <span class="n">Track5</span>  <span class="mi">569</span>                <span class="mf">2510.96124</span>
+<span class="mi">588</span>             <span class="n">Track5</span>  <span class="mi">570</span>                <span class="mf">2514.96094</span>
+<span class="mi">589</span>             <span class="n">Track5</span>  <span class="mi">571</span>                <span class="mf">2518.96094</span>
+<span class="mi">590</span>             <span class="n">Track5</span>  <span class="mi">572</span>                <span class="mf">2522.96064</span>
+<span class="mi">592</span>             <span class="n">Track5</span>  <span class="mi">573</span>                <span class="mf">2530.96084</span>
+<span class="n">Name</span><span class="p">:</span> <span class="n">spike_ts</span><span class="p">,</span> <span class="n">Length</span><span class="p">:</span> <span class="mi">1157</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="add-more-functions">
+<h2>4. Add more functions<a class="headerlink" href="#add-more-functions" title="Permalink to this heading">#</a></h2>
+<p>Now you know how to build and execute a plan and get the data from it.
+Let’s add some more stages to the execution plan. * To provide input to
+a normal stage, we pass the proxy data object as simple additional
+arguments after the function. * When a function produces only one piece
+of data, it will still return a tuple. Remember to add the required ‘,’
+to properly unpack that tuple.</p>
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">quantities</span> <span class="k">as</span> <span class="nn">pq</span>
+<span class="kn">from</span> <span class="nn">openmnglab.functions</span> <span class="kn">import</span> <span class="n">Windowing</span><span class="p">,</span> <span class="n">IntervalData</span><span class="p">,</span> <span class="n">WaveformPlot</span>
+
+<span class="c1"># create a window of +- 1.5 ms around the actionpotential timestamps. Pass a name for the resulting series.</span>
+<span class="n">ap_windows</span><span class="p">,</span> <span class="o">=</span> <span class="n">planner</span><span class="o">.</span><span class="n">add_stage</span><span class="p">(</span><span class="n">Windowing</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span> <span class="o">*</span> <span class="n">pq</span><span class="o">.</span><span class="n">ms</span><span class="p">,</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">pq</span><span class="o">.</span><span class="n">ms</span><span class="p">,</span> <span class="s2">&quot;ap windows&quot;</span><span class="p">),</span> <span class="n">tracks</span><span class="p">)</span>
+<span class="c1"># now we will extract the data of the windows and calculate their first and second derivatives. This requires the window inervals and the continuous recording</span>
+<span class="n">action_potentials</span><span class="p">,</span> <span class="o">=</span> <span class="n">planner</span><span class="o">.</span><span class="n">add_stage</span><span class="p">(</span><span class="n">IntervalData</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">derivative_base</span><span class="o">=</span><span class="n">pq</span><span class="o">.</span><span class="n">ms</span><span class="p">),</span> <span class="n">ap_windows</span><span class="p">,</span> <span class="n">continuous_recording</span><span class="p">)</span>
+<span class="c1"># next, plot the average waveforms of the data with their standard deviation:</span>
+<span class="n">action_potential_plots</span><span class="p">,</span> <span class="o">=</span> <span class="n">planner</span><span class="o">.</span><span class="n">add_stage</span><span class="p">(</span><span class="n">WaveformPlot</span><span class="p">(),</span> <span class="n">action_potentials</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="execute-the-plan-and-the-figure">
+<h3>4.1 execute the plan (and the figure)<a class="headerlink" href="#execute-the-plan-and-the-figure" title="Permalink to this heading">#</a></h3>
+<p>Executing the plan will calculate and stages and immediately plot the
+figure when matplotlib is configured using the IPython backend
+(i.e. when running in Jupyter).</p>
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">executor</span> <span class="o">=</span> <span class="n">SingleThreadedExecutor</span><span class="p">(</span><span class="n">planner</span><span class="o">.</span><span class="n">get_plan</span><span class="p">())</span>
+<span class="n">executor</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/quickstart_16_0.png" src="../_images/quickstart_16_0.png" />
+</section>
+<section id="optional-save-the-figure">
+<h3>4.2 (optional) save the figure<a class="headerlink" href="#optional-save-the-figure" title="Permalink to this heading">#</a></h3>
+<p>of course, the figure object can still be retrieved from the executor,
+independent if it was plotted directly or not. To save the figure to a
+file, retrieve it either by the <code class="docutils literal notranslate"><span class="pre">data</span></code> property of <code class="docutils literal notranslate"><span class="pre">IDataContainer</span></code>
+or the <code class="docutils literal notranslate"><span class="pre">figure</span></code> attribute of the concrete <code class="docutils literal notranslate"><span class="pre">MatPlotLibContainer</span></code> and
+save:</p>
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">executor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">action_potential_plots</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;my_actpots.svg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Quickstart</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="implementing_functions.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Implementing a function</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-planner">1. Create a planner</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-a-source-function">2. Add a source function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#execute-your-plan">3. Execute your plan</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#get-your-plan">3.1 Get your plan</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#create-your-executor-and-feed-it-the-plan">3.2 Create your executor and feed it the plan</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#get-your-data">3.3 get your data.</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-more-functions">4. Add more functions</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#execute-the-plan-and-the-figure">4.1 execute the plan (and the figure)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-save-the-figure">4.2 (optional) save the figure</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Peter Konradi
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Peter Konradi.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
