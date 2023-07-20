@@ -39,10 +39,9 @@ class SPDFFeatures(FunctionDefinitionBase[IProxyData[DataFrame]]):
     def consumes(self) -> tuple[PrincipleComponentsInputScheme, IntervalDataInputSchema]:
         return PrincipleComponentsInputScheme(), IntervalDataInputSchema(0, 1, 2)
 
-    def production_for(self, principle_compo: PrincipleComponentsInputScheme, diffs: IntervalDataInputSchema) -> tuple[
-        SPDFFeatureOutputSchema]:
+    def production_for(self, principle_compo: PrincipleComponentsInputScheme, diffs: IntervalDataInputSchema) -> SPDFFeatureOutputSchema:
         compare_index(principle_compo.pandera_schema.index, pa.MultiIndex(diffs.pandera_schema.index.indexes[:-1]))
-        return SPDFFeatureOutputSchema(principle_compo.pandera_schema.index),
+        return SPDFFeatureOutputSchema(principle_compo.pandera_schema.index)
 
     def new_function(self) -> FeatureFunc:
         return FeatureFunc()

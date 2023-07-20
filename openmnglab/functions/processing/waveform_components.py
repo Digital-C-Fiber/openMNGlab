@@ -44,13 +44,12 @@ class WaveformComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
         super().__init__("openmnglab.principlecomponents")
 
     @property
-    def consumes(self) -> tuple[IntervalDataInputSchema]:
-        return IntervalDataInputSchema(0, 1),
+    def consumes(self) -> IntervalDataInputSchema:
+        return IntervalDataInputSchema(0, 1)
 
     @staticmethod
-    def production_for(diffs: PandasInputDataScheme[pa.DataFrameSchema]) -> tuple[
-        PrincipleComponentsDynamicOutputScheme]:
-        return PrincipleComponentsDynamicOutputScheme(diffs.pandera_schema.index),
+    def production_for(diffs: PandasInputDataScheme[pa.DataFrameSchema]) ->  PrincipleComponentsDynamicOutputScheme:
+        return PrincipleComponentsDynamicOutputScheme(diffs.pandera_schema.index)
 
     @staticmethod
     def new_function() -> WaveformComponentsFunc:

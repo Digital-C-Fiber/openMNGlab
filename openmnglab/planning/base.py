@@ -1,19 +1,21 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Collection, TypeVar, Generic, Optional, Iterable, Mapping
+from typing import Collection, TypeVar, Generic, Iterable, Mapping, Sequence
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
 from openmnglab.model.datamodel.interface import IInputDataScheme, IOutputDataScheme
 from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
-from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
 from openmnglab.model.planning.interface import IExecutionPlanner, IProxyData
 from openmnglab.model.planning.plan.interface import IExecutionPlan, IStage, IPlannedData, IPlannedElement
+from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
+from openmnglab.util.iterables import ensure_iterable, ensure_sequence
 
 
-def check_input(expected_schemes: Optional[Collection[IInputDataScheme]], actual_schemes: Optional[Collection[IOutputDataScheme]]):
-    expected_schemes: Collection[IInputDataScheme] = expected_schemes if expected_schemes is not None else tuple()
-    actual_schemes: Collection[IOutputDataScheme] = actual_schemes if actual_schemes is not None else tuple()
+def check_input(expected_schemes: Sequence[IInputDataScheme] | IInputDataScheme | None,
+                actual_schemes: Sequence[IOutputDataScheme] | IOutputDataScheme | None):
+    expected_schemes: Sequence[IInputDataScheme] = ensure_sequence(expected_schemes, IInputDataScheme)
+    actual_schemes: Sequence[IOutputDataScheme] = ensure_sequence(actual_schemes, IOutputDataScheme)
     if len(expected_schemes) != len(actual_schemes):
         raise InvalidFunctionArgumentCountError(len(expected_schemes), len(actual_schemes))
     for pos, (expected_scheme, actual_scheme) in enumerate(zip(expected_schemes, actual_schemes)):

@@ -78,12 +78,12 @@ class Windowing(FunctionDefinitionBase[IProxyData[DataFrame]]):
             .digest()
 
     @property
-    def consumes(self) -> tuple[WindowingInputDataScheme]:
-        return WindowingInputDataScheme(),
+    def consumes(self) -> WindowingInputDataScheme:
+        return WindowingInputDataScheme()
 
-    def production_for(self, inp: PandasOutputDataScheme) -> tuple[DynamicIndexIntervalScheme]:
+    def production_for(self, inp: PandasOutputDataScheme) -> DynamicIndexIntervalScheme:
         assert isinstance(inp, PandasOutputDataScheme)
-        return DynamicIndexIntervalScheme.for_input(inp, self._name),
+        return DynamicIndexIntervalScheme.for_input(inp, self._name)
 
     def new_function(self) -> IFunction:
         return WindowingFunc(self._lo, self._hi, self._name, closed=self._closed)
