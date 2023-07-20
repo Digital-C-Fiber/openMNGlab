@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Generic
 
-from openmnglab.model.functions.interface import IFunction, IFunctionDefinition, ISourceFunction, Prods, \
+from openmnglab.model.functions.interface import IFunction, IFunctionDefinition, ISourceFunction, ProxyRet, \
     IStaticFunctionDefinition, ISourceFunctionDefinition
 from openmnglab.util.hashing import Hash
 
@@ -20,7 +20,7 @@ class SourceFunctionBase(FunctionBase, ISourceFunction, ABC):
         pass
 
 
-class FunctionDefinitionBase(Generic[*Prods], IFunctionDefinition[*Prods], ABC):
+class FunctionDefinitionBase(Generic[ProxyRet], IFunctionDefinition[ProxyRet], ABC):
 
     def __init__(self, identifier: str):
         self._identifier = identifier
@@ -41,11 +41,11 @@ class FunctionDefinitionBase(Generic[*Prods], IFunctionDefinition[*Prods], ABC):
         return hashgen.digest()
 
 
-class StaticFunctionDefinitionBase(Generic[*Prods], FunctionDefinitionBase[*Prods], IStaticFunctionDefinition[*Prods],
+class StaticFunctionDefinitionBase(Generic[ProxyRet], FunctionDefinitionBase[ProxyRet], IStaticFunctionDefinition[ProxyRet],
                                    ABC):
     ...
 
 
-class SourceFunctionDefinitionBase(Generic[*Prods], StaticFunctionDefinitionBase[*Prods],
-                                   ISourceFunctionDefinition[*Prods], ABC):
+class SourceFunctionDefinitionBase(Generic[ProxyRet], StaticFunctionDefinitionBase[ProxyRet],
+                                   ISourceFunctionDefinition[ProxyRet], ABC):
     ...

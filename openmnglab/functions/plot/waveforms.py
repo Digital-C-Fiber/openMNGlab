@@ -90,10 +90,10 @@ class WaveformPlot(StaticFunctionDefinitionBase[IProxyData[plt.Figure]]):
         return h.digest()
 
     @property
-    def consumes(self) -> tuple[PandasInputDataScheme[pd.DataFrame]]:
+    def consumes(self) -> PandasInputDataScheme[pd.DataFrame]:
         return PandasInputDataScheme(DataFrameSchema({
             self.column: Column(float)
-        })),
+        }))
 
     def new_function(self) -> WaveformPlotFunc:
         return WaveformPlotFunc(mode=self.mode, selector=self.selector, column=self.column, fig_args=self.fig_args,
@@ -101,5 +101,5 @@ class WaveformPlot(StaticFunctionDefinitionBase[IProxyData[plt.Figure]]):
                                 time_col=self.time_col, stim_idx=self.stim_idx, **self.sns_args)
 
     @property
-    def produces(self) -> tuple[MatPlotlibSchema]:
-        return MatPlotlibSchema(),
+    def produces(self) -> MatPlotlibSchema:
+        return MatPlotlibSchema()

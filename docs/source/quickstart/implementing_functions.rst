@@ -25,7 +25,7 @@ Declare a new class and derive it from :class:`~openmnglab.functions.base.Functi
 
 
     class SeriesChooserFunc(FunctionBase):
-        def execute(self) -> Iterable[IDataContainer]:
+        def execute(self) -> IDataContainer | Iterable[IDataContainer]:
             pass
 
         def set_input(self, *data_in: IDataContainer):
@@ -69,7 +69,7 @@ We will implement the constructor and specify the type annotations of our class:
             self.series_b_container: PandasContainer[pd.Series] = None
             self.chosen_series = chosen_series
 
-        def execute(self) -> tuple[PandasContainer[pd.Series]]:
+        def execute(self) -> PandasContainer[pd.Series]:
             pass
 
         def set_input(self, series_a_container: PandasContainer[pd.Series], series_b_container: PandasContainer[pd.Series]):
@@ -79,11 +79,7 @@ We will implement the constructor and specify the type annotations of our class:
 Now implement the (trivial) execution function. For the sake of demonstration, we will not simple return the chosen container, but will construct a new one with the chosen series.
 Remember that a `PandasContainer` requires a dictionary which contains the unit of each column and index of the contained pandas structure.
 
-.. important::
-    Always make sure to include a comma at the end of ``execute`` to return a tuple! Returning a single item not wrapped in a tuple is not supported at this time.
-
 .. code-block:: python
-    :emphasize-lines: 17, 18
 
     import pandas as pd
 
@@ -98,11 +94,10 @@ Remember that a `PandasContainer` requires a dictionary which contains the unit 
             self.series_b_container: PandasContainer[pd.Series] = None
             self.chosen_series = chosen_series
 
-        def execute(self) -> tuple[PandasContainer[pd.Series]]:
+        def execute(self) -> PandasContainer[pd.Series]:
             chosen_container = self.series_a_container if self.chosen_series == 0 else self.series_b_container
             return_container = PandasContainer(chosen_container.data, chosen_container.units)
-            # remember to return a tuple
-            return return_container,
+            return return_container
 
         def set_input(self, series_a_container: PandasContainer[pd.Series], series_b_container: PandasContainer[pd.Series]):
             self.series_a_container = series_a_container
@@ -112,11 +107,7 @@ Test
 ^^^^^
 You should now test your function to make sure it works like intended:
 
-.. important::::
-    Always make sure to include a comma to unpack the result of ``execute``.
-
 .. code-block:: python
-    :emphasize-lines: 19, 20
 
     import quantities as pq
 
@@ -136,7 +127,7 @@ You should now test your function to make sure it works like intended:
     # set the input
     chooser.set_input(ser_a_container, ser_b_container)
     # execute it; remember to include the comma to unpack the returned tuple
-    chosen_series_container, = chooser.execute()
+    chosen_series_container = chooser.execute()
 
     print(chosen_series_container)
 
@@ -225,7 +216,7 @@ we will also have to implement a function that will return the data schema for a
 .. code-block:: python
 
     def production_for(self, schema_a: PandasOutputDataScheme[SeriesSchema], schema_b: PandasOutputDataScheme[SeriesSchema]) -> tuple[PandasOutputDataScheme[SeriesSchema]]:
-        return schema_a if self.chosen_series == 0 else schema_b,
+        return schema_a if self.chosen_series == 0 else schema_b
 
 
 Finally, we have to implement the factory function
@@ -259,7 +250,7 @@ Complete implementation
             chosen_container = self.series_a_container if self.chosen_series == 0 else self.series_b_container
             return_container = PandasContainer(chosen_container.data, chosen_container.units)
             # remember to return a tuple
-            return return_container,
+            return return_container
 
         def set_input(self, series_a_container: PandasContainer[pd.Series], series_b_container: PandasContainer[pd.Series]):
             self.series_a_container = series_a_container
@@ -281,7 +272,7 @@ Complete implementation
 
         def production_for(self, schema_a: PandasOutputDataScheme[SeriesSchema],
                            schema_b: PandasOutputDataScheme[SeriesSchema]) -> tuple[PandasOutputDataScheme[SeriesSchema]]:
-            return schema_a if self.chosen_series == 0 else schema_b,
+            return schema_a if self.chosen_series == 0 else schema_b
 
         def new_function(self) -> SeriesChooserFunc:
             return SeriesChooserFunc(self.chosen_series)

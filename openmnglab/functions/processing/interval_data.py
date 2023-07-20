@@ -151,7 +151,7 @@ class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
         return generic_interval_list(), NumericIndexedList()
 
     def production_for(self, window_intervals: IOutputDataScheme[pa.SeriesSchema],
-                       data: IOutputDataScheme[pa.SeriesSchema]) -> tuple[IntervalDataOutputSchema]:
+                       data: IOutputDataScheme[pa.SeriesSchema]) -> IntervalDataOutputSchema:
         window_scheme, data_scheme = self.consumes
         assert (window_scheme.accepts(window_intervals))
         assert (data_scheme.accepts(data))
@@ -161,7 +161,7 @@ class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
             idx = pa.MultiIndex([window_intervals.pandera_schema.index, data.pandera_schema.index])
         else:
             idx = pa.MultiIndex([*window_intervals.pandera_schema.index.indexes, data.pandera_schema.index])
-        return IntervalDataOutputSchema(idx, *self._levels),
+        return IntervalDataOutputSchema(idx, *self._levels)
 
     def new_function(self) -> IntervalDataFunc:
         return IntervalDataFunc(self._levels,

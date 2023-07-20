@@ -104,11 +104,11 @@ class WaveformComponentsFunc(FunctionBase):
             units[column_name] = self._diffs.units[self._diffs.data.index.names[-1]]
         return units
 
-    def execute(self) -> tuple[PandasContainer[DataFrame]]:
+    def execute(self) -> PandasContainer[DataFrame]:
         idx = self._diffs.data.index.droplevel(-1).unique()
         components = self.calc_principle_components()
         df = DataFrame(data=components.T, columns=PRINCIPLE_COMPONENTS, index=idx)
-        return PandasContainer(df, units=self.build_unitdict()),
+        return PandasContainer(df, units=self.build_unitdict())
 
     def set_input(self, diffs: PandasContainer[DataFrame]):
         self._diffs = diffs

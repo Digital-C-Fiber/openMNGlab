@@ -12,7 +12,7 @@ from openmnglab.model.planning.interface import IProxyData
 from openmnglab.util.hashing import Hash
 
 
-class DapsysReader(SourceFunctionDefinitionBase[IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series]]):
+class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series]]]):
     """Loads data from a DAPSYS file
 
     In: nothing

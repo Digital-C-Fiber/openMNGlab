@@ -98,7 +98,7 @@ class IntervalDataFunc(FunctionBase):
             units[name] = u
         return units
 
-    def execute(self) -> tuple[PandasContainer[DataFrame]]:
+    def execute(self) -> PandasContainer[DataFrame]:
         intervals = self._window_intervals.data
         recording = self._recording.data
         interval_ranges = np.fromiter(
@@ -139,7 +139,7 @@ class IntervalDataFunc(FunctionBase):
                                                recording.index.name], codes=multiindex_codes)
         return PandasContainer(DataFrame(data=diffs.T,
                                          columns=[LEVEL_COLUMN[i] for i in self._levels], index=new_multiindex),
-                               units=self.build_unitdict()),
+                               units=self.build_unitdict())
 
     def set_input(self, window_intervals: IDataContainer, data: IDataContainer):
         self._window_intervals = window_intervals

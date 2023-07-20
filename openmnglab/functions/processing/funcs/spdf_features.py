@@ -113,7 +113,7 @@ class FeatureFunc(FunctionBase):
             units[index_name] = self._components.units[index_name]
         return units
 
-    def execute(self) -> tuple[PandasContainer[DataFrame]]:
+    def execute(self) -> PandasContainer[DataFrame]:
         stuff = self._components.data.index
 
         nmpy = np.empty((len(stuff), 24), dtype=self._dtype)
@@ -123,7 +123,7 @@ class FeatureFunc(FunctionBase):
                                           *(spike_components[component] for component in PRINCIPLE_COMPONENTS))
         df = DataFrame(data=nmpy, columns=SPDF_FEATURES, index=self._components.data.index)
 
-        return PandasContainer(df, self.build_unitdict()),
+        return PandasContainer(df, self.build_unitdict())
 
     def set_input(self, components: PandasContainer[DataFrame], diffs: PandasContainer[DataFrame]) -> Self:
         self._components = components
