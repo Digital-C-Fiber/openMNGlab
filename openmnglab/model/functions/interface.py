@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Iterable, Sequence, Literal, TypeVarTuple, Generic
+from typing import Optional, Iterable, Sequence, Literal, TypeVarTuple, Generic, TypeVar
 
 from openmnglab.model.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme
 
@@ -43,10 +43,10 @@ class ISourceFunction(IFunction, ABC):
         ...
 
 
-Prods = TypeVarTuple('Prods')
+ProxyRet = TypeVar('ProxyRet')
 
 
-class IFunctionDefinition(ABC, Generic[*Prods]):
+class IFunctionDefinition(ABC, Generic[ProxyRet]):
 
     @property
     @abstractmethod
@@ -77,7 +77,7 @@ class IFunctionDefinition(ABC, Generic[*Prods]):
         ...
 
 
-class IStaticFunctionDefinition(Generic[*Prods], IFunctionDefinition[*Prods], ABC):
+class IStaticFunctionDefinition(Generic[ProxyRet], IFunctionDefinition[ProxyRet], ABC):
     @property
     @abstractmethod
     def produces(self) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
@@ -87,7 +87,7 @@ class IStaticFunctionDefinition(Generic[*Prods], IFunctionDefinition[*Prods], AB
         return self.produces
 
 
-class ISourceFunctionDefinition(Generic[*Prods], IStaticFunctionDefinition[*Prods], ABC):
+class ISourceFunctionDefinition(Generic[ProxyRet], IStaticFunctionDefinition[ProxyRet], ABC):
 
     @property
     def consumes(self) -> Literal[None]:
