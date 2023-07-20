@@ -72,9 +72,9 @@ def unpack_sequence(inp: Sequence[T]) -> Sequence[T] | T | None:
     .. seealso::
         :func:`ensure_iterable` for the inverse operation
 
-        1. ``inp`` has no items: return ``None``
-        2. ``inp`` has one item: return that item
-        3. ``inp`` has more items: return ``inp``
+    1. ``inp`` has no items: return ``None``
+    2. ``inp`` has one item: return that item
+    3. ``inp`` has more items: return ``inp``
 
 
     :param inp: A sequence of items
