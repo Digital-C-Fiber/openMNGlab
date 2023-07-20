@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Iterable, Sequence, Literal, TypeVarTuple, Generic, TypeVar
+from typing import Optional, Iterable, Sequence, Literal, Generic, TypeVar
 
 from openmnglab.model.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme
 
@@ -16,7 +16,7 @@ class IFunction(ABC):
     """
 
     @abstractmethod
-    def execute(self) -> Optional[IDataContainer, Iterable[IDataContainer]]:
+    def execute(self) -> Optional[IDataContainer | Iterable[IDataContainer]]:
         """ Execute the function based on the data set by :meth:`set_input`
 
         :return: The data containers produced by executing the function
