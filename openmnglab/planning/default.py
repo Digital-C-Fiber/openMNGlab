@@ -7,6 +7,7 @@ from openmnglab.planning.exceptions import PlanningError
 from openmnglab.model.planning.interface import IProxyData
 from openmnglab.model.planning.plan.interface import IStage, IPlannedData
 from openmnglab.util.hashing import Hash
+from openmnglab.util.iterables import ensure_iterable
 
 
 class Stage(IStage):
@@ -20,7 +21,7 @@ class Stage(IStage):
         self._definition = definition
         self._data_in = data_in
         self._data_out = tuple(PlannedData.from_function(self, out, i) for i, out in
-                               enumerate(definition.production_for(*(d.schema for d in data_in))))
+                               enumerate(ensure_iterable(definition.production_for(*(d.schema for d in data_in)), IOutputDataScheme)))
 
     @property
     def definition(self) -> IFunctionDefinition:

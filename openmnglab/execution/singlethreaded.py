@@ -6,6 +6,7 @@ from openmnglab.model.execution.interface import IExecutor
 from openmnglab.model.functions.interface import IFunction
 from openmnglab.model.planning.interface import IProxyData
 from openmnglab.model.planning.plan.interface import IExecutionPlan, IPlannedData
+from openmnglab.util.iterables import ensure_iterable
 
 
 def _func_setinput(func: IFunction, *inp: IDataContainer):
@@ -17,13 +18,7 @@ def _func_setinput(func: IFunction, *inp: IDataContainer):
 
 def _func_exec(func: IFunction) -> Iterable[IDataContainer]:
     try:
-        ret = func.execute()
-        if ret is None:
-            return tuple()
-        elif isinstance(ret, IDataContainer):
-            return (ret,)
-        else:
-            return ret
+        return ensure_iterable(func.execute(), IDataContainer)
     except Exception as e:
         raise FunctionExecutionError("function failed to execute") from e
 
