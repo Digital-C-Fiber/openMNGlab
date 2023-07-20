@@ -21,7 +21,7 @@ class WindowingFunc(FunctionBase):
         self._closed = closed
         self._name = name
 
-    def execute(self) -> Tuple[PandasContainer[Series]]:
+    def execute(self) -> PandasContainer[Series]:
         origin_series = self._target_series_container.data
         series_quantity = self._target_series_container.units[origin_series.name]
         lo, hi = magnitudes(*rescale_pq(series_quantity, self._lo, self._hi))
@@ -33,7 +33,7 @@ class WindowingFunc(FunctionBase):
         window_series.name = self._name
         q_dict = get_index_quantities(self._target_series_container)
         q_dict[window_series.name] = series_quantity
-        return PandasContainer(window_series, q_dict),
+        return PandasContainer(window_series, q_dict)
 
     def set_input(self, series: PandasContainer[Series]):
         self._target_series_container = series

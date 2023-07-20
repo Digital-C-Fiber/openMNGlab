@@ -100,7 +100,7 @@ class WaveformPlotFunc(FunctionBase):
             return self._plot_rel(**universal_kwargs)
         return self._plot_line(**universal_kwargs)
 
-    def execute(self) -> tuple[MatPlotLibContainer]:
+    def execute(self) -> MatPlotLibContainer:
         with self.theme:
             if self.mode == WaveformPlotMode.AVERAGE:
                 fig = self._plot_avg()
@@ -108,7 +108,7 @@ class WaveformPlotFunc(FunctionBase):
                 fig = self._plot_overlap()
             else:
                 raise NotImplementedError(f"Mode {self.mode} is not implemented")
-        return MatPlotLibContainer(fig),
+        return MatPlotLibContainer(fig)
 
     def set_input(self, data: PandasContainer):
         self.data_container = data
