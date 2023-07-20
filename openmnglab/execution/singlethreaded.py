@@ -20,7 +20,7 @@ def _func_exec(func: IFunction) -> Iterable[IDataContainer]:
         ret = func.execute()
         if ret is None:
             return tuple()
-        elif isinstance(IDataContainer, ret):
+        elif isinstance(ret, IDataContainer):
             return (ret,)
         else:
             return ret
