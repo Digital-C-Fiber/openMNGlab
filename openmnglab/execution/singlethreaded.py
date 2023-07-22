@@ -35,14 +35,14 @@ class SingleThreadedExecutor(IExecutor):
         return proxy_data.calculated_hash in self._data
 
     def execute(self, plan: IExecutionPlan):
-        for planned_func in sorted(self._plan.stages.values(), key=lambda x: x.depth):
-            input_values = tuple(self._data[dependency.calculated_hash] for dependency in planned_func.data_in)
-            func = planned_func.definition.new_function()
+        for stage in sorted(plan.stages.values(), key=lambda x: x.depth):
+            input_values = tuple(self._data[dependency.calculated_hash] for dependency in stage.data_in)
+            func = stage.definition.new_function()
             _func_setinput(func, *input_values)
             results: tuple[IDataContainer] = tuple(_func_exec(func))
-            if len(results) != len(planned_func.data_out):
-                raise FunctionReturnCountMissmatch(expected=len(planned_func.data_out), actual=len(results))
-            for planned_data_output, actual_data_output in zip(planned_func.data_out, results):
+            if len(results) != len(stage.data_out):
+                raise FunctionReturnCountMissmatch(expected=len(stage.data_out), actual=len(results))
+            for planned_data_output, actual_data_output in zip(stage.data_out, results):
                 actual_data_output: IDataContainer
                 planned_data_output: IPlannedData
                 #planned_data_output.schema.validate(actual_data_output)
