@@ -1,11 +1,11 @@
 from typing import Mapping, Iterable
 
-from openmnglab.model.datamodel.interface import IDataContainer
 from openmnglab.execution.exceptions import FunctionInputError, FunctionExecutionError, FunctionReturnCountMissmatch
+from openmnglab.model.datamodel.interface import IDataContainer
 from openmnglab.model.execution.interface import IExecutor
 from openmnglab.model.functions.interface import IFunction
 from openmnglab.model.planning.interface import IProxyData
-from openmnglab.model.planning.plan.interface import IExecutionPlan, IPlannedData
+from openmnglab.model.planning.plan.interface import IExecutionPlan, IPlannedData, IStage
 from openmnglab.util.iterables import ensure_iterable
 
 
@@ -25,7 +25,7 @@ def _func_exec(func: IFunction) -> Iterable[IDataContainer]:
 
 class SingleThreadedExecutor(IExecutor):
     def __init__(self):
-       self._data: dict[bytes, IDataContainer] = dict()
+        self._data: dict[bytes, IDataContainer] = dict()
 
     @property
     def data(self) -> Mapping[bytes, IDataContainer]:
@@ -34,18 +34,25 @@ class SingleThreadedExecutor(IExecutor):
     def has_computed(self, proxy_data: IProxyData) -> bool:
         return proxy_data.calculated_hash in self._data
 
+    def run_stage(self, stage: IStage):
+        """Executes a single stage and stores its output.
+        
+        .. warn:: Caller must ensure that required input data of the stage is present in :attr:`data`
+
+        """
+        input_values = tuple(self._data[dependency.calculated_hash] for dependency in stage.data_in)
+        func = stage.definition.new_function()
+        _func_setinput(func, *input_values)
+        results: tuple[IDataContainer] = tuple(_func_exec(func))
+        if len(results) != len(stage.data_out):
+            raise FunctionReturnCountMissmatch(expected=len(stage.data_out), actual=len(results))
+        for planned_data_output, actual_data_output in zip(stage.data_out, results):
+            actual_data_output: IDataContainer
+            planned_data_output: IPlannedData
+            # planned_data_output.schema.validate(actual_data_output)
+            self._data[planned_data_output.calculated_hash] = actual_data_output
+
     def execute(self, plan: IExecutionPlan):
         for stage in sorted(plan.stages.values(), key=lambda x: x.depth):
-            if all(planned_output.calculated_hash in self._data for planned_output in stage.data_out):
-                continue
-            input_values = tuple(self._data[dependency.calculated_hash] for dependency in stage.data_in)
-            func = stage.definition.new_function()
-            _func_setinput(func, *input_values)
-            results: tuple[IDataContainer] = tuple(_func_exec(func))
-            if len(results) != len(stage.data_out):
-                raise FunctionReturnCountMissmatch(expected=len(stage.data_out), actual=len(results))
-            for planned_data_output, actual_data_output in zip(stage.data_out, results):
-                actual_data_output: IDataContainer
-                planned_data_output: IPlannedData
-                #planned_data_output.schema.validate(actual_data_output)
-                self._data[planned_data_output.calculated_hash] = actual_data_output
+            if not all(planned_output.calculated_hash in self._data for planned_output in stage.data_out):
+                self.run_stage(stage)
