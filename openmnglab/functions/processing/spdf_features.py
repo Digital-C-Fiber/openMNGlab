@@ -7,8 +7,10 @@ from openmnglab.datamodel.pandas.model import PandasDataScheme, PandasOutputData
 from openmnglab.datamodel.pandas.verification import compare_index
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.spdf_features import SPDF_FEATURES, FeatureFunc
-from openmnglab.functions.processing.waveform_components import PrincipleComponentsInputScheme
-from openmnglab.functions.processing.interval_data import IntervalDataInputSchema
+from openmnglab.functions.processing.interval_data import IntervalDataInputSchema, IntervalDataOutputSchema
+from openmnglab.functions.processing.waveform_components import PrincipleComponentsInputScheme, \
+    PrincipleComponentsDynamicOutputScheme
+from openmnglab.model.datamodel.interface import IOutputDataScheme
 from openmnglab.model.planning.interface import IProxyData
 
 
@@ -32,6 +34,7 @@ class SPDFFeatures(FunctionDefinitionBase[IProxyData[DataFrame]]):
     Out: Dataframe with the features, indexed by the same index as the WaveformComponents input. F4 will always be None.
 
     """
+
     def __init__(self):
         super().__init__("omngl.spdffeatures")
 
@@ -39,7 +42,8 @@ class SPDFFeatures(FunctionDefinitionBase[IProxyData[DataFrame]]):
     def consumes(self) -> tuple[PrincipleComponentsInputScheme, IntervalDataInputSchema]:
         return PrincipleComponentsInputScheme(), IntervalDataInputSchema(0, 1, 2)
 
-    def production_for(self, principle_compo: PrincipleComponentsInputScheme, diffs: IntervalDataInputSchema) -> SPDFFeatureOutputSchema:
+    def production_for(self, principle_compo: PrincipleComponentsDynamicOutputScheme,
+                       diffs: IntervalDataOutputSchema) -> SPDFFeatureOutputSchema:
         compare_index(principle_compo.pandera_schema.index, pa.MultiIndex(diffs.pandera_schema.index.indexes[:-1]))
         return SPDFFeatureOutputSchema(principle_compo.pandera_schema.index)
 
