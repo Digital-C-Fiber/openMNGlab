@@ -8,7 +8,7 @@ from openmnglab.model.planning.plan.interface import IExecutionPlan
 
 class IExecutor(ABC):
     @abstractmethod
-    def execute(self, plan: IExecutionPlan):
+    def execute(self, plan: IExecutionPlan, ignore_previous=False):
         ...
 
     @property
