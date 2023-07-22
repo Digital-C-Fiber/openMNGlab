@@ -3,11 +3,12 @@ from typing import Mapping, Optional
 
 from openmnglab.model.datamodel.interface import IDataContainer
 from openmnglab.model.planning.interface import DCT, IProxyData
+from openmnglab.model.planning.plan.interface import IExecutionPlan
 
 
 class IExecutor(ABC):
     @abstractmethod
-    def execute(self):
+    def execute(self, plan: IExecutionPlan):
         ...
 
     @property
