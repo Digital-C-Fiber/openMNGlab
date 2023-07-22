@@ -36,6 +36,8 @@ class SingleThreadedExecutor(IExecutor):
 
     def execute(self, plan: IExecutionPlan):
         for stage in sorted(plan.stages.values(), key=lambda x: x.depth):
+            if all(planned_output.calculated_hash in self._data for planned_output in stage.data_out):
+                continue
             input_values = tuple(self._data[dependency.calculated_hash] for dependency in stage.data_in)
             func = stage.definition.new_function()
             _func_setinput(func, *input_values)
