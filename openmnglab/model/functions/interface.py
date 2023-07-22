@@ -69,7 +69,7 @@ class IFunctionDefinition(ABC, Generic[ProxyRet]):
         ...
 
     @abstractmethod
-    def production_for(self, *inputs: IInputDataScheme) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
+    def production_for(self, *inputs: IOutputDataScheme) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
         ...
 
     @abstractmethod
@@ -83,14 +83,14 @@ class IStaticFunctionDefinition(Generic[ProxyRet], IFunctionDefinition[ProxyRet]
     def produces(self) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
         ...
 
-    def production_for(self, *_: IInputDataScheme) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
+    def production_for(self, *_: IOutputDataScheme) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
         return self.produces
 
 
 class ISourceFunctionDefinition(Generic[ProxyRet], IStaticFunctionDefinition[ProxyRet], ABC):
 
     @property
-    def consumes(self) -> Literal[None]:
+    def consumes(self) -> None:
         return None
 
     def production_for(self) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:

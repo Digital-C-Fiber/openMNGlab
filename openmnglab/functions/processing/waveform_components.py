@@ -3,14 +3,13 @@ from abc import ABC
 import pandera as pa
 from pandas import DataFrame
 
-from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
-from openmnglab.model.datamodel.interface import IOutputDataScheme
 from openmnglab.datamodel.pandas.model import PandasInputDataScheme, PandasOutputDataScheme, \
     PandasDataScheme
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.waveform_components import WaveformComponentsFunc, PRINCIPLE_COMPONENTS
 from openmnglab.functions.processing.interval_data import IntervalDataInputSchema
 from openmnglab.model.planning.interface import IProxyData
+
 
 class PrincipleComponentsBaseScheme(PandasDataScheme[pa.DataFrameSchema], ABC):
     def __init__(self):
@@ -22,8 +21,10 @@ class PrincipleComponentsBaseScheme(PandasDataScheme[pa.DataFrameSchema], ABC):
             PRINCIPLE_COMPONENTS[4]: pa.Column(float, nullable=True),
             PRINCIPLE_COMPONENTS[5]: pa.Column(float, nullable=True)}, title="Principle Components"))
 
+
 class PrincipleComponentsInputScheme(PrincipleComponentsBaseScheme, PandasInputDataScheme):
     ...
+
 
 class PrincipleComponentsDynamicOutputScheme(PrincipleComponentsBaseScheme, PandasOutputDataScheme):
     def __init__(self, index: pa.MultiIndex | pa.Index):
@@ -40,6 +41,7 @@ class WaveformComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
     Out: Dataframe with the waveform components, columns are named based on PRINCIPLE_COMPONENTS constant.
          Index is taken from the input series non-timestamp multiindex.
     """
+
     def __init__(self):
         super().__init__("openmnglab.principlecomponents")
 
@@ -48,7 +50,7 @@ class WaveformComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
         return IntervalDataInputSchema(0, 1)
 
     @staticmethod
-    def production_for(diffs: PandasInputDataScheme[pa.DataFrameSchema]) ->  PrincipleComponentsDynamicOutputScheme:
+    def production_for(diffs: PandasOutputDataScheme[pa.DataFrameSchema]) -> PrincipleComponentsDynamicOutputScheme:
         return PrincipleComponentsDynamicOutputScheme(diffs.pandera_schema.index)
 
     @staticmethod
