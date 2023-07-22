@@ -24,9 +24,8 @@ def _func_exec(func: IFunction) -> Iterable[IDataContainer]:
 
 
 class SingleThreadedExecutor(IExecutor):
-    def __init__(self, plan: IExecutionPlan):
-        self._plan = plan
-        self._data: dict[bytes, IDataContainer] = dict()
+    def __init__(self):
+       self._data: dict[bytes, IDataContainer] = dict()
 
     @property
     def data(self) -> Mapping[bytes, IDataContainer]:
@@ -35,7 +34,7 @@ class SingleThreadedExecutor(IExecutor):
     def has_computed(self, proxy_data: IProxyData) -> bool:
         return proxy_data.calculated_hash in self._data
 
-    def execute(self):
+    def execute(self, plan: IExecutionPlan):
         for planned_func in sorted(self._plan.stages.values(), key=lambda x: x.depth):
             input_values = tuple(self._data[dependency.calculated_hash] for dependency in planned_func.data_in)
             func = planned_func.definition.new_function()
