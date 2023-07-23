@@ -12,24 +12,25 @@ from openmnglab.model.planning.interface import IProxyData
 from openmnglab.util.hashing import Hash
 
 
-class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series]]]):
+class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series]]]):
     """Loads data from a DAPSYS file
 
     In: nothing
 
-    Out: [Continuous recording, Stimuli list, tracks]
+    Out: [Continuous recording, Stimuli list, tracks, comments, stimdefs]
 
     Produces
     ........
-        * Continuous Recording: continuous recording from the file. timestamps as float index, signal values as float
-          values pd.Series[[TIMESTAMP: float], float].
-        * Stimuli list: list of stimuli timestamps. Indexed by the global stimulus id
-          (the stimulus id amongst all stimuli in the file), the label of stimulus and the id of the stimulus type / label
-          (the id amongst all other stimuli in the file which have the same label):
-          pd.Series[[GLOBAL_STIM_ID: int, STIM_TYPE: str, STIM_TYPE_ID: int], float]
-        * tracks: List of all sorted tracks. Indexed by the global stimulus id they are attributed to, the name of the track and their id respective to the track.
-          pd.Series[[GLOBAL_STIM_ID: int, TRACK: str, TRACK_SPIKE_IDX: int], float]
-
+        1. Continuous Recording: continuous recording from the file. timestamps as float index, signal values as float
+           values pd.Series[[TIMESTAMP: float], float].
+        2. Stimuli list: list of stimuli timestamps. Indexed by the global stimulus id
+           (the stimulus id amongst all stimuli in the file), the label of stimulus and the id of the stimulus type / label
+           (the id amongst all other stimuli in the file which have the same label):
+           pd.Series[[GLOBAL_STIM_ID: int, STIM_TYPE: str, STIM_TYPE_ID: int], float]
+        3. tracks: List of all sorted tracks. Indexed by the global stimulus id they are attributed to, the name of the track and their id respective to the track.
+           pd.Series[[GLOBAL_STIM_ID: int, TRACK: str, TRACK_SPIKE_IDX: int], float]
+        4. comments: List of all comments. Index is a float of timestamps, values are strings containing the text.
+        5. stimdefs: List of all stimulus definitions. Index is a float of timestamps, values are strings containing the text.
 
     :param file: Path to the DAPSYS file
     :param stim_folder: The stimulator folder inside the DAPSYS file (i.e. "NI Pulse Stimulator")
@@ -40,7 +41,7 @@ class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IPr
     """
     def __init__(self, file: str | Path, stim_folder: str, main_pulse: Optional[str] = "Main Pulse",
                  continuous_recording: Optional[str] = "Continuous Recording", responses="responses",
-                 tracks: Optional[Sequence[str] | str] = "all"):
+                 tracks: Optional[Sequence[str] | str] = "all", comments="comments", stimdefs="Stim Def Starts"):
 
         super().__init__("net.codingchipmunk.dapsysreader")
         self._file = file
@@ -49,6 +50,8 @@ class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IPr
         self._continuous_recording = continuous_recording
         self._responses = responses
         self._tracks = tracks
+        self._comments = comments
+        self._stimdefs = stimdefs
 
     @property
     def config_hash(self) -> bytes:
@@ -63,10 +66,11 @@ class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IPr
 
     @property
     def produces(self) -> tuple[
-        PandasDataScheme[SeriesSchema], PandasDataScheme[SeriesSchema], PandasDataScheme[DataFrameSchema]]:
-        return time_waveform(), stimulus_list(), sorted_spikes()
+        PandasDataScheme[SeriesSchema], PandasDataScheme[SeriesSchema], PandasDataScheme[SeriesSchema], PandasDataScheme[SeriesSchema], PandasDataScheme[SeriesSchema]]:
+        return time_waveform(), stimulus_list(), sorted_spikes(), str_float_list(), str_float_list()
 
     def new_function(self) -> DapsysReaderFunc:
         return DapsysReaderFunc(self._file, self._stim_folder, main_pulse=self._main_pulse,
                                 continuous_recording=self._continuous_recording,
-                                responses=self._responses, tracks=self._tracks)
+                                responses=self._responses, tracks=self._tracks, comments=self._comments,
+                                stimdefs=self._stimdefs)
