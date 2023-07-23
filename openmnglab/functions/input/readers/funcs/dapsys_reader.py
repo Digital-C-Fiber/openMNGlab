@@ -23,9 +23,9 @@ def _kernel_offset_assign(target: np.array, calc_add, calc_mul, pos_offset, n):
 
 
 class DapsysReaderFunc(SourceFunctionBase):
-    def __init__(self, file_path: str | Path, stim_folder: str, main_pulse: Optional[str] = "Main Pulse",
+    def __init__(self, file_path: str | Path, stim_folder: str, main_pulse: str = "Main Pulse",
                  continuous_recording: Optional[str] = "Continuous Recording", responses="responses",
-                 tracks: Optional[Sequence[str] | str] = "all"):
+                 tracks: Optional[Sequence[str] | str] = "all", comments="comments", stimdefs="Stim Def Starts"):
         self._log = logging.getLogger("DapsysReaderFunc")
         self._file: Optional[File] = None
         self._file_path = file_path
@@ -34,6 +34,8 @@ class DapsysReaderFunc(SourceFunctionBase):
         self._continuous_recording = continuous_recording
         self._responses = responses
         self._tracks = tracks
+        self._comments = comments
+        self._stimdefs = stimdefs
         self._log.debug("initialized")
 
     def _load_file(self) -> File:
@@ -73,6 +75,20 @@ class DapsysReaderFunc(SourceFunctionBase):
         self._log.debug("finished loading continuous recording")
         return pd.Series(data=values, index=pd.Index(data=timestamps, copy=False, name=TIMESTAMP),
                          name=CONT_REC, copy=False)
+
+    def _load_textstream(self, path: str) -> pd.Series:
+        file = self.file
+        stream: Stream = file.toc.path(path)
+        timestamps = np.empty(len(stream.page_ids), dtype=np.double)
+        labels = [""] * len(stream.page_ids)
+        for i, page in enumerate(file.pages[pid] for pid in stream.page_ids):
+            page: TextPage
+            timestamps[i] = page.timestamp_a
+            labels[i] = page.text
+        series_name = path.split('/')[-1]
+        return pd.Series(data=labels, copy=False,
+                         index=pd.Index(timestamps, copy=False, name=TIMESTAMP), name=series_name)
+
 
     def get_main_pulses(self) -> tuple[pd.Series, dict]:
         file = self.file
@@ -140,10 +156,14 @@ class DapsysReaderFunc(SourceFunctionBase):
                          index=pd.MultiIndex.from_arrays([responding_to, track_labels, track_response_number],
                                                          names=(GLOBAL_STIM_ID, TRACK, TRACK_SPIKE_IDX)))
 
-    def execute(self) -> tuple[PandasContainer[pd.Series], PandasContainer[pd.Series], PandasContainer[pd.Series]]:
+    def execute(self) -> tuple[PandasContainer[pd.Series], PandasContainer[pd.Series], PandasContainer[pd.Series], PandasContainer[pd.Series], PandasContainer[pd.Series]]:
         self._log.info("Executing function")
         self._log.info("Loading continuous recording")
         cont_rec = self.get_continuous_recording()
+        self._log.info("Loading comments")
+        comments = self._load_textstream(self._comments)
+        self._log.info("Loading stimdefs")
+        stimdefs = self._load_textstream(f"{self._stim_folder}/{self._stimdefs}")
         self._log.info("Loading pulses")
         pulses, idmap = self.get_main_pulses()
         self._log.info("Loading tracks")
@@ -154,4 +174,6 @@ class DapsysReaderFunc(SourceFunctionBase):
                                      STIM_LBL: pq.dimensionless}), \
             PandasContainer(tracks,
                             {GLOBAL_STIM_ID: pq.dimensionless, SPIKE_TS: pq.s, TRACK: pq.dimensionless,
-                             TRACK_SPIKE_IDX: pq.dimensionless})
+                             TRACK_SPIKE_IDX: pq.dimensionless}), \
+            PandasContainer(comments, {TIMESTAMP: pq.s, comments.name: pq.dimensionless}),\
+            PandasContainer(stimdefs, {TIMESTAMP: pq.s, stimdefs.name: pq.dimensionless})
