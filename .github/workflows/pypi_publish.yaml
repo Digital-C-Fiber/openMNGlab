@@ -1,3 +1,6 @@
+name: "Publish release to PyPI"
+run-name: "Publish ${{ github.ref }} to PyPI"
+
 on:
   release:
     types: [ published ]

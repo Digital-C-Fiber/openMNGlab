@@ -1,4 +1,6 @@
-name: Make a release
+name: "Make a release"
+run-name: "Release tag ${{ github.ref_name }}"
+
 on:
   push:
     tags:

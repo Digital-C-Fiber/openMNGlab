@@ -1,4 +1,6 @@
 name: Build and release
+run-name: "Build version ${{ inputs.version_tag }} and make a release"
+
 on:
   workflow_call:
     inputs:
