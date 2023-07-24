@@ -2,9 +2,6 @@ name: DocPages
 on:
   release:
     types: [ published ]
-  pull_request:
-    branches:
-      - main
 
 jobs:
   build-docs:
