@@ -24,6 +24,7 @@ jobs:
           mkdir dist
           cd dist
           hub release download ${{ github.ref }}
+          cd ..
       - name: Upload to PyPi
         uses: pypa/gh-action-pypi-publish@release/v1
 
