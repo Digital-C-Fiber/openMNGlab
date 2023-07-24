@@ -10,6 +10,11 @@ jobs:
   verify-release:
     runs-on: ubuntu-latest
     steps:
+      - name: Check that trigger is protected
+        if: !${{ github.ref_protected }}
+        uses: actions/github-script@v3
+        with:
+          script: "core.setFailed('automation safeguard tripped: workflow was triggered by ${{ github.ref }}, which is not protected')"
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup environment
