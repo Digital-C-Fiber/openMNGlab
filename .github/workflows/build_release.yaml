@@ -18,14 +18,13 @@ jobs:
           ref: ${{inputs.version_tag}}
       - name: Setup environment
         uses: ./.github/actions/setup_poetry_env.yaml
-      - run: mkdir dist
-      - name: Build artifacts cache
+      - name: Build package
+        run: poetry build
+      - name: Save artifacts to cache
         uses: actions/cache/save@v3
         with:
           path: ./dist
           key: ${{ inputs.version_tag }}-buildartifacts
-      - name: Build package
-        run: poetry build
       - name: Create release
         id: create_release
         env:
