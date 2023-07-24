@@ -1,26 +1,30 @@
+name: "Publish release to PyPI"
+run-name: "Publish ${{ github.ref }} to PyPI"
+
 on:
   release:
     types: [ published ]
 
 jobs:
-  poetrypublish:
+  pypi-publish:
+    name: "Upload release to pypi"
     runs-on: ubuntu-latest
+    environment:
+      name: pypi-publish
+      url: https://pypi.org/p/openmnglab/
+    permissions:
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
       - name: Download release files
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
           mkdir dist
           cd dist
           hub release download ${{ github.ref }}
-      - name: Poetry publish
-        env:
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.pypi_token }}
-        run: poetry publish
+          cd ..
+      - name: Upload to PyPi
+        uses: pypa/gh-action-pypi-publish@release/v1
 

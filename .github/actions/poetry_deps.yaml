@@ -1,0 +1,23 @@
+name: 'Install dependencies using poetry'
+inputs:
+  install-args:
+    required: false
+    description: "Additional arguments to pass to 'poetry install'"
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Configure Poetry for venv
+      run: |
+        poetry config virtualenvs.create true --local
+        poetry config virtualenvs.in-project true --local
+    - name: Lock dependencies
+      run: poetry lock --no-update
+    - name: Dependencies cache
+      uses: actions/cache@v3
+      with:
+        path: ./.venv
+        key: poetry-venv-${{ hashFiles('poetry.lock') }}
+    - name: Install dependencies
+      run: poetry install ${{ inputs.install-args }}
