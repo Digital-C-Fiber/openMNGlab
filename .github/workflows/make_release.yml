@@ -10,8 +10,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
+      - name: Setup environment
+        uses: ./.github/actions/setup_poetry_env.yaml
+        with:
+          install-deps: false
       - id: package_version
         run: echo "ver=v$(poetry version -s)" >> $GITHUB_OUTPUT
       - name: Check that package version matches tag version

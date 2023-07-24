@@ -8,12 +8,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Setup environment
+        uses: ./.github/actions/setup_poetry_env.yaml
         with:
-          python-version: '3.11'
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
+          install-deps: false
       - name: Download release files
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

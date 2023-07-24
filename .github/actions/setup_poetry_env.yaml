@@ -1,0 +1,28 @@
+name: "Setup poetry environment"
+inputs:
+  python-version:
+    required: true
+    description: "Python version to install"
+    default: '3.11'
+  install-deps:
+    required: true
+    description: "Install dependencies from the toml file"
+    default: true
+  install-args:
+    required: false
+    description: "Additional args to pass to 'poetry-install'"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{inputs.python-version}}
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v2
+    - name: Install dependencies
+      if: ${{ inputs.install-deps }}
+      uses: ./.github/actions/poetry_deps.yaml
+      with:
+        install-args: ${{ inputs.install-args }}
