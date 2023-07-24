@@ -24,6 +24,12 @@ jobs:
         uses: abatilo/actions-poetry@v2
       - name: Install Requirements
         run: poetry install
+      - run: mkdir dist
+      - name: Build artifacts cache
+        uses: actions/cache/save@v3
+        with:
+          path: ./dist
+          key: ${{ inputs.version_tag }}-buildartifacts
       - name: Build package
         run: poetry build
       - name: Create release
