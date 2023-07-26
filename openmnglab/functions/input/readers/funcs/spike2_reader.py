@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Mapping, Any, Iterable, Match
+from typing import Mapping, Iterable, Match
 
 import numpy as np
 import pandas as pd
-import pymatreader as pymat
 import quantities as pq
 from pandas import Index
 
@@ -14,6 +13,9 @@ from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.datamodel.pandas.schemes import TIMESTAMP, SIGNAL, MASS, TEMPERATURE, COMMENT
 from openmnglab.functions.base import SourceFunctionBase
 from openmnglab.functions.input.readers.funcs.dapsys_reader import _kernel_offset_assign
+from openmnglab.functions.input.readers.funcs.spike2.hdfmat import HDFMatGroup, HDFMatFile
+from openmnglab.functions.input.readers.funcs.spike2.structs import Spike2Realwave, Spike2Waveform, Spike2Marker, \
+    Spike2Textmark, Spike2UnbinnedEvent, spike2_struct
 
 SPIKE2_CHANID = int | str
 
@@ -27,13 +29,13 @@ class Spike2ReaderFunc(SourceFunctionBase):
     class Spike2Channels:
         _channelno_regex = r"_Ch(\d*)"
 
-        def __init__(self, structs: dict):
+        def __init__(self, structs: HDFMatFile):
             self._structs = structs
             self._id_map: dict[str | int, str] | None = None
             self._supports_chan_no: bool | None = None
 
         @classmethod
-        def _make_idmap(cls, structs: dict) -> dict[str | int, str]:
+        def _make_idmap(cls, structs: Mapping) -> dict[str | int, str]:
             def unpack_match(result: Match[str] | None) -> int | None:
                 return int(result.group(1)) if result is not None else None
 
@@ -45,11 +47,11 @@ class Spike2ReaderFunc(SourceFunctionBase):
                     idmap[chan_no] = struct_name
                 chan_name = fields.get("title", None)
                 if chan_name:
-                    idmap[chan_name] = struct_name
+                    idmap[chan_name[0]] = struct_name
             return idmap
 
         @property
-        def structs(self) -> dict:
+        def structs(self) -> HDFMatFile:
             return self._structs
 
         @property
@@ -65,7 +67,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
                 self._supports_chan_no = any(pattern.search(struct_name) is not None for struct_name in self.structs)
             return self._supports_chan_no
 
-        def get_chan(self, chan_id: SPIKE2_CHANID, default: dict | None = None) -> dict | None:
+        def get_chan(self, chan_id: SPIKE2_CHANID, default: dict | None = None) -> HDFMatGroup | None:
             if isinstance(chan_id, int) and not self.supports_chan_no:
                 raise KeyError(
                     "A channel number was provided as a channel id. However, channel numbers are not contained in the exported Matlab file and are thus unavailable.")
@@ -74,7 +76,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
                 return default
             return self.structs[struct_name]
 
-        def __getitem__(self, item: SPIKE2_CHANID) -> dict:
+        def __getitem__(self, item: SPIKE2_CHANID) -> HDFMatGroup:
             value = self.get_chan(item)
             if value is None:
                 raise KeyError(f"No channel with the id {item} found")
@@ -119,12 +121,6 @@ class Spike2ReaderFunc(SourceFunctionBase):
         res = cls._channel_regex.search(matlab_struct_name)
         return int(res.group(1)) if res is not None else matlab_struct_name
 
-    @property
-    def channels(self) -> Spike2Channels:
-        if self._channels is None:
-            self._channels = Spike2ReaderFunc.Spike2Channels(pymat.read_mat(self._path))
-        return self._channels
-
     @staticmethod
     def codes_to_int(codes: np.ndarray) -> np.ndarray:
         return codes.view(np.int8).flatten().view(np.uint32)
@@ -138,82 +134,89 @@ class Spike2ReaderFunc(SourceFunctionBase):
         return channel_struct.get("title", "unknown channel")
 
     @staticmethod
-    def _waveform_chan_to_series(matlab_struct: Mapping[str, Any] | None,
+    def _waveform_chan_to_series(spike2_struct: Spike2Realwave | Spike2Waveform | None,
                                  name: str, index_name: str = TIMESTAMP) -> pd.Series:
         values, times = tuple(), tuple()
-        if matlab_struct is not None and matlab_struct.get('length', 0) > 0:
-            values = matlab_struct['values']
-            if 'times' not in matlab_struct:
-                times = np.empty(len(matlab_struct['values']))
-                _kernel_offset_assign(times, matlab_struct['start'], matlab_struct['interval'], 0, len(times))
+        if spike2_struct is not None and spike2_struct.length > 0:
+            values = spike2_struct.values
+            if isinstance(spike2_struct, Spike2Realwave):
+                times = np.empty(len(values))
+                _kernel_offset_assign(times, spike2_struct.start, spike2_struct.interval, 0, len(times))
             else:
-                times = matlab_struct['times']
+                times = spike2_struct.times
 
         series = pd.Series(data=values, index=pd.Index(times, name=index_name, copy=False),
                            name=name, copy=False)
         return series
 
     @classmethod
-    def _marker_chan_to_series(cls, matlab_struct: Mapping[str, Any] | None, name: str,
+    def _marker_chan_to_series(cls, spike2_struct: Spike2Marker | None, name: str,
                                index_name: str = TIMESTAMP) -> pd.Series:
         times, codes = tuple(), tuple()
-        if matlab_struct is not None and matlab_struct.get('length', 0) > 0:
-            times = (matlab_struct['times'],) if isinstance(matlab_struct['times'], float) else matlab_struct['times']
-            codes = cls.codes_to_int(matlab_struct['codes'])
+        if spike2_struct is not None and spike2_struct.length > 0:
+            times = spike2_struct.times
+            codes = spike2_struct.codes
         series = pd.Series(data=codes, dtype="category", name=name,
                            index=Index(data=times, copy=False, name=index_name))
         return series
 
     @staticmethod
-    def _textmarker_chan_to_series(matlab_struct: Mapping[str, Any] | None, name: str,
+    def _textmarker_chan_to_series(spike2_struct: Spike2Textmark | None, name: str,
                                    index_name: str = TIMESTAMP) -> pd.Series:
         texts, times, codes = tuple(), tuple(), tuple()
-        if matlab_struct is not None and matlab_struct.get('length', 0) > 0:
-            times = matlab_struct['times']
-            texts = [t.rstrip("\x00") for t in matlab_struct['text']]
+        if spike2_struct is not None and spike2_struct.length > 0:
+            times = spike2_struct.times
+            texts = spike2_struct.text
         series = pd.Series(data=texts, index=pd.Index(times, name=index_name, copy=False), copy=False,
                            name=name)
         return series
 
     @staticmethod
-    def _unbinned_event_chant_to_series(matlab_struct: Mapping[str, Any] | None, name: str,
+    def _unbinned_event_chant_to_series(spike2_struct: Spike2UnbinnedEvent | None, name: str,
                                         index_name: str = TIMESTAMP):
         times, levels = tuple(), tuple()
-        if matlab_struct is not None and matlab_struct.get('length', 0) > 0:
-            times = matlab_struct['times']
-            levels = matlab_struct['level'].astype(np.int8)
+        if spike2_struct is not None and spike2_struct.length > 0:
+            times = spike2_struct.times
+            levels = spike2_struct.level
         series = pd.Series(data=levels, index=pd.Index(times, name=index_name, copy=False), copy=False, name=name)
         return series
 
     @classmethod
     def _load_sig_chan(cls, chan_struct: dict | None, quantity: pq.Quantity, time_quantity: pq.Quantity = pq.second,
                        name: str | None = None):
-        series = cls._waveform_chan_to_series(chan_struct, cls._get_channel_name(chan_struct, name_override=name))
+        parsed_struct = spike2_struct(chan_struct) if chan_struct is not None else None
+        series = cls._waveform_chan_to_series(parsed_struct, cls._get_channel_name(parsed_struct, name_override=name))
         return PandasContainer(series, {series.name: quantity, series.index.name: time_quantity})
 
     @classmethod
     def _load_unbinned_event(cls, chan_struct: dict | None, quantity: pq.Quantity = pq.dimensionless,
                              time_quantity: pq.Quantity = pq.second):
-        series = cls._unbinned_event_chant_to_series(chan_struct, SPIKE2_LEVEL)
+        parsed_struct = spike2_struct(chan_struct) if chan_struct is not None else None
+        series = cls._unbinned_event_chant_to_series(parsed_struct, SPIKE2_LEVEL)
         return PandasContainer(series, {series.name: quantity, series.index.name: time_quantity})
 
     @classmethod
     def _load_texts(cls, chan_struct: dict | None, time_quantity: pq.Quantity = pq.second, name: str | None = None):
-        series = cls._textmarker_chan_to_series(chan_struct, cls._get_channel_name(chan_struct, name_override=name))
+        parsed_struct = spike2_struct(chan_struct) if chan_struct is not None else None
+        series = cls._textmarker_chan_to_series(parsed_struct, cls._get_channel_name(parsed_struct, name_override=name))
         return PandasContainer(series, {series.name: pq.dimensionless, series.index.name: time_quantity})
 
     @classmethod
     def _load_marker(cls, chan_struct: dict | None, time_quantity: pq.Quantity = pq.second, name: str | None = None):
-        series = cls._marker_chan_to_series(chan_struct, name = cls._get_channel_name(chan_struct, name_override=name))
+        parsed_struct = spike2_struct(chan_struct) if chan_struct is not None else None
+        series = cls._marker_chan_to_series(parsed_struct,
+                                            name=cls._get_channel_name(parsed_struct, name_override=name))
         return PandasContainer(series, {series.name: pq.dimensionless, series.index.name: time_quantity})
 
     def execute(self) -> tuple[PandasContainer, ...]:
-        mass = self._load_sig_chan(self.channels.get_chan(self._mass), self._mass_unit, name=MASS)
-        sig = self._load_sig_chan(self.channels.get_chan(self._signal_chan), self._signal_unit, name=SIGNAL)
-        temp = self._load_sig_chan(self.channels.get_chan(self._temp_chan), self._temp_unit, name=TEMPERATURE)
-        v_chan = self._load_sig_chan(self.channels.get_chan(self._v_chan), self._v_chan_unit, name=SPIKE2_V_CHAN)
-        ext_pull = self._load_unbinned_event(self.channels.get_chan(self._ext_pul))
-        comments = self._load_texts(self.channels.get_chan(self._comments), name=COMMENT)
-        dig_mark = self._load_marker(self.channels.get_chan(self._digmark), name=SPIKE2_DIGMARK)
-        keyboard = self._load_marker(self.channels.get_chan(self._keyboard), name=SPIKE2_KEYBOARD)
+        with HDFMatFile(self._path, 'r') as f:
+            channels = Spike2ReaderFunc.Spike2Channels(f)
+            mass = self._load_sig_chan(channels.get_chan(self._mass), self._mass_unit, name=MASS)
+            sig = self._load_sig_chan(channels.get_chan(self._signal_chan), self._signal_unit, name=SIGNAL)
+            temp = self._load_sig_chan(channels.get_chan(self._temp_chan), self._temp_unit, name=TEMPERATURE)
+            v_chan = self._load_sig_chan(channels.get_chan(self._v_chan), self._v_chan_unit, name=SPIKE2_V_CHAN)
+            ext_pull = self._load_unbinned_event(channels.get_chan(self._ext_pul))
+            comments = self._load_texts(channels.get_chan(self._comments), name=COMMENT)
+            dig_mark = self._load_marker(channels.get_chan(self._digmark), name=SPIKE2_DIGMARK)
+            keyboard = self._load_marker(channels.get_chan(self._keyboard), name=SPIKE2_KEYBOARD)
         return sig, mass, temp, v_chan, ext_pull, comments, dig_mark, keyboard
