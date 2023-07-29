@@ -1,7 +1,7 @@
 from typing import Any
 
 import numpy as np
-
+import numpy.typing as npt
 from openmnglab.functions.input.readers.funcs.spike2.hdfmat import HDFMatGroup
 
 
@@ -52,7 +52,7 @@ class _LevelMixin(_Spike2Base):
     _level = None
 
     @property
-    def level(self) -> np.ndarray:
+    def level(self) -> npt.NDArray[np.int8]:
         if self._level is None:
             val = self.hdfgroup['level']
             self._level = val.astype(np.int8).flatten()
@@ -63,7 +63,7 @@ class _TimesMixin(_Spike2Base):
     _times = None
 
     @property
-    def times(self):
+    def times(self) -> npt.NDArray[float]:
         if self._times is None:
             val = self.hdfgroup['times']
             self._times = val.flatten()
@@ -74,7 +74,7 @@ class _TextMixin(_Spike2Base):
     _text = None
 
     @property
-    def text(self):
+    def text(self) -> tuple[str,...]:
         if self._text is None:
             val = self.hdfgroup['text']
             self._text = val
@@ -85,22 +85,22 @@ class _CodesMixin(_Spike2Base):
     _codes = None
 
     @property
-    def codes(self):
+    def codes(self) -> npt.NDArray:
         if self._codes is None:
             val = self.hdfgroup['codes']
             self._codes = val
         return self._codes
 
     @property
-    def int_codes(self):
-        return self.codes.view(np.int8).flatten().view(np.uint32)
+    def int_codes(self) -> npt.NDArray[np.uint32]:
+        return self.codes.astype(np.int8).flatten().view(np.uint32)
 
 
 class _StartMixin(_Spike2Base):
     _start = None
 
     @property
-    def start(self):
+    def start(self) -> float:
         if self._start is None:
             val = self.hdfgroup['start']
             self._start = val.flatten()[0]
@@ -111,7 +111,7 @@ class _IntervalMixin(_Spike2Base):
     _interval = None
 
     @property
-    def interval(self):
+    def interval(self) -> float:
         if self._interval is None:
             val = self.hdfgroup['interval']
             self._interval = val.flatten()[0]
@@ -122,7 +122,7 @@ class _ValuesMixin(_Spike2Base):
     _values = None
 
     @property
-    def values(self):
+    def values(self) -> npt.NDArray:
         if self._values is None:
             val = self.hdfgroup['values']
             self._values = val.flatten()
