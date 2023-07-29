@@ -155,7 +155,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
         times, codes = tuple(), tuple()
         if spike2_struct is not None and spike2_struct.length > 0:
             times = spike2_struct.times
-            codes = spike2_struct.codes
+            codes = spike2_struct.int_codes
         series = pd.Series(data=codes, dtype="category", name=name,
                            index=Index(data=times, copy=False, name=index_name))
         return series

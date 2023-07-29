@@ -91,6 +91,10 @@ class _CodesMixin(_Spike2Base):
             self._codes = val
         return self._codes
 
+    @property
+    def int_codes(self):
+        return self.codes.view(np.int8).flatten().view(np.uint32)
+
 
 class _StartMixin(_Spike2Base):
     _start = None
