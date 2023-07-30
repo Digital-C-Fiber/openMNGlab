@@ -1,4 +1,5 @@
 import logging
+import math
 from pathlib import Path
 from typing import Optional, Sequence
 
@@ -21,6 +22,14 @@ def _kernel_offset_assign(target: np.array, calc_add, calc_mul, pos_offset, n):
     for i in range(n):
         target[pos_offset + i] = calc_add + i * calc_mul
 
+
+@njit
+def find_nearest_i(array, value):
+    idx = np.searchsorted(array, value, side="left")
+    if idx > 0 and (idx == len(array) or math.fabs(value - array[idx-1]) < math.fabs(value - array[idx])):
+        return idx-1
+    else:
+        return idx
 
 class DapsysReaderFunc(SourceFunctionBase):
     """Implementation of a reader for DAPSYS"""
@@ -107,27 +116,29 @@ class DapsysReaderFunc(SourceFunctionBase):
         self._log.debug("processing stimuli")
         path = f"{self.stim_folder}/pulses"
         stream: Stream = file.toc.path(path)
-        values = np.empty(len(stream.page_ids), dtype=float64)
-        lbl_id = np.empty(len(stream.page_ids), dtype=np.uint)
+        timestamps = np.empty(len(stream.page_ids), dtype=float64)
+
+        lbl_num = np.empty(len(stream.page_ids), dtype=np.uint)
+        """The sequence number for the entry of the stimulus label (i.e. the second entry of 'main pulse')"""
         labels = [""] * len(stream.page_ids)
+        """The label pulse labels"""
         counter = dict()
+        """Stores the next number for each label (see lbl_num)"""
         self._log.debug("reading stimuli")
-        id_map = dict()
+        timestamp_to_stimid = dict()
+        """Maps the timestamp of the pulse to the trace that has triggered it"""
         for i, page in enumerate(
                 file.pages[page_id] for page_id in stream.page_ids):
             page: TextPage
-            values[i] = page.timestamp_a
+            timestamps[i] = page.timestamp_a
             labels[i] = page.text
-            lbl_id[i] = get_and_incr(counter, page.text)
-            n = page.id + 1
-            while file.pages[n].type != PageType.Waveform:
-                n += 1
-            id_map[n] = i
+            lbl_num[i] = get_and_incr(counter, page.text)
+            timestamp_to_stimid[page.timestamp_a] = i
         self._log.debug("finished stimuli")
-        return pd.Series(data=values, copy=False,
-                         index=pd.MultiIndex.from_arrays([np.arange(len(stream.page_ids)), labels, lbl_id],
+        return pd.Series(data=timestamps, copy=False,
+                         index=pd.MultiIndex.from_arrays([np.arange(len(stream.page_ids)), labels, lbl_num],
                                                          names=[GLOBAL_STIM_ID, STIM_LBL, STIM_TYPE_ID]),
-                         name=STIM_TS), id_map
+                         name=STIM_TS), timestamp_to_stimid
 
     def get_tracks_for_responses(self, idmap: dict) -> pd.Series:
         file = self.file
@@ -154,6 +165,9 @@ class DapsysReaderFunc(SourceFunctionBase):
         track_response_number = np.empty(n_responses, dtype=int)
         track_labels = list()
         n = 0
+        sorted_ids = np.sort(np.fromiter(idmap.keys(), dtype=float))
+        sorted_ids_slice = sorted_ids
+        sorted_idx_offset = 0
         self._log.info(f"processing streams ({n_responses} responses total)")
         for stream in streams:
             track_labels.extend(stream.name for _ in range(len(stream.page_ids)))
@@ -161,7 +175,9 @@ class DapsysReaderFunc(SourceFunctionBase):
                 stim: TextPage
                 response_timestamps[n] = stim.timestamp_a
                 track_response_number[n] = i
-                responding_to[n] = idmap[stim.reference_id]
+                nearest_offset_i = find_nearest_i(sorted_ids_slice[sorted_idx_offset:], stim.timestamp_a)
+                responding_to[n] = idmap[sorted_ids_slice[nearest_offset_i]]
+                sorted_ids_slice = sorted_ids_slice[nearest_offset_i:]
                 n += 1
         self._log.debug("streams finished")
         return pd.Series(data=response_timestamps, copy=False, name=SPIKE_TS,
