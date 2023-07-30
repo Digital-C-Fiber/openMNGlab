@@ -23,7 +23,8 @@ def _kernel_offset_assign(target: np.array, calc_add, calc_mul, pos_offset, n):
 
 
 class DapsysReaderFunc(SourceFunctionBase):
-    def __init__(self, file_path: str | Path, stim_folder: str, main_pulse: str = "Main Pulse",
+    """Implementation of a reader for DAPSYS"""
+    def __init__(self, file_path: str | Path, stim_folder: str | None = None, main_pulse: str = "Main Pulse",
                  continuous_recording: Optional[str] = "Continuous Recording", responses="responses",
                  tracks: Optional[Sequence[str] | str] = "all", comments="comments", stimdefs="Stim Def Starts"):
         self._log = logging.getLogger("DapsysReaderFunc")
@@ -39,6 +40,7 @@ class DapsysReaderFunc(SourceFunctionBase):
         self._log.debug("initialized")
 
     def _load_file(self) -> File:
+        """load and parse the referenced DAPSYS file"""
         self._log.debug("Opening file")
         with open(self._file_path, "rb") as binfile:
             self._log.debug("Parsing file")
@@ -47,16 +49,26 @@ class DapsysReaderFunc(SourceFunctionBase):
 
     @property
     def file(self) -> File:
+        """Lazy Property for the file attached to this instance. """
         if self._file is None:
             self._log.debug("File not loaded yet!")
             self._file = self._load_file()
             self._log.debug("File loaded!")
         return self._file
 
+    @property
+    def stim_folder(self) -> str:
+        """Returns the configured folder of the pulse stimulator. If none is configured, selects the first folder in the file and uses that. """
+        if self._stim_folder is None:
+            self._log.debug("No stim folder defined!")
+            self._stim_folder = next(iter(self.file.toc.f.keys()))
+            self._log.info(f"Selected stim folder: {self._stim_folder}")
+        return self._stim_folder
+
     def get_continuous_recording(self) -> pd.Series:
         file = self.file
         self._log.debug("processing continuous recording")
-        path = f"{self._stim_folder}/{self._continuous_recording}"
+        path = f"{self.stim_folder}/{self._continuous_recording}"
         total_datapoint_count = sum(len(wp.values) for wp in file.get_data(path, stype=StreamType.Waveform))
         self._log.debug(f"{total_datapoint_count} datapoints in continuous recording")
         values = np.empty(total_datapoint_count, dtype=float32)
@@ -93,7 +105,7 @@ class DapsysReaderFunc(SourceFunctionBase):
     def get_main_pulses(self) -> tuple[pd.Series, dict]:
         file = self.file
         self._log.debug("processing stimuli")
-        path = f"{self._stim_folder}/pulses"
+        path = f"{self.stim_folder}/pulses"
         stream: Stream = file.toc.path(path)
         values = np.empty(len(stream.page_ids), dtype=float64)
         lbl_id = np.empty(len(stream.page_ids), dtype=np.uint)
@@ -120,7 +132,7 @@ class DapsysReaderFunc(SourceFunctionBase):
     def get_tracks_for_responses(self, idmap: dict) -> pd.Series:
         file = self.file
         self._log.debug("processing tracks")
-        tracks: Folder = file.toc.path(f"{self._stim_folder}/{self._responses}")
+        tracks: Folder = file.toc.path(f"{self.stim_folder}/{self._responses}")
         all_responses = tracks.f.get("Tracks for all Responses", None)
 
         if self._tracks is None or all_responses is None:
@@ -163,7 +175,7 @@ class DapsysReaderFunc(SourceFunctionBase):
         self._log.info("Loading comments")
         comments = self._load_textstream(self._comments)
         self._log.info("Loading stimdefs")
-        stimdefs = self._load_textstream(f"{self._stim_folder}/{self._stimdefs}")
+        stimdefs = self._load_textstream(f"{self.stim_folder}/{self._stimdefs}")
         self._log.info("Loading pulses")
         pulses, idmap = self.get_main_pulses()
         self._log.info("Loading tracks")

@@ -39,7 +39,7 @@ class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IPr
     :param responses: Name of the folder containing the responses, defaults to "responses"
     :param tracks: Define which tracks to load from the file. Tracks must be present in the "Tracks for all Responses" folder. "all" loads all tracks found in that subfolder.
     """
-    def __init__(self, file: str | Path, stim_folder: str, main_pulse: Optional[str] = "Main Pulse",
+    def __init__(self, file: str | Path, stim_folder: str |None = None, main_pulse: Optional[str] = "Main Pulse",
                  continuous_recording: Optional[str] = "Continuous Recording", responses="responses",
                  tracks: Optional[Sequence[str] | str] = "all", comments="comments", stimdefs="Stim Def Starts"):
 
@@ -57,7 +57,8 @@ class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IPr
     def config_hash(self) -> bytes:
         hasher = Hash()
         hasher.path(self._file)
-        hasher.str(self._stim_folder)
+        if self._stim_folder is not None:
+            hasher.str(self._stim_folder)
         hasher.str(self._main_pulse)
         hasher.str(self._continuous_recording)
         hasher.str(self._responses)
