@@ -23,6 +23,7 @@ def _kernel_offset_assign(target: np.array, calc_add, calc_mul, pos_offset, n):
 
 
 class DapsysReaderFunc(SourceFunctionBase):
+    """Implementation of a reader for DAPSYS"""
     def __init__(self, file_path: str | Path, stim_folder: str | None = None, main_pulse: str = "Main Pulse",
                  continuous_recording: Optional[str] = "Continuous Recording", responses="responses",
                  tracks: Optional[Sequence[str] | str] = "all", comments="comments", stimdefs="Stim Def Starts"):
@@ -39,6 +40,7 @@ class DapsysReaderFunc(SourceFunctionBase):
         self._log.debug("initialized")
 
     def _load_file(self) -> File:
+        """load and parse the referenced DAPSYS file"""
         self._log.debug("Opening file")
         with open(self._file_path, "rb") as binfile:
             self._log.debug("Parsing file")
@@ -47,6 +49,7 @@ class DapsysReaderFunc(SourceFunctionBase):
 
     @property
     def file(self) -> File:
+        """Lazy Property for the file attached to this instance. """
         if self._file is None:
             self._log.debug("File not loaded yet!")
             self._file = self._load_file()
@@ -55,6 +58,7 @@ class DapsysReaderFunc(SourceFunctionBase):
 
     @property
     def stim_folder(self) -> str:
+        """Returns the configured folder of the pulse stimulator. If none is configured, selects the first folder in the file and uses that. """
         if self._stim_folder is None:
             self._log.debug("No stim folder defined!")
             self._stim_folder = next(iter(self.file.toc.f.keys()))
