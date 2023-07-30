@@ -9,6 +9,7 @@ import quantities as pq
 from numba import njit
 from numpy import float32, float64
 from pydapsys import File, StreamType, WaveformPage, Stream, TextPage, Folder, PageType
+from pydapsys.toc.exceptions import ToCPathError
 
 from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.datamodel.pandas.schemes import TIMESTAMP, CONT_REC, STIM_TS, STIM_LBL, SPIKE_TS, TRACK, \
@@ -78,31 +79,40 @@ class DapsysReaderFunc(SourceFunctionBase):
         file = self.file
         self._log.debug("processing continuous recording")
         path = f"{self.stim_folder}/{self._continuous_recording}"
-        total_datapoint_count = sum(len(wp.values) for wp in file.get_data(path, stype=StreamType.Waveform))
-        self._log.debug(f"{total_datapoint_count} datapoints in continuous recording")
-        values = np.empty(total_datapoint_count, dtype=float32)
-        timestamps = np.empty(total_datapoint_count, dtype=float64)
-        current_pos = 0
-        self._log.debug("begin load")
-        for wp in file.get_data(path, stype=StreamType.Waveform):
-            wp: WaveformPage
-            n = len(wp.values)
-            values[current_pos:current_pos + n] = wp.values
-            if wp.is_irregular:
-                timestamps[current_pos:current_pos + n] = wp.timestamps
-            else:
-                _kernel_offset_assign(timestamps, wp.timestamps[0], wp.interval, current_pos, n)
-            current_pos += n
-        self._log.debug("finished loading continuous recording")
+        values, timestamps = tuple(), tuple()
+        if self.stim_folder in self.file.toc.f and self._continuous_recording in self.file.toc.f[self._stim_folder]:
+            total_datapoint_count = sum(len(wp.values) for wp in file.get_data(path, stype=StreamType.Waveform))
+            self._log.debug(f"{total_datapoint_count} datapoints in continuous recording")
+            values = np.empty(total_datapoint_count, dtype=float32)
+            timestamps = np.empty(total_datapoint_count, dtype=float64)
+            current_pos = 0
+            self._log.debug("begin load")
+            for wp in file.get_data(path, stype=StreamType.Waveform):
+                wp: WaveformPage
+                n = len(wp.values)
+                values[current_pos:current_pos + n] = wp.values
+                if wp.is_irregular:
+                    timestamps[current_pos:current_pos + n] = wp.timestamps
+                else:
+                    _kernel_offset_assign(timestamps, wp.timestamps[0], wp.interval, current_pos, n)
+                current_pos += n
+            self._log.debug("finished loading continuous recording")
+        else:
+            self._log.warning("No continuous recording in file")
         return pd.Series(data=values, index=pd.Index(data=timestamps, copy=False, name=TIMESTAMP),
                          name=CONT_REC, copy=False)
 
     def _load_textstream(self, path: str) -> pd.Series:
         file = self.file
-        stream: Stream = file.toc.path(path)
-        timestamps = np.empty(len(stream.page_ids), dtype=np.double)
-        labels = [""] * len(stream.page_ids)
-        for i, page in enumerate(file.pages[pid] for pid in stream.page_ids):
+        try:
+            stream: Stream = file.toc.path(path)
+            page_ids = stream.page_ids
+        except ToCPathError as e:
+            self._log.warning(f"Folder {path} not found in file")
+            page_ids = tuple()
+        timestamps = np.empty(len(page_ids), dtype=np.double)
+        labels = [""] * len(page_ids)
+        for i, page in enumerate(file.pages[pid] for pid in page_ids):
             page: TextPage
             timestamps[i] = page.timestamp_a
             labels[i] = page.text
@@ -115,12 +125,16 @@ class DapsysReaderFunc(SourceFunctionBase):
         file = self.file
         self._log.debug("processing stimuli")
         path = f"{self.stim_folder}/pulses"
-        stream: Stream = file.toc.path(path)
-        timestamps = np.empty(len(stream.page_ids), dtype=float64)
-
-        lbl_num = np.empty(len(stream.page_ids), dtype=np.uint)
+        if self.stim_folder in self.file.toc.f and self._continuous_recording in self.file.toc.f[self._stim_folder]:
+            stream: Stream = file.toc.path(path)
+            page_ids = stream.page_ids
+        else:
+            self._log.warning("pulses not found in file")
+            page_ids = tuple()
+        timestamps = np.empty(len(page_ids), dtype=float64)
+        lbl_num = np.empty(len(page_ids), dtype=np.uint)
         """The sequence number for the entry of the stimulus label (i.e. the second entry of 'main pulse')"""
-        labels = [""] * len(stream.page_ids)
+        labels = [""] * len(page_ids)
         """The label pulse labels"""
         counter = dict()
         """Stores the next number for each label (see lbl_num)"""
@@ -128,7 +142,7 @@ class DapsysReaderFunc(SourceFunctionBase):
         timestamp_to_stimid = dict()
         """Maps the timestamp of the pulse to the trace that has triggered it"""
         for i, page in enumerate(
-                file.pages[page_id] for page_id in stream.page_ids):
+                file.pages[page_id] for page_id in page_ids):
             page: TextPage
             timestamps[i] = page.timestamp_a
             labels[i] = page.text
@@ -136,7 +150,7 @@ class DapsysReaderFunc(SourceFunctionBase):
             timestamp_to_stimid[page.timestamp_a] = i
         self._log.debug("finished stimuli")
         return pd.Series(data=timestamps, copy=False,
-                         index=pd.MultiIndex.from_arrays([np.arange(len(stream.page_ids)), labels, lbl_num],
+                         index=pd.MultiIndex.from_arrays([np.arange(len(page_ids)), labels, lbl_num],
                                                          names=[GLOBAL_STIM_ID, STIM_LBL, STIM_TYPE_ID]),
                          name=STIM_TS), timestamp_to_stimid
 
@@ -151,34 +165,37 @@ class DapsysReaderFunc(SourceFunctionBase):
                 self._log.info("Should not load any tracks (Tracks is None)")
             else:
                 self._log.info("No tracks in file")
-            return pd.Series(data=np.array(tuple(), dtype=float64), name=SPIKE_TS,
-                             copy=False, index=pd.MultiIndex.from_arrays([[], []],
-                                                                         names=(TRACK, TRACK_SPIKE_IDX)))
-        if self._tracks == "all":
-            streams: list[Stream] = list(all_responses.s.values())
+            streams = list()
+        elif len(idmap) == 0:
+            self._log.warning("empty idmap, cannot load responses")
+            streams = list()
         else:
-            streams: list[Stream] = [all_responses.s[name] for name in self._tracks]
-        self._log.info(f"loading {len(streams)} tracks")
+            if self._tracks == "all":
+                streams: list[Stream] = list(all_responses.s.values())
+            else:
+                streams: list[Stream] = [all_responses.s[name] for name in self._tracks]
+            self._log.info(f"loading {len(streams)} tracks")
         n_responses = sum(len(s.page_ids) for s in streams)
         response_timestamps = np.empty(n_responses, dtype=float64)
         responding_to = np.empty(n_responses, dtype=int)
         track_response_number = np.empty(n_responses, dtype=int)
         track_labels = list()
-        n = 0
-        sorted_ids = np.sort(np.fromiter(idmap.keys(), dtype=float))
-        sorted_ids_slice = sorted_ids
-        sorted_idx_offset = 0
-        self._log.info(f"processing streams ({n_responses} responses total)")
-        for stream in streams:
-            track_labels.extend(stream.name for _ in range(len(stream.page_ids)))
-            for i, stim in enumerate(file.pages[page_id] for page_id in stream.page_ids):
-                stim: TextPage
-                response_timestamps[n] = stim.timestamp_a
-                track_response_number[n] = i
-                nearest_offset_i = find_nearest_i(sorted_ids_slice[sorted_idx_offset:], stim.timestamp_a)
-                responding_to[n] = idmap[sorted_ids_slice[nearest_offset_i]]
-                sorted_ids_slice = sorted_ids_slice[nearest_offset_i:]
-                n += 1
+        if n_responses > 0:
+            n = 0
+            sorted_ids = np.sort(np.fromiter(idmap.keys(), dtype=float))
+            sorted_ids_slice = sorted_ids
+            sorted_idx_offset = 0
+            self._log.info(f"processing streams ({n_responses} responses total)")
+            for stream in streams:
+                track_labels.extend(stream.name for _ in range(len(stream.page_ids)))
+                for i, stim in enumerate(file.pages[page_id] for page_id in stream.page_ids):
+                    stim: TextPage
+                    response_timestamps[n] = stim.timestamp_a
+                    track_response_number[n] = i
+                    nearest_offset_i = find_nearest_i(sorted_ids_slice[sorted_idx_offset:], stim.timestamp_a)
+                    responding_to[n] = idmap[sorted_ids_slice[nearest_offset_i]]
+                    sorted_ids_slice = sorted_ids_slice[nearest_offset_i:]
+                    n += 1
         self._log.debug("streams finished")
         return pd.Series(data=response_timestamps, copy=False, name=SPIKE_TS,
                          index=pd.MultiIndex.from_arrays([responding_to, track_labels, track_response_number],
