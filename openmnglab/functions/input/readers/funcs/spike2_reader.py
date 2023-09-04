@@ -122,10 +122,6 @@ class Spike2ReaderFunc(SourceFunctionBase):
         return int(res.group(1)) if res is not None else matlab_struct_name
 
     @staticmethod
-    def codes_to_int(codes: np.ndarray) -> np.ndarray:
-        return codes.view(np.int8).flatten().view(np.uint32)
-
-    @staticmethod
     def _get_channel_name(channel_struct: dict | None, name_override: str | None = None) -> str:
         if name_override is not None:
             return name_override
@@ -140,6 +136,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
         if spike2_struct is not None and spike2_struct.length > 0:
             values = spike2_struct.values
             if isinstance(spike2_struct, Spike2Realwave):
+                print(spike2_struct.start, spike2_struct.interval, len(times))
                 times = np.empty(len(values))
                 _kernel_offset_assign(times, spike2_struct.start, spike2_struct.interval, 0, len(times))
             else:
@@ -167,7 +164,8 @@ class Spike2ReaderFunc(SourceFunctionBase):
         if spike2_struct is not None and spike2_struct.length > 0:
             times = spike2_struct.times
             texts = spike2_struct.text
-        series = pd.Series(data=texts, index=pd.Index(times, name=index_name, copy=False), copy=False,
+            codes = spike2_struct.int_codes
+        series = pd.Series(data=texts, index=pd.MultiIndex.from_arrays([times,codes], names=[index_name, "codes"]), copy=False,
                            name=name)
         return series
 
@@ -199,7 +197,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
     def _load_texts(cls, chan_struct: dict | None, time_quantity: pq.Quantity = pq.second, name: str | None = None):
         parsed_struct = spike2_struct(chan_struct) if chan_struct is not None else None
         series = cls._textmarker_chan_to_series(parsed_struct, cls._get_channel_name(parsed_struct, name_override=name))
-        return PandasContainer(series, {series.name: pq.dimensionless, series.index.name: time_quantity})
+        return PandasContainer(series, {series.name: pq.dimensionless, series.index.levels[0].name: time_quantity, series.index.levels[1].name: pq.dimensionless})
 
     @classmethod
     def _load_marker(cls, chan_struct: dict | None, time_quantity: pq.Quantity = pq.second, name: str | None = None):
@@ -211,12 +209,12 @@ class Spike2ReaderFunc(SourceFunctionBase):
     def execute(self) -> tuple[PandasContainer, ...]:
         with HDFMatFile(self._path, 'r') as f:
             channels = Spike2ReaderFunc.Spike2Channels(f)
-            mass = self._load_sig_chan(channels.get_chan(self._mass), self._mass_unit, name=MASS)
             sig = self._load_sig_chan(channels.get_chan(self._signal_chan), self._signal_unit, name=SIGNAL)
+            mass = self._load_sig_chan(channels.get_chan(self._mass), self._mass_unit, name=MASS)
             temp = self._load_sig_chan(channels.get_chan(self._temp_chan), self._temp_unit, name=TEMPERATURE)
             v_chan = self._load_sig_chan(channels.get_chan(self._v_chan), self._v_chan_unit, name=SPIKE2_V_CHAN)
-            ext_pull = self._load_unbinned_event(channels.get_chan(self._ext_pul))
+            ext_pul = self._load_unbinned_event(channels.get_chan(self._ext_pul))
             comments = self._load_texts(channels.get_chan(self._comments), name=COMMENT)
             dig_mark = self._load_marker(channels.get_chan(self._digmark), name=SPIKE2_DIGMARK)
             keyboard = self._load_marker(channels.get_chan(self._keyboard), name=SPIKE2_KEYBOARD)
-        return sig, mass, temp, v_chan, ext_pull, comments, dig_mark, keyboard
+        return sig, mass, temp, v_chan, ext_pul, comments, dig_mark, keyboard
