@@ -120,13 +120,20 @@ class IntervalDataFunc(FunctionBase):
 
         if self._use_time_offsets:
             interval_lens = interval_ranges[1] - interval_ranges[0]
-            code_cut = np.arange(interval_lens.max())
-            interval = self._interval if self._interval is not None else recording.index.values[1] - \
-                                                                         recording.index.values[0]
-            index_values = code_cut * interval
-            codes = np.concatenate([code_cut[:l] for l in interval_lens])
-            multiindex_codes = extend_multiindex_f(intervals.index.codes, interval_ranges, codes)
-            new_multiindex = MultiIndex(levels=(*intervals.index.levels, index_values),
+            if len(interval_lens) > 0:
+                code_cut = np.arange(interval_lens.max())
+
+                interval = self._interval if self._interval is not None else recording.index.values[1] - \
+                                                                             recording.index.values[0]
+                index_values = code_cut * interval
+                codes = np.concatenate([code_cut[:l] for l in interval_lens])
+                multiindex_codes = extend_multiindex_f(intervals.index.codes, interval_ranges, codes)
+                levels = (*intervals.index.levels, index_values)
+            else:
+                multiindex_codes = [[] for _ in range(len(intervals.index.names)+1)]
+                levels = [tuple() for _ in range(len(intervals.index.names)+1)]
+
+            new_multiindex = MultiIndex(levels=levels,
                                         names=[*intervals.index.names,
                                                recording.index.name], codes=multiindex_codes)
         else:
