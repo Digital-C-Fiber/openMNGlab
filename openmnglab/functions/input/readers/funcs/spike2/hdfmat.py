@@ -12,7 +12,7 @@ class HDFMatGroup(Mapping):
     @staticmethod
     def _parse_dataset(h5ds: h5py.Dataset, *slicers: slice) -> np.ndarray | tuple[str]:
         assert (len(slicers) <= len(h5ds.shape))
-        
+
         def transposed_slicers(norm_slicers: tuple[slice], total_levels: int):
             # when we transpose a matrix, we have to reverse the slicers for it (since the last level will be returned as the first one)
             return tuple(chain((slice(None, None, None) for _ in range(total_levels - len(norm_slicers))),
@@ -41,6 +41,12 @@ class HDFMatGroup(Mapping):
         if dataset is None:
             return default
         return self._parse_dataset(dataset, *slicers)
+
+    def get_array(self, key, slicer=slice(None, None, None), default=None):
+        values = self.get(key, slice(None, None, None), slicer, default=None)
+        if values is None:
+            return default
+        return values.flatten()
 
     def __contains__(self, item):
         return self.h5group.__contains__(item)
