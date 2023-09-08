@@ -136,7 +136,6 @@ class Spike2ReaderFunc(SourceFunctionBase):
         if spike2_struct is not None and spike2_struct.length > 0:
             values = spike2_struct.values
             if isinstance(spike2_struct, Spike2Realwave):
-                print(spike2_struct.start, spike2_struct.interval, len(times))
                 times = np.empty(len(values))
                 _kernel_offset_assign(times, spike2_struct.start, spike2_struct.interval, 0, len(times))
             else:
@@ -175,7 +174,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
         times, levels = tuple(), tuple()
         if spike2_struct is not None and spike2_struct.length > 0:
             times = spike2_struct.times
-            levels = spike2_struct.level
+            levels = spike2_struct.levels
         series = pd.Series(data=levels, index=pd.Index(times, name=index_name, copy=False), copy=False, name=name)
         return series
 
