@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openmnglab"
-version = "0.1.0a1"
+version = "0.1.0"
 description = "A Python framework for microneurography analysis"
 authors = ["Peter Konradi <codingchipmunk@posteo.net>"]
 license = "MIT"
@@ -19,7 +19,7 @@ seaborn = "^0.12.2"
 pandas = "^2.0.1"
 pandera = "^0.14.5"
 quantities = "^0.14.1"
-pymatreader = "^0.0.31"
+h5py = "^3.9.0"
 
 
 [tool.poetry.group.dev.dependencies]
