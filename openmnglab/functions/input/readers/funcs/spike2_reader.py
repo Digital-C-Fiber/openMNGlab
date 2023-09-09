@@ -23,6 +23,7 @@ SPIKE2_LEVEL = "level"
 SPIKE2_V_CHAN = "V chan"
 SPIKE2_DIGMARK = "digmark"
 SPIKE2_KEYBOARD = "keyboard"
+SPIKE2_CODES = "codes"
 
 
 class Spike2ReaderFunc(SourceFunctionBase):
@@ -133,11 +134,9 @@ class Spike2ReaderFunc(SourceFunctionBase):
             channel_struct = dict()
         return channel_struct.get("title", "unknown channel")
 
-
-
     def _waveform_chan_to_series(self, spike2_struct: Spike2Realwave | Spike2Waveform | None,
                                  name: str, index_name: str = TIMESTAMP) -> pd.Series:
-        values, times = tuple(), tuple()
+        values, times = np.empty(0, dtype=np.float64), np.empty(0, dtype=np.float64)
         if spike2_struct is not None and spike2_struct.length > 0:
             slicer = spike2_struct.timerange_slice(self._start, self._end)
             values = spike2_struct.get_values_slice(slicer)
@@ -154,7 +153,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
 
     def _marker_chan_to_series(self, spike2_struct: Spike2Marker | None, name: str,
                                index_name: str = TIMESTAMP) -> pd.Series:
-        times, codes = tuple(), tuple()
+        times, codes = np.empty(0,dtype=np.float64), np.empty(0, dtype=np.uint32)
         if spike2_struct is not None and spike2_struct.length > 0:
             slicer = spike2_struct.timerange_slice(self._start, self._end)
             times = spike2_struct.get_times_slice(slicer)
@@ -163,23 +162,23 @@ class Spike2ReaderFunc(SourceFunctionBase):
                            index=Index(data=times, copy=False, name=index_name))
         return series
 
-
     def _textmarker_chan_to_series(self, spike2_struct: Spike2Textmark | None, name: str,
                                    index_name: str = TIMESTAMP) -> pd.Series:
-        texts, times, codes = tuple(), tuple(), tuple()
+        texts, times, codes = np.empty(0, dtype=str), np.empty(0,dtype=np.float64), np.empty(0, dtype=np.uint32)
         if spike2_struct is not None and spike2_struct.length > 0:
             slicer = spike2_struct.timerange_slice(self._start, self._end)
             times = spike2_struct.get_times_slice(slicer)
             texts = spike2_struct.get_texts_slice(slicer)
             codes = spike2_struct.get_int_codes_slice(slicer)
-        series = pd.Series(data=texts, index=pd.MultiIndex.from_arrays([times, codes], names=[index_name, "codes"]),
+        series = pd.Series(data=texts,
+                           index=pd.MultiIndex.from_arrays([times, codes], names=[index_name, SPIKE2_CODES]),
                            copy=False,
                            name=name)
         return series
 
     def _unbinned_event_chant_to_series(self, spike2_struct: Spike2UnbinnedEvent | None, name: str,
                                         index_name: str = TIMESTAMP):
-        times, levels = tuple(), tuple()
+        times, levels = np.empty(0,dtype=np.float64), np.empty(0, dtype=np.int8)
         if spike2_struct is not None and spike2_struct.length > 0:
             slicer = spike2_struct.timerange_slice(self._start, self._end)
             times = spike2_struct.get_times_slice(slicer)
@@ -201,14 +200,15 @@ class Spike2ReaderFunc(SourceFunctionBase):
 
     def _load_texts(self, chan_struct: dict | None, time_quantity: pq.Quantity = pq.second, name: str | None = None):
         parsed_struct = spike2_struct(chan_struct) if chan_struct is not None else None
-        series = self._textmarker_chan_to_series(parsed_struct, self._get_channel_name(parsed_struct, name_override=name))
+        series = self._textmarker_chan_to_series(parsed_struct,
+                                                 self._get_channel_name(parsed_struct, name_override=name))
         return PandasContainer(series, {series.name: pq.dimensionless, series.index.levels[0].name: time_quantity,
                                         series.index.levels[1].name: pq.dimensionless})
 
     def _load_marker(self, chan_struct: dict | None, time_quantity: pq.Quantity = pq.second, name: str | None = None):
         parsed_struct = spike2_struct(chan_struct) if chan_struct is not None else None
         series = self._marker_chan_to_series(parsed_struct,
-                                            name=self._get_channel_name(parsed_struct, name_override=name))
+                                             name=self._get_channel_name(parsed_struct, name_override=name))
         return PandasContainer(series, {series.name: pq.dimensionless, series.index.name: time_quantity})
 
     def execute(self) -> tuple[PandasContainer, ...]:
