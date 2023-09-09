@@ -19,6 +19,34 @@ from openmnglab.util.hashing import Hash
 class Spike2Reader(SourceFunctionDefinitionBase[tuple[
     IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[
         pd.Series]]]):
+    """ Load data from Spike2 recordings exported to MATLAB v7.3+ files
+        Attempts to load data from 9 channels. To avoid loading data from a channel, pass ``None`` as a channels name,to avoid loading data from itl.
+        Channels can be specified either by their name or their numeric channel id. Channel ids are only available, if the MATLAB file
+        was exported without the "Use source channel name in variable names" option, as they can only be loaded from the MATLAB structure name.
+        Channel names are loaded from the respective attribute of the matlab structure and not from its name.
+
+        Use the ``start`` and ``end`` parameters to load only a section of the data by specifying the start, respective end timestamps in seconds.
+
+        You can provide a quantity for all channels which require one.
+
+        :param path: Path to the file
+        :param signal: Name or channel id of the signal channel. Pass ``None`` to avoid loading it. Defaults to "Signal".
+        :param temp: Name or channel id of the temperature channel. Pass ``None`` to avoid loading it. Defaults to "Temp".
+        :param mass: Name or channel id of the mass / force channel. Pass ``None`` to avoid loading it. Defaults to "Force".
+        :param v_chan: Name or channel id of the v chan channel. Pass ``None`` to avoid loading it. Defaults to "V".
+        :param ext_pul: Name or channel id of the external pulses channel. Pass ``None`` to avoid loading it. Defaults to 10.
+        :param comments: Name or channel id of the comments channel. Pass ``None`` to avoid loading it. Defaults to 30.
+        :param keyboard: Name or channel id of the keyboard channel. Pass ``None`` to avoid loading it. Defaults to 31.
+        :param digmark: Name or channel id of the digmark channel. Pass ``None`` to avoid loading it. Defaults to 32.
+        :param wavemarks: Name or channel id of the wavemarks channel. Pass ``None`` to avoid loading it. Defaults to "nw-1".
+        :param start: first timestamp to load from the file, defaults to 0
+        :param end: last timestamp to load from the file, defaults to infinity
+        :param mass_unit: Unit to use for the mass channel, defaults to gramms.
+        :param signal_unit: Unit to use for the signal channel, defaults to microvolt
+        :param temp_unit: Unit to use for the temperature channel, defaults to degree Celsius.
+        :param v_chan_unit: Unit to use for the v_chan channel, defaults to dimensionless.
+        :param time_unit: Unit to use for all timestamps, defaults to seconds.
+    """
 
     def __init__(self, path: str | Path,
                  signal: SPIKE2_CHANID | None = "Signal",
@@ -37,6 +65,7 @@ class Spike2Reader(SourceFunctionDefinitionBase[tuple[
                  temp_unit: pq.Quantity = pq.celsius,
                  v_chan_unit: pq.Quantity = pq.dimensionless,
                  time_unit: pq.Quantity = pq.second):
+
         super().__init__("codingchipmunk.spike2loader")
         self._start = start
         self._end = end
