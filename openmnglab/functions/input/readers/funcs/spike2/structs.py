@@ -23,6 +23,18 @@ class _Spike2Base:
         return self._hdfgroup
 
 
+class _TimeRangeSliceMixin:
+
+    def timerange_slice(self, start: float, stop: float) -> slice:
+        if isinstance(self, _TimesMixin):
+            times_ds = self.hdfgroup.h5group.get(self._TIMES_ITEM_NAME, default=None)
+            if times_ds and times_ds.attrs.get("MATLAB_empty", 0) == 0:
+                return self.timerange_slice_from_times(start, stop)
+        elif isinstance(self, _CalculatedIndexMixin):
+            return self.timerange_slice_from_calc_idx(start, stop)
+        raise Exception("This object does not support calculating timeranges!")
+
+
 class _StartMixin(_Spike2Base):
     _start = None
 
@@ -45,7 +57,7 @@ class _LengthMixin(_Spike2Base):
         return self._length
 
 
-class _TimesMixin(_Spike2Base):
+class _TimesMixin(_TimeRangeSliceMixin, _Spike2Base):
     _times = None
     _TIMES_ITEM_NAME = 'times'
 
@@ -60,17 +72,25 @@ class _TimesMixin(_Spike2Base):
         return vals
 
     def _binary_search_times(self, val: float, tolerance: float = sys.float_info.epsilon) -> tuple[None, None] | tuple[
-        int, int]:
+        int|None, int|None]:
         h5ds: h5py.Dataset = self.hdfgroup.h5group[self._TIMES_ITEM_NAME]
         low, high = 0, h5ds.shape[1] - 1
+        if low == high:
+            single_val = h5ds[0,0]
+            if comp_float(val, single_val, delta=tolerance):
+                return low, low
+            else:
+                return None,None
         mid = (high - low) // 2
         low_val, mid_val, high_val = h5ds[0, [low, mid, high]]
         if comp_float(val, low_val, delta=tolerance):
             return low, low
         elif comp_float(val, high_val, delta=tolerance):
             return high, high
-        elif not low_val < val < high_val:
-            return None, None
+        elif val < low_val:
+            return None,0
+        elif high_val < val:
+            return h5ds.shape[1], None
         while high - low > 1:
             if comp_float(val, mid_val, delta=tolerance):
                 return mid, mid
@@ -83,9 +103,11 @@ class _TimesMixin(_Spike2Base):
         return low, high
 
     def timerange_slice_from_times(self, start: float, stop: float) -> slice:
-        _, start_idx = self._binary_search_times(start)
-        stop_idx, _ = self._binary_search_times(stop)
-        return slice(start_idx, stop_idx + 1)
+        start_low, start_idx = self._binary_search_times(start)
+        stop_idx, stop_high = self._binary_search_times(stop)
+        if not start_low and not stop_high:
+            return slice(0)
+        return slice(start_idx, stop_idx + 1 if stop_idx else None)
 
 
 class _TitleMixin(_Spike2Base):
@@ -124,15 +146,18 @@ class _LevelsMixin(_Spike2Base):
         return vals.astype(np.int8)
 
 
-class _TextMixin(_Spike2Base):
-    _text = None
+class _TextsMixin(_Spike2Base):
+    _texts = None
 
     @property
-    def text(self) -> tuple[str, ...]:
-        if self._text is None:
-            val = self.hdfgroup['text']
-            self._text = val
-        return self._text
+    def texts(self) -> tuple[str, ...]:
+        if self._texts is None:
+            self._texts = self.get_texts_slice(slice(None, None, None))
+        return self._texts
+
+    def get_texts_slice(self, slicer: slice) -> tuple[str, ...]:
+        vals = self.hdfgroup.get("text", slicer)
+        return vals
 
 
 class _IntervalMixin(_Spike2Base):
@@ -181,9 +206,9 @@ class _ValuesMixin(_Spike2Base):
         return vals
 
 
-class _CalculatedIndexMixin(_LengthMixin, _StartMixin, _IntervalMixin):
+class _CalculatedIndexMixin(_TimeRangeSliceMixin, _LengthMixin, _StartMixin, _IntervalMixin):
 
-    def _calc_closest_idx(self, val: float) -> tuple[int, int] | tuple[None, None]:
+    def _calc_closest_idx(self, val: float) -> tuple[int, int] | tuple[None|int, None|int]:
         if self.length == 0:
             return None, None
         end = self.start + self.interval * (self.length - 1)
@@ -191,8 +216,10 @@ class _CalculatedIndexMixin(_LengthMixin, _StartMixin, _IntervalMixin):
             return 0, 0
         elif comp_float(val, end):
             return self.length - 1, self.length - 1
-        elif not self.start < val < end:
-            return None, None
+        elif val < self.start:
+            return None, 0
+        elif end < val:
+            return self.length, None
 
         float_pos = (val - self.start) / self.interval
         floor_pos = math.floor(float_pos)
@@ -233,7 +260,7 @@ class Spike2Result(_CalculatedIndexMixin, _ValuesMixin, _TitleMixin, _TimesMixin
     ...
 
 
-class Spike2Textmark(_LengthMixin, _TitleMixin, _CodesMixin, _TimesMixin, _TextMixin, _Spike2Base):
+class Spike2Textmark(_LengthMixin, _TitleMixin, _CodesMixin, _TimesMixin, _TextsMixin, _Spike2Base):
     ...
 
 

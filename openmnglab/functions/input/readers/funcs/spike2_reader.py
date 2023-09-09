@@ -45,7 +45,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
                 chan_no = unpack_match(channel_no_regex.search(struct_name))
                 if chan_no is not None:
                     idmap[chan_no] = struct_name
-                chan_name = fields.get("title", None)
+                chan_name = fields.get("title", default=None)
                 if chan_name:
                     idmap[chan_name[0]] = struct_name
             return idmap
@@ -94,11 +94,15 @@ class Spike2ReaderFunc(SourceFunctionBase):
                  keyboard: SPIKE2_CHANID | None = 31,
                  digmark: SPIKE2_CHANID | None = 32,
                  wavemarks: SPIKE2_CHANID | None | Iterable[int | str] = "nw-1",
+                 start: float = 0,
+                 end: float = np.inf,
                  mass_unit: pq.Quantity = pq.g,
                  signal_unit: pq.Quantity = pq.microvolt,
                  temp_unit: pq.Quantity = pq.celsius,
                  v_chan_unit: pq.Quantity = pq.dimensionless,
                  time_unit: pq.Quantity = pq.second):
+        self._start = start
+        self._end = end
         self._signal_chan = signal
         self._temp_chan = temp
         self._mass = mass
@@ -129,80 +133,82 @@ class Spike2ReaderFunc(SourceFunctionBase):
             channel_struct = dict()
         return channel_struct.get("title", "unknown channel")
 
-    @staticmethod
-    def _waveform_chan_to_series(spike2_struct: Spike2Realwave | Spike2Waveform | None,
+
+
+    def _waveform_chan_to_series(self, spike2_struct: Spike2Realwave | Spike2Waveform | None,
                                  name: str, index_name: str = TIMESTAMP) -> pd.Series:
         values, times = tuple(), tuple()
         if spike2_struct is not None and spike2_struct.length > 0:
-            values = spike2_struct.values
+            slicer = spike2_struct.timerange_slice(self._start, self._end)
+            values = spike2_struct.get_values_slice(slicer)
             if isinstance(spike2_struct, Spike2Realwave):
                 times = np.empty(len(values))
-                _kernel_offset_assign(times, spike2_struct.start, spike2_struct.interval, 0, len(times))
+                start = slicer.start * spike2_struct.interval + spike2_struct.start
+                _kernel_offset_assign(times, start, spike2_struct.interval, 0, len(times))
             else:
-                times = spike2_struct.times
+                times = spike2_struct.get_times_slice(slicer)
 
         series = pd.Series(data=values, index=pd.Index(times, name=index_name, copy=False),
                            name=name, copy=False)
         return series
 
-    @classmethod
-    def _marker_chan_to_series(cls, spike2_struct: Spike2Marker | None, name: str,
+    def _marker_chan_to_series(self, spike2_struct: Spike2Marker | None, name: str,
                                index_name: str = TIMESTAMP) -> pd.Series:
         times, codes = tuple(), tuple()
         if spike2_struct is not None and spike2_struct.length > 0:
-            times = spike2_struct.times
-            codes = spike2_struct.int_codes
+            slicer = spike2_struct.timerange_slice(self._start, self._end)
+            times = spike2_struct.get_times_slice(slicer)
+            codes = spike2_struct.get_int_codes_slice(slicer)
         series = pd.Series(data=codes, dtype="category", name=name,
                            index=Index(data=times, copy=False, name=index_name))
         return series
 
-    @staticmethod
-    def _textmarker_chan_to_series(spike2_struct: Spike2Textmark | None, name: str,
+
+    def _textmarker_chan_to_series(self, spike2_struct: Spike2Textmark | None, name: str,
                                    index_name: str = TIMESTAMP) -> pd.Series:
         texts, times, codes = tuple(), tuple(), tuple()
         if spike2_struct is not None and spike2_struct.length > 0:
-            times = spike2_struct.times
-            texts = spike2_struct.text
-            codes = spike2_struct.int_codes
-        series = pd.Series(data=texts, index=pd.MultiIndex.from_arrays([times,codes], names=[index_name, "codes"]), copy=False,
+            slicer = spike2_struct.timerange_slice(self._start, self._end)
+            times = spike2_struct.get_times_slice(slicer)
+            texts = spike2_struct.get_texts_slice(slicer)
+            codes = spike2_struct.get_int_codes_slice(slicer)
+        series = pd.Series(data=texts, index=pd.MultiIndex.from_arrays([times, codes], names=[index_name, "codes"]),
+                           copy=False,
                            name=name)
         return series
 
-    @staticmethod
-    def _unbinned_event_chant_to_series(spike2_struct: Spike2UnbinnedEvent | None, name: str,
+    def _unbinned_event_chant_to_series(self, spike2_struct: Spike2UnbinnedEvent | None, name: str,
                                         index_name: str = TIMESTAMP):
         times, levels = tuple(), tuple()
         if spike2_struct is not None and spike2_struct.length > 0:
-            times = spike2_struct.times
-            levels = spike2_struct.levels
+            slicer = spike2_struct.timerange_slice(self._start, self._end)
+            times = spike2_struct.get_times_slice(slicer)
+            levels = spike2_struct.get_levels_slice(slicer)
         series = pd.Series(data=levels, index=pd.Index(times, name=index_name, copy=False), copy=False, name=name)
         return series
 
-    @classmethod
-    def _load_sig_chan(cls, chan_struct: dict | None, quantity: pq.Quantity, time_quantity: pq.Quantity = pq.second,
+    def _load_sig_chan(self, chan_struct: dict | None, quantity: pq.Quantity, time_quantity: pq.Quantity = pq.second,
                        name: str | None = None):
         parsed_struct = spike2_struct(chan_struct) if chan_struct is not None else None
-        series = cls._waveform_chan_to_series(parsed_struct, cls._get_channel_name(parsed_struct, name_override=name))
+        series = self._waveform_chan_to_series(parsed_struct, self._get_channel_name(parsed_struct, name_override=name))
         return PandasContainer(series, {series.name: quantity, series.index.name: time_quantity})
 
-    @classmethod
-    def _load_unbinned_event(cls, chan_struct: dict | None, quantity: pq.Quantity = pq.dimensionless,
+    def _load_unbinned_event(self, chan_struct: dict | None, quantity: pq.Quantity = pq.dimensionless,
                              time_quantity: pq.Quantity = pq.second):
         parsed_struct = spike2_struct(chan_struct) if chan_struct is not None else None
-        series = cls._unbinned_event_chant_to_series(parsed_struct, SPIKE2_LEVEL)
+        series = self._unbinned_event_chant_to_series(parsed_struct, SPIKE2_LEVEL)
         return PandasContainer(series, {series.name: quantity, series.index.name: time_quantity})
 
-    @classmethod
-    def _load_texts(cls, chan_struct: dict | None, time_quantity: pq.Quantity = pq.second, name: str | None = None):
+    def _load_texts(self, chan_struct: dict | None, time_quantity: pq.Quantity = pq.second, name: str | None = None):
         parsed_struct = spike2_struct(chan_struct) if chan_struct is not None else None
-        series = cls._textmarker_chan_to_series(parsed_struct, cls._get_channel_name(parsed_struct, name_override=name))
-        return PandasContainer(series, {series.name: pq.dimensionless, series.index.levels[0].name: time_quantity, series.index.levels[1].name: pq.dimensionless})
+        series = self._textmarker_chan_to_series(parsed_struct, self._get_channel_name(parsed_struct, name_override=name))
+        return PandasContainer(series, {series.name: pq.dimensionless, series.index.levels[0].name: time_quantity,
+                                        series.index.levels[1].name: pq.dimensionless})
 
-    @classmethod
-    def _load_marker(cls, chan_struct: dict | None, time_quantity: pq.Quantity = pq.second, name: str | None = None):
+    def _load_marker(self, chan_struct: dict | None, time_quantity: pq.Quantity = pq.second, name: str | None = None):
         parsed_struct = spike2_struct(chan_struct) if chan_struct is not None else None
-        series = cls._marker_chan_to_series(parsed_struct,
-                                            name=cls._get_channel_name(parsed_struct, name_override=name))
+        series = self._marker_chan_to_series(parsed_struct,
+                                            name=self._get_channel_name(parsed_struct, name_override=name))
         return PandasContainer(series, {series.name: pq.dimensionless, series.index.name: time_quantity})
 
     def execute(self) -> tuple[PandasContainer, ...]:
