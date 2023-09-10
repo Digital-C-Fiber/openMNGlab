@@ -81,7 +81,7 @@ class DapsysReaderFunc(SourceFunctionBase):
         file = self.file
         self._log.debug("processing continuous recording")
         path = f"{self.stim_folder}/{self._continuous_recording}"
-        values, timestamps = tuple(), tuple()
+        values, timestamps = np.empty(0, dtype=float64), np.empty(0, dtype=float64)
         if self.stim_folder in self.file.toc.f and self._continuous_recording in self.file.toc.f[self._stim_folder]:
             total_datapoint_count = sum(len(wp.values) for wp in file.get_data(path, stype=StreamType.Waveform))
             self._log.debug(f"{total_datapoint_count} datapoints in continuous recording")
@@ -101,7 +101,7 @@ class DapsysReaderFunc(SourceFunctionBase):
             self._log.debug("finished loading continuous recording")
         else:
             self._log.warning("No continuous recording in file")
-        return pd.Series(data=values, index=pd.Index(data=timestamps, copy=False, name=TIMESTAMP),
+        return pd.Series(data=values.astype(float64), index=pd.Index(data=timestamps, copy=False, name=TIMESTAMP),
                          name=SIGNAL, copy=False)
 
     def _load_textstream(self, path: str) -> pd.Series:
