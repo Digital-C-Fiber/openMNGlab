@@ -1,4 +1,3 @@
-import numpy as np
 from pandas import IntervalDtype
 from pandera import Column, Index, DataFrameSchema, SeriesSchema, MultiIndex
 
@@ -23,30 +22,18 @@ STIM_TYPE_ID = "stime type id"
 COMMENT = "comment"
 
 
-def time_waveform() -> PandasDataSchema[SeriesSchema]:
-    return PandasDataSchema(SeriesSchema(np.float32, index=Index(float)))
+def float_timeseries(name: str, index_name: str = TIMESTAMP) -> PandasDataSchema[SeriesSchema]:
+    return PandasDataSchema(SeriesSchema(float, index=Index(float, name=index_name), name=name))
 
 
-def int_list() -> PandasDataSchema[SeriesSchema]:
-    return PandasDataSchema(SeriesSchema(int, index=Index(int)))
-
-
-def float_list() -> PandasDataSchema[SeriesSchema]:
-    return PandasDataSchema(SeriesSchema(float, index=Index(float)))
-
-
-def str_float_list() -> PandasDataSchema[SeriesSchema]:
-    return PandasDataSchema(SeriesSchema(str, index=Index(float)))
-
-
-def generic_interval_list() -> PandasDataSchema[SeriesSchema]:
-    return PandasDataSchema(SeriesSchema(IntervalDtype))
+def str_eventseries(name: str, index_name: str = TIMESTAMP) -> PandasDataSchema[SeriesSchema]:
+    return PandasDataSchema(SeriesSchema(str, index=Index(float, name=index_name), name=name))
 
 
 def stimulus_list() -> PandasDataSchema[SeriesSchema]:
     return PandasDataSchema(SeriesSchema(float, index=MultiIndex(
         indexes=[Index(int, name=GLOBAL_STIM_ID), Index(str, name=STIM_TYPE), Index(int, name=STIM_TYPE_ID)]),
-                                               name=STIM_TS))
+                                         name=STIM_TS))
 
 
 def related_spikes() -> PandasDataSchema[DataFrameSchema]:
@@ -60,7 +47,7 @@ def related_spikes() -> PandasDataSchema[DataFrameSchema]:
 
 def sorted_spikes() -> PandasDataSchema[SeriesSchema]:
     return PandasDataSchema(SeriesSchema(float,
-                                               index=MultiIndex(
-                                                   indexes=[Index(int, name=GLOBAL_STIM_ID), Index(str, name=TRACK),
-                                                            Index(int, name=TRACK_SPIKE_IDX)]),
-                                               name=SPIKE_TS))
+                                         index=MultiIndex(
+                                             indexes=[Index(int, name=GLOBAL_STIM_ID), Index(str, name=TRACK),
+                                                      Index(int, name=TRACK_SPIKE_IDX)]),
+                                         name=SPIKE_TS))
