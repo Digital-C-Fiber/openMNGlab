@@ -6,7 +6,7 @@ import pandas as pd
 import quantities as pq
 from pandera import SeriesSchema, Index, MultiIndex, Category
 
-from openmnglab.datamodel.pandas.model import PandasStaticDataSchema
+from openmnglab.datamodel.pandas.model import PandasDataSchema
 from openmnglab.datamodel.pandas.schemas import TIMESTAMP, SIGNAL, MASS, TEMPERATURE
 from openmnglab.functions.base import SourceFunctionDefinitionBase
 from openmnglab.functions.input.readers.funcs.spike2_reader import SPIKE2_CHANID, Spike2ReaderFunc, SPIKE2_V_CHAN, \
@@ -106,15 +106,15 @@ class Spike2Reader(SourceFunctionDefinitionBase[tuple[
 
     @property
     def produces(self) -> Optional[Sequence[IDataSchema] | IDataSchema]:
-        return PandasStaticDataSchema(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=SIGNAL)), \
-            PandasStaticDataSchema(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=MASS)), \
-            PandasStaticDataSchema(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=TEMPERATURE)), \
-            PandasStaticDataSchema(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=SPIKE2_V_CHAN)), \
-            PandasStaticDataSchema(SeriesSchema(np.int8, index=Index(float, name=TIMESTAMP), name=SPIKE2_LEVEL)), \
-            PandasStaticDataSchema(SeriesSchema(str, index=MultiIndex(
+        return PandasDataSchema(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=SIGNAL)), \
+            PandasDataSchema(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=MASS)), \
+            PandasDataSchema(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=TEMPERATURE)), \
+            PandasDataSchema(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=SPIKE2_V_CHAN)), \
+            PandasDataSchema(SeriesSchema(np.int8, index=Index(float, name=TIMESTAMP), name=SPIKE2_LEVEL)), \
+            PandasDataSchema(SeriesSchema(str, index=MultiIndex(
                 indexes=[Index(float, name=TIMESTAMP), Index(np.uint32, name=SPIKE2_CODES)]))), \
-            PandasStaticDataSchema(SeriesSchema(Category, index=(Index(float, name=TIMESTAMP)), name=SPIKE2_DIGMARK)), \
-            PandasStaticDataSchema(SeriesSchema(Category, index=(Index(float, name=TIMESTAMP)), name=SPIKE2_KEYBOARD))
+            PandasDataSchema(SeriesSchema(Category, index=(Index(float, name=TIMESTAMP)), name=SPIKE2_DIGMARK)), \
+            PandasDataSchema(SeriesSchema(Category, index=(Index(float, name=TIMESTAMP)), name=SPIKE2_KEYBOARD))
 
     def new_function(self) -> Spike2ReaderFunc:
         return Spike2ReaderFunc(start=self._start,
