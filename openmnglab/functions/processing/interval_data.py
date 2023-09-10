@@ -10,12 +10,12 @@ from pandas import DataFrame, DatetimeTZDtype, PeriodDtype, SparseDtype, Interva
     BooleanDtype
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
-from openmnglab.datamodel.pandas.model import PandasOutputDataScheme, PandasInputDataSchema, \
+from openmnglab.datamodel.pandas.model import PandasOutputDataSchema, PandasInputDataSchema, \
     PandasDataScheme
 from openmnglab.datamodel.pandas.schemes import generic_interval_list
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.interval_data import IntervalDataFunc, LEVEL_COLUMN
-from openmnglab.model.datamodel.interface import IDataContainer, IInputDataSchema, IOutputDataScheme
+from openmnglab.model.datamodel.interface import IDataContainer, IInputDataSchema, IOutputDataSchema
 from openmnglab.model.functions.interface import IFunction
 from openmnglab.model.planning.interface import IProxyData
 from openmnglab.util.hashing import Hash
@@ -23,8 +23,8 @@ from openmnglab.util.hashing import Hash
 
 class WindowDataInputSchema(IInputDataSchema):
 
-    def accepts(self, output_data_scheme: IOutputDataScheme) -> bool:
-        if not isinstance(output_data_scheme, PandasOutputDataScheme):
+    def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
+        if not isinstance(output_data_scheme, PandasOutputDataSchema):
             raise DataSchemeCompatibilityError("Data scheme is not a pandas data scheme")
         schema = output_data_scheme.schema
         if not isinstance(schema, pa.SeriesSchema):
@@ -43,19 +43,19 @@ class NumericIndexedList(PandasInputDataSchema[pa.SeriesSchema]):
     def __init__(self):
         super().__init__(pa.SeriesSchema())
 
-    def accepts(self, output_data_scheme: IOutputDataScheme) -> bool:
+    def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
         super_accepts = super().accepts(output_data_scheme)
-        output_data_scheme: PandasOutputDataScheme
+        output_data_scheme: PandasOutputDataSchema
         if not pa.dtypes.is_numeric(output_data_scheme.pandera_schema.index.dtype):
             raise DataSchemeCompatibilityError("Requires a numerically series")
         return super_accepts
 
 
-class DynamicIndexWindowDataScheme(PandasOutputDataScheme[pa.SeriesSchema]):
+class DynamicIndexWindowDataScheme(PandasOutputDataSchema[pa.SeriesSchema]):
 
     @staticmethod
-    def for_input(inp_series: PandasOutputDataScheme[pa.SeriesSchema],
-                  inp_interval: PandasOutputDataScheme[pa.SeriesSchema],
+    def for_input(inp_series: PandasOutputDataSchema[pa.SeriesSchema],
+                  inp_interval: PandasOutputDataSchema[pa.SeriesSchema],
                   name: str) -> DynamicIndexWindowDataScheme:
         if inp_interval.pandera_schema.dtype != IntervalDtype:
             raise Exception("Input interval does not contain intervals!")
@@ -81,9 +81,9 @@ class IntervalDataInputSchema(IntervalDataBaseSchema, PandasInputDataSchema):
     def __init__(self, first_level: int, *levels: int):
         super().__init__(first_level, *levels)
 
-    def accepts(self, output_data_scheme: IOutputDataScheme) -> bool:
+    def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
         super_accepts = super().accepts(output_data_scheme)
-        output_data_scheme: PandasOutputDataScheme
+        output_data_scheme: PandasOutputDataSchema
         if isinstance(output_data_scheme.pandera_schema.index, pa.MultiIndex):
             num_idx = output_data_scheme.pandera_schema.index.indexes[-1]
         else:
@@ -94,7 +94,7 @@ class IntervalDataInputSchema(IntervalDataBaseSchema, PandasInputDataSchema):
         return super_accepts
 
 
-class IntervalDataOutputSchema(IntervalDataBaseSchema, PandasOutputDataScheme):
+class IntervalDataOutputSchema(IntervalDataBaseSchema, PandasOutputDataSchema):
     def __init__(self, idx: pa.Index | pa.MultiIndex, first_level: int, *levels: int):
         super().__init__(first_level, *levels)
         self.pandera_schema.index = idx
@@ -150,13 +150,13 @@ class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
     def consumes(self) -> tuple[PandasInputDataSchema[pa.SeriesSchema], PandasInputDataSchema[pa.SeriesSchema]]:
         return generic_interval_list(), NumericIndexedList()
 
-    def production_for(self, window_intervals: IOutputDataScheme[pa.SeriesSchema],
-                       data: IOutputDataScheme[pa.SeriesSchema]) -> IntervalDataOutputSchema:
+    def production_for(self, window_intervals: IOutputDataSchema[pa.SeriesSchema],
+                       data: IOutputDataSchema[pa.SeriesSchema]) -> IntervalDataOutputSchema:
         window_scheme, data_scheme = self.consumes
         assert (window_scheme.accepts(window_intervals))
         assert (data_scheme.accepts(data))
-        window_intervals: PandasOutputDataScheme[pa.SeriesSchema]
-        data: PandasOutputDataScheme[pa.SeriesSchema]
+        window_intervals: PandasOutputDataSchema[pa.SeriesSchema]
+        data: PandasOutputDataSchema[pa.SeriesSchema]
         if not isinstance(window_intervals.pandera_schema.index, pa.MultiIndex):
             idx = pa.MultiIndex([window_intervals.pandera_schema.index, data.pandera_schema.index])
         else:

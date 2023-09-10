@@ -24,7 +24,7 @@ class IDataContainer(ABC, Generic[T_co]):
         ...
 
 
-class IOutputDataScheme(ABC):
+class IOutputDataSchema(ABC):
     """
     Scheme for data that is produced by a function.
     """
@@ -48,7 +48,7 @@ class IInputDataSchema(ABC):
     """
 
     @abstractmethod
-    def accepts(self, output_data_scheme: IOutputDataScheme) -> bool:
+    def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
         """Assess whether this scheme would accept the other data scheme as input.
 
         If the schemes are incompatible, the function may either raise an exception containing further details on why the
@@ -73,7 +73,7 @@ class IInputDataSchema(ABC):
         ...
 
 
-class IStaticDataSchema(IOutputDataScheme, IInputDataSchema, ABC):
+class IStaticDataSchema(IOutputDataSchema, IInputDataSchema, ABC):
     """
     A data scheme that behaves the same for in- and outputs
     """

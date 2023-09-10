@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from openmnglab.model.datamodel.interface import IOutputDataScheme, IInputDataSchema
+from openmnglab.model.datamodel.interface import IOutputDataSchema, IInputDataSchema
 from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
 from openmnglab.planning.base import PlannerBase, check_input, ProxyData
 from openmnglab.planning.exceptions import PlanningError
@@ -21,7 +21,7 @@ class Stage(IStage):
         self._definition = definition
         self._data_in = data_in
         self._data_out = tuple(PlannedData.from_function(self, out, i) for i, out in
-                               enumerate(ensure_iterable(definition.production_for(*(d.schema for d in data_in)), IOutputDataScheme)))
+                               enumerate(ensure_iterable(definition.production_for(*(d.schema for d in data_in)), IOutputDataSchema)))
 
     @property
     def definition(self) -> IFunctionDefinition:
@@ -46,14 +46,14 @@ class Stage(IStage):
 
 class PlannedData(IPlannedData):
 
-    def __init__(self, depth: int, calculated_hash: bytes, schema: IOutputDataScheme, produced_by: Stage):
+    def __init__(self, depth: int, calculated_hash: bytes, schema: IOutputDataSchema, produced_by: Stage):
         self._depth = depth
         self._calculated_hash = calculated_hash
         self._schema = schema
         self.produced_by = produced_by
 
     @staticmethod
-    def from_function(func: Stage, scheme: IOutputDataScheme, pos: int) -> PlannedData:
+    def from_function(func: Stage, scheme: IOutputDataSchema, pos: int) -> PlannedData:
         depth = func.depth + 1
         hashgen = Hash()
         hashgen.int(pos)
@@ -61,7 +61,7 @@ class PlannedData(IPlannedData):
         return PlannedData(depth, hashgen.digest(), scheme, func)
 
     @property
-    def schema(self) -> IOutputDataScheme:
+    def schema(self) -> IOutputDataSchema:
         return self._schema
 
     @property

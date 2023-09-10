@@ -8,8 +8,8 @@ from pandas import DataFrame, DatetimeTZDtype, CategoricalDtype, PeriodDtype, Sp
 from pandera import SeriesSchema
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
-from openmnglab.model.datamodel.interface import IDataContainer, IInputDataSchema, IOutputDataScheme
-from openmnglab.datamodel.pandas.model import PandasOutputDataScheme
+from openmnglab.model.datamodel.interface import IDataContainer, IInputDataSchema, IOutputDataSchema
+from openmnglab.datamodel.pandas.model import PandasOutputDataSchema
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.model.functions.interface import IFunction
 from openmnglab.functions.processing.funcs.windowing import WindowingFunc
@@ -19,8 +19,8 @@ from openmnglab.util.hashing import Hash
 
 class WindowingInputDataSchema(IInputDataSchema):
 
-    def accepts(self, output_data_scheme: IOutputDataScheme) -> bool:
-        if not isinstance(output_data_scheme, PandasOutputDataScheme):
+    def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
+        if not isinstance(output_data_scheme, PandasOutputDataSchema):
             raise DataSchemeCompatibilityError("Data scheme is not a pandas data scheme")
         schema = output_data_scheme.pandera_schema
         if not isinstance(schema, SeriesSchema):
@@ -34,10 +34,10 @@ class WindowingInputDataSchema(IInputDataSchema):
         return data_container
 
 
-class DynamicIndexIntervalScheme(PandasOutputDataScheme[SeriesSchema]):
+class DynamicIndexIntervalScheme(PandasOutputDataSchema[SeriesSchema]):
 
     @staticmethod
-    def for_input(inp: PandasOutputDataScheme[SeriesSchema], name: str) -> DynamicIndexIntervalScheme:
+    def for_input(inp: PandasOutputDataSchema[SeriesSchema], name: str) -> DynamicIndexIntervalScheme:
         return DynamicIndexIntervalScheme(SeriesSchema(IntervalDtype, index=inp.pandera_schema.index, name=name))
 
 
@@ -81,8 +81,8 @@ class Windowing(FunctionDefinitionBase[IProxyData[DataFrame]]):
     def consumes(self) -> WindowingInputDataSchema:
         return WindowingInputDataSchema()
 
-    def production_for(self, inp: PandasOutputDataScheme) -> DynamicIndexIntervalScheme:
-        assert isinstance(inp, PandasOutputDataScheme)
+    def production_for(self, inp: PandasOutputDataSchema) -> DynamicIndexIntervalScheme:
+        assert isinstance(inp, PandasOutputDataSchema)
         return DynamicIndexIntervalScheme.for_input(inp, self._name)
 
     def new_function(self) -> IFunction:

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Collection, TypeVar, Generic, Iterable, Mapping, Sequence
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
-from openmnglab.model.datamodel.interface import IInputDataSchema, IOutputDataScheme
+from openmnglab.model.datamodel.interface import IInputDataSchema, IOutputDataSchema
 from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
 from openmnglab.model.planning.interface import IExecutionPlanner, IProxyData
 from openmnglab.model.planning.plan.interface import IExecutionPlan, IStage, IPlannedData, IPlannedElement
@@ -13,14 +13,14 @@ from openmnglab.util.iterables import ensure_iterable, ensure_sequence
 
 
 def check_input(expected_schemes: Sequence[IInputDataSchema] | IInputDataSchema | None,
-                actual_schemes: Sequence[IOutputDataScheme] | IOutputDataScheme | None):
+                actual_schemes: Sequence[IOutputDataSchema] | IOutputDataSchema | None):
     expected_schemes: Sequence[IInputDataSchema] = ensure_sequence(expected_schemes, IInputDataSchema)
-    actual_schemes: Sequence[IOutputDataScheme] = ensure_sequence(actual_schemes, IOutputDataScheme)
+    actual_schemes: Sequence[IOutputDataSchema] = ensure_sequence(actual_schemes, IOutputDataSchema)
     if len(expected_schemes) != len(actual_schemes):
         raise InvalidFunctionArgumentCountError(len(expected_schemes), len(actual_schemes))
     for pos, (expected_scheme, actual_scheme) in enumerate(zip(expected_schemes, actual_schemes)):
         expected_scheme: IInputDataSchema
-        actual_scheme: IOutputDataScheme
+        actual_scheme: IOutputDataSchema
         try:
             if not expected_scheme.accepts(actual_scheme):
                 raise DataSchemeCompatibilityError("Expected scheme is not compatible with actual scheme")

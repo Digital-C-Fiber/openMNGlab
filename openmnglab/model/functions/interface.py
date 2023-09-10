@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Iterable, Sequence, Literal, Generic, TypeVar
 
-from openmnglab.model.datamodel.interface import IDataContainer, IInputDataSchema, IOutputDataScheme
+from openmnglab.model.datamodel.interface import IDataContainer, IInputDataSchema, IOutputDataSchema
 
 
 class IFunction(ABC):
@@ -69,7 +69,7 @@ class IFunctionDefinition(ABC, Generic[ProxyRet]):
         ...
 
     @abstractmethod
-    def production_for(self, *inputs: IOutputDataScheme) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
+    def production_for(self, *inputs: IOutputDataSchema) -> Optional[Sequence[IOutputDataSchema] | IOutputDataSchema]:
         ...
 
     @abstractmethod
@@ -80,10 +80,10 @@ class IFunctionDefinition(ABC, Generic[ProxyRet]):
 class IStaticFunctionDefinition(Generic[ProxyRet], IFunctionDefinition[ProxyRet], ABC):
     @property
     @abstractmethod
-    def produces(self) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
+    def produces(self) -> Optional[Sequence[IOutputDataSchema] | IOutputDataSchema]:
         ...
 
-    def production_for(self, *_: IOutputDataScheme) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
+    def production_for(self, *_: IOutputDataSchema) -> Optional[Sequence[IOutputDataSchema] | IOutputDataSchema]:
         return self.produces
 
 
@@ -93,7 +93,7 @@ class ISourceFunctionDefinition(Generic[ProxyRet], IStaticFunctionDefinition[Pro
     def consumes(self) -> None:
         return None
 
-    def production_for(self) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
+    def production_for(self) -> Optional[Sequence[IOutputDataSchema] | IOutputDataSchema]:
         return self.produces
 
     @abstractmethod

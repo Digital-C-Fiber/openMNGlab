@@ -3,14 +3,14 @@ from abc import ABC
 import pandera as pa
 from pandas import DataFrame
 
-from openmnglab.datamodel.pandas.model import PandasDataScheme, PandasOutputDataScheme
+from openmnglab.datamodel.pandas.model import PandasDataScheme, PandasOutputDataSchema
 from openmnglab.datamodel.pandas.verification import compare_index
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.spdf_features import SPDF_FEATURES, FeatureFunc
 from openmnglab.functions.processing.interval_data import IntervalDataInputSchema, IntervalDataOutputSchema
 from openmnglab.functions.processing.waveform_components import PrincipleComponentsInputScheme, \
     PrincipleComponentsDynamicOutputScheme
-from openmnglab.model.datamodel.interface import IOutputDataScheme
+from openmnglab.model.datamodel.interface import IOutputDataSchema
 from openmnglab.model.planning.interface import IProxyData
 
 
@@ -20,7 +20,7 @@ class SPDFFeaturesBaseSchema(PandasDataScheme[pa.DataFrameSchema], ABC):
             feature: pa.Column(float, nullable=True) for feature in SPDF_FEATURES}, title="Principle Components"))
 
 
-class SPDFFeatureOutputSchema(SPDFFeaturesBaseSchema, PandasOutputDataScheme):
+class SPDFFeatureOutputSchema(SPDFFeaturesBaseSchema, PandasOutputDataSchema):
     def __init__(self, idx: pa.Index | pa.MultiIndex):
         super().__init__()
         self.pandera_schema.index = idx
