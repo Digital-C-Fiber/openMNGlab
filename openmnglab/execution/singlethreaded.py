@@ -43,17 +43,23 @@ class SingleThreadedExecutor(IExecutor):
 
         .. warn:: Caller must ensure that required input data of the stage is present in :attr:`~.data`
         """
-        input_values = tuple(self._data[dependency.calculated_hash] for dependency in stage.data_in)
-        func = stage.definition.new_function()
-        self._set_func_input(func, *input_values)
-        results: tuple[IDataContainer] = tuple(self._exec_func(func))
-        if len(results) != len(stage.data_out):
-            raise FunctionReturnCountMissmatch(expected=len(stage.data_out), actual=len(results))
-        for planned_data_output, actual_data_output in zip(stage.data_out, results):
-            actual_data_output: IDataContainer
-            planned_data_output: IPlannedData
-            planned_data_output.schema.validate(actual_data_output)
-            self._data[planned_data_output.calculated_hash] = actual_data_output
+        try:
+            input_values = tuple(self._data[dependency.calculated_hash] for dependency in stage.data_in)
+            func = stage.definition.new_function()
+            self._set_func_input(func, *input_values)
+            results: tuple[IDataContainer] = tuple(self._exec_func(func))
+            if len(results) != len(stage.data_out):
+                raise FunctionReturnCountMissmatch(expected=len(stage.data_out), actual=len(results))
+            for i,(planned_data_output, actual_data_output) in enumerate(zip(stage.data_out, results)):
+                actual_data_output: IDataContainer
+                planned_data_output: IPlannedData
+                try:
+                    planned_data_output.schema.validate(actual_data_output)
+                except Exception as e:
+                    raise Exception(f"Schema validation of output #{i} failed") from e
+                self._data[planned_data_output.calculated_hash] = actual_data_output
+        except Exception as e:
+            raise FunctionExecutionError(f"Failed to execute {stage.definition.identifier} (stage {stage.calculated_hash.hex()})")
 
     def execute(self, plan: IExecutionPlan, ignore_previous=False):
         for stage in sorted(plan.stages.values(), key=lambda x: x.depth):
