@@ -137,10 +137,6 @@ class PandasDataSchema(Generic[TPanderaSchema], IPandasDataSchema[TPanderaSchema
                     raise KeyError(f"Index level {i} is not named")
         return True
 
-    def __init__(self, schema: TPanderaSchema):
-        super().__init__(schema)
-        self.ensure_all_schema_elements_named(schema)
-
     @property
     def pandera_schema(self) -> TPanderaSchema:
         return self._schema
