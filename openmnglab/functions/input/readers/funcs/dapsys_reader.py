@@ -13,7 +13,7 @@ from pydapsys.toc.exceptions import ToCPathError
 
 from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.datamodel.pandas.schemas import TIMESTAMP, CONT_REC, STIM_TS, STIM_LBL, SPIKE_TS, TRACK, \
-    TRACK_SPIKE_IDX, GLOBAL_STIM_ID, STIM_TYPE_ID
+    TRACK_SPIKE_IDX, GLOBAL_STIM_ID, STIM_TYPE_ID, SIGNAL
 from openmnglab.functions.base import SourceFunctionBase
 from openmnglab.util.dicts import get_and_incr
 
@@ -102,7 +102,7 @@ class DapsysReaderFunc(SourceFunctionBase):
         else:
             self._log.warning("No continuous recording in file")
         return pd.Series(data=values, index=pd.Index(data=timestamps, copy=False, name=TIMESTAMP),
-                         name=CONT_REC, copy=False)
+                         name=SIGNAL, copy=False)
 
     def _load_textstream(self, path: str) -> pd.Series:
         file = self.file
