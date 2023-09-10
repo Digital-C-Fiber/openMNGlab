@@ -10,7 +10,7 @@ from pandas import DataFrame, DatetimeTZDtype, PeriodDtype, SparseDtype, Interva
     BooleanDtype
 
 from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
-from openmnglab.datamodel.pandas.model import PandasDataSchema, PandasSchemaAcceptor, \
+from openmnglab.datamodel.pandas.model import PandasDataSchema, DefaultPandasSchemaAcceptor, \
     PanderaContainer
 from openmnglab.datamodel.pandas.schemas import generic_interval_list
 from openmnglab.functions.base import FunctionDefinitionBase
@@ -35,7 +35,7 @@ class WindowDataInputSchema(ISchemaAcceptor):
         return True
 
 
-class NumericIndexedList(PandasSchemaAcceptor[pa.SeriesSchema]):
+class NumericIndexedList(DefaultPandasSchemaAcceptor[pa.SeriesSchema]):
 
     def __init__(self):
         super().__init__(pa.SeriesSchema())
@@ -74,7 +74,7 @@ class IntervalDataBaseSchema(PanderaContainer[pa.DataFrameSchema], ABC):
             pa.DataFrameSchema({LEVEL_COLUMN[i]: pa.Column(np.float32) for i in sorted([first_level, *levels])}))
 
 
-class IntervalDataAcceptor(IntervalDataBaseSchema, PandasSchemaAcceptor):
+class IntervalDataAcceptor(IntervalDataBaseSchema, DefaultPandasSchemaAcceptor):
     def __init__(self, first_level: int, *levels: int):
         super().__init__(first_level, *levels)
 
@@ -144,7 +144,7 @@ class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
         return hsh.digest()
 
     @property
-    def consumes(self) -> tuple[PandasSchemaAcceptor[pa.SeriesSchema], PandasSchemaAcceptor[pa.SeriesSchema]]:
+    def consumes(self) -> tuple[DefaultPandasSchemaAcceptor[pa.SeriesSchema], DefaultPandasSchemaAcceptor[pa.SeriesSchema]]:
         return generic_interval_list(), NumericIndexedList()
 
     def production_for(self, window_intervals: IDataSchema[pa.SeriesSchema],

@@ -86,14 +86,7 @@ Units: {units}
 TPanderaSchema = TypeVar("TPandasScheme", pa.DataFrameSchema, pa.SeriesSchema)
 
 
-class IPanderaContainer(Generic[TPanderaSchema], ABC):
-    @property
-    @abstractmethod
-    def pandera_schema(self) -> TPanderaSchema:
-        ...
-
-
-class PanderaContainer(Generic[TPanderaSchema], IPanderaContainer[TPanderaSchema]):
+class DefaultPandasSchemaAcceptor(Generic[TPanderaSchema], ISchemaAcceptor):
 
     def __init__(self, schema: TPanderaSchema):
         if not isinstance(schema, (pa.DataFrameSchema, pa.SeriesSchema)):
@@ -101,21 +94,23 @@ class PanderaContainer(Generic[TPanderaSchema], IPanderaContainer[TPanderaSchema
                 f"Argument 'model' must be either a pandas series or a dataframe, is {type(schema).__qualname__}")
         self._schema = schema
 
-    @property
-    def pandera_schema(self) -> TPanderaSchema:
-        return self._schema
-
-
-class PandasSchemaAcceptor(Generic[TPanderaSchema], PanderaContainer[TPanderaSchema], ISchemaAcceptor):
-
     def accepts(self, output_data_scheme: IDataSchema) -> bool:
-        if not isinstance(output_data_scheme, IPanderaContainer):
+        if not isinstance(output_data_scheme, IPandasDataSchema):
             raise DataSchemaCompatibilityError(
                 f"Other data scheme of type {type(output_data_scheme).__qualname__} is not a pandas data schema")
-        return compare_schemas(self.pandera_schema, output_data_scheme.pandera_schema)
+        return compare_schemas(self._schema, output_data_scheme.pandera_schema)
 
 
-class PandasDataSchema(Generic[TPanderaSchema], PandasSchemaAcceptor[TPanderaSchema], IDataSchema):
+class IPandasDataSchema(Generic[TPanderaSchema], IDataSchema, ABC):
+    """Contains a Pandera schema with all elements named"""
+
+    @property
+    @abstractmethod
+    def pandera_schema(self) -> TPanderaSchema:
+        ...
+
+
+class PandasDataSchema(Generic[TPanderaSchema], DefaultPandasSchemaAcceptor, IPandasDataSchema):
     """Implements IDataSchema for PanderaContainer. Will ensure that all elements in the schema are named.
     """
 
@@ -127,6 +122,9 @@ class PandasDataSchema(Generic[TPanderaSchema], PandasSchemaAcceptor[TPanderaSch
             for i, c in enumerate(schema.columns):
                 if not c.name:
                     raise KeyError(f"Column #{i} of data schema has no name")
+        else:
+            raise TypeError(
+                f"Argument 'model' must be either a pandas series or a dataframe, is {type(schema).__qualname__}")
         if not schema.index:
             raise KeyError("Schema is missing an index")
         if isinstance(schema.index, pa.Index) and not schema.index.name:
@@ -139,13 +137,16 @@ class PandasDataSchema(Generic[TPanderaSchema], PandasSchemaAcceptor[TPanderaSch
 
     def __init__(self, schema: TPanderaSchema):
         super().__init__(schema)
-        if not self.ensure_all_schema_elements_named(schema):
-            raise Exception("Not all elements of the schema have names")
+        self.ensure_all_schema_elements_named(schema)
+
+    @property
+    def pandera_schema(self) -> TPanderaSchema:
+        return self._schema
 
     def validate(self, data_container: IDataContainer) -> bool:
         if not isinstance(data_container, PandasContainer):
             raise DataSchemaConformityError(
-                f"PandasDataScheme expects a PandasContainer for validation but got an object of type {type(data_container).__qualname__}")
+                f"PandasDataSchema expects a PandasContainer for validation but got an object of type {type(data_container).__qualname__}")
         try:
             _ = self._schema.validate(data_container.data)
             return True
@@ -153,6 +154,6 @@ class PandasDataSchema(Generic[TPanderaSchema], PandasSchemaAcceptor[TPanderaSch
             raise DataSchemaConformityError("Pandera model validation failed") from e
 
 
-class PandasStaticDataSchema(Generic[TPanderaSchema], PandasSchemaAcceptor[TPanderaSchema],
+class PandasStaticDataSchema(Generic[TPanderaSchema], DefaultPandasSchemaAcceptor[TPanderaSchema],
                              PandasDataSchema[TPanderaSchema], IStaticDataSchema):
     ...
