@@ -20,7 +20,7 @@ class SPDFFeaturesAcceptor(DefaultPandasSchemaAcceptor[pa.DataFrameSchema]):
             feature: pa.Column(float, nullable=True) for feature in SPDF_FEATURES}, title="Principle Components", index=index))
 
 
-class SPDFFeaturesDynamicSchema(PandasDataSchema, SPDFFeaturesAcceptor):
+class SPDFFeaturesDynamicSchema(SPDFFeaturesAcceptor, PandasDataSchema):
     def __init__(self, idx: pa.Index | pa.MultiIndex):
         super().__init__(index=idx)
 
@@ -35,7 +35,7 @@ class SPDFFeatures(FunctionDefinitionBase[IProxyData[DataFrame]]):
     """
 
     def __init__(self):
-        super().__init__("omngl.spdffeatures")
+        super().__init__("codingchipmunk.spdf.features")
 
     @property
     def consumes(self) -> tuple[SPDFComponentsAcceptor, IntervalDataAcceptor]:
