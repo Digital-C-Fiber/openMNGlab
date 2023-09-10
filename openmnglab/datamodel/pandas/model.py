@@ -119,13 +119,10 @@ class PandasDataSchema(Generic[TPanderaSchema], IPandasDataSchema[TPanderaSchema
 
     @staticmethod
     def ensure_all_schema_elements_named(schema: TPanderaSchema) -> bool:
-        if isinstance(schema, pa.SeriesSchema) and not schema.name:
-            raise KeyError("Series defined by the series schema is not named")
-        elif isinstance(schema, pa.DataFrameSchema):
-            for i, c in enumerate(schema.columns):
-                if not c.name:
-                    raise KeyError(f"Column #{i} of data schema has no name")
-        else:
+        if isinstance(schema, pa.SeriesSchema):
+            if not schema.name:
+                raise KeyError("Series defined by the series schema is not named")
+        elif not isinstance(schema, pa.DataFrameSchema):
             raise TypeError(
                 f"Argument 'model' must be either a pandas series or a dataframe, is {type(schema).__qualname__}")
         if not schema.index:
