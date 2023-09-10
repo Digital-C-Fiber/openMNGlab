@@ -4,14 +4,14 @@ import pandera as pa
 from pandas import DataFrame
 
 from openmnglab.datamodel.pandas.model import PandasSchemaAcceptor, PandasDataSchema, \
-    PandasDataSchemaBase
+    PanderaContainer
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.waveform_components import WaveformComponentsFunc, PRINCIPLE_COMPONENTS
 from openmnglab.functions.processing.interval_data import IntervalDataAcceptor
 from openmnglab.model.planning.interface import IProxyData
 
 
-class PrincipleComponentsBaseSchema(PandasDataSchemaBase[pa.DataFrameSchema], ABC):
+class PrincipleComponentsBaseSchema(PanderaContainer[pa.DataFrameSchema], ABC):
     def __init__(self):
         super().__init__(pa.DataFrameSchema({
             PRINCIPLE_COMPONENTS[0]: pa.Column(float, nullable=True),
