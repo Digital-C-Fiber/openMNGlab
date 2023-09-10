@@ -128,6 +128,6 @@ class PandasOutputDataSchema(Generic[TPandasScheme], PandasDataSchema[TPandasSch
             raise DataSchemeConformityError("Pandera model validation failed") from e
 
 
-class PandasStaticDataScheme(Generic[TPandasScheme], PandasInputDataSchema[TPandasScheme],
+class PandasStaticDataSchema(Generic[TPandasScheme], PandasInputDataSchema[TPandasScheme],
                              PandasOutputDataSchema[TPandasScheme], IStaticDataSchema):
     ...
