@@ -63,7 +63,7 @@ _FuncT = TypeVar('_FuncT', bound=IStage)
 _DataT = TypeVar('_DataT', bound=IVirtualData)
 
 
-class PlannerBase(IExecutionPlanner, ABC, Generic[_FuncT, _DataT]):
+class PlannerBase( Generic[_FuncT, _DataT], IExecutionPlanner, ABC):
 
     def __init__(self):
         self._functions: dict[bytes, _FuncT] = dict()
@@ -77,9 +77,9 @@ class PlannerBase(IExecutionPlanner, ABC, Generic[_FuncT, _DataT]):
         ...
 
     def add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: IDataReference) -> ProxyRet:
-        return self._add_function(function, *self._proxy_data_to_concrete(*inp_data))
+        return self._add_function(function, *self._get_referenced_virt_data(*inp_data))
 
-    def _proxy_data_to_concrete(self, *inp_data: IDataReference) -> Iterable[_DataT]:
+    def _get_referenced_virt_data(self, *inp_data: IDataReference) -> Iterable[_DataT]:
         for pos, inp in enumerate(inp_data):
             concrete_data = self._data.get(inp.referenced_data_id)
             if concrete_data is None:
