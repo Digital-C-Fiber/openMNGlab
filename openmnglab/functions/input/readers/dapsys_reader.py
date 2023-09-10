@@ -4,8 +4,8 @@ from typing import Optional, Sequence
 import pandas as pd
 from pandera import SeriesSchema, DataFrameSchema
 
-from openmnglab.datamodel.pandas.model import PanderaContainer
-from openmnglab.datamodel.pandas.schemas import float_timeseries, str_float_list, sorted_spikes, stimulus_list, SIGNAL
+from openmnglab.datamodel.pandas.model import PandasContainer
+from openmnglab.datamodel.pandas.schemas import float_timeseries, sorted_spikes, stimulus_list, SIGNAL, str_eventseries
 from openmnglab.functions.base import SourceFunctionDefinitionBase
 from openmnglab.functions.input.readers.funcs.dapsys_reader import DapsysReaderFunc
 from openmnglab.model.planning.interface import IProxyData
@@ -67,8 +67,8 @@ class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IPr
 
     @property
     def produces(self) -> tuple[
-        PanderaContainer[SeriesSchema], PanderaContainer[SeriesSchema], PanderaContainer[SeriesSchema], PanderaContainer[SeriesSchema], PanderaContainer[SeriesSchema]]:
-        return float_timeseries(SIGNAL), stimulus_list(), sorted_spikes(), str_float_list(), str_float_list()
+        PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[SeriesSchema]]:
+        return float_timeseries(SIGNAL), stimulus_list(), sorted_spikes(), str_eventseries("t"), str_eventseries("a")
 
     def new_function(self) -> DapsysReaderFunc:
         return DapsysReaderFunc(self._file, self._stim_folder, main_pulse=self._main_pulse,
