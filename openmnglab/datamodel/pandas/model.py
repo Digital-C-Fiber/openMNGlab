@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic
 
+import numpy as np
 import pandas as pd
 import pandera as pa
 import quantities as pq
@@ -100,7 +101,7 @@ class DefaultPandasSchemaAcceptor(Generic[TPanderaSchema], ISchemaAcceptor):
         return compare_schemas(self._schema, output_data_scheme.pandera_schema)
 
 
-class IPandasDataSchema(Generic[TPanderaSchema], ABC):
+class IPandasDataSchema(Generic[TPanderaSchema], IDataSchema, ABC):
     """Contains a Pandera schema with all elements named"""
 
     @property
@@ -109,7 +110,8 @@ class IPandasDataSchema(Generic[TPanderaSchema], ABC):
         ...
 
 
-class PandasDataSchema(Generic[TPanderaSchema], IPandasDataSchema[TPanderaSchema], DefaultPandasSchemaAcceptor[TPanderaSchema]):
+class PandasDataSchema(Generic[TPanderaSchema], IPandasDataSchema[TPanderaSchema],
+                       DefaultPandasSchemaAcceptor[TPanderaSchema]):
     """Implements IDataSchema for PanderaContainer. Will ensure that all elements in the schema are named.
     """
 
