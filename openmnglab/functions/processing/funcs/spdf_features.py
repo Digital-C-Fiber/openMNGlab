@@ -9,7 +9,7 @@ from pandas import Series, DataFrame
 from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.functions.base import FunctionBase
 from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
-from openmnglab.functions.processing.funcs.waveform_components import PRINCIPLE_COMPONENTS
+from openmnglab.functions.processing.funcs.spdf_components import SPDF_COMPONENTS
 from openmnglab.util.pandas import index_names
 
 SPDF_FEATURES = tuple((f"F{i + 1}" for i in range(24)))
@@ -120,7 +120,7 @@ class FeatureFunc(FunctionBase):
         for i, (spike_loc, spike_components) in enumerate(self._components.data.iterrows()):
             diff = self._diffs.data.loc[spike_loc]
             nmpy[i] = self._calc_features(diff[LEVEL_COLUMN[1]], diff[LEVEL_COLUMN[2]],
-                                          *(spike_components[component] for component in PRINCIPLE_COMPONENTS))
+                                          *(spike_components[component] for component in SPDF_COMPONENTS))
         df = DataFrame(data=nmpy, columns=SPDF_FEATURES, index=self._components.data.index)
 
         return PandasContainer(df, self.build_unitdict())

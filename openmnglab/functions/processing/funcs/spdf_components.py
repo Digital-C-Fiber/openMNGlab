@@ -82,11 +82,11 @@ def get_principle_components_alt1(idx: np.ndarray, diff1: np.ndarray):
     return p1, p2, p3, p4, p5, p6
 
 
-class WaveformComponentsFunc(FunctionBase):
+class SPDFComponentsFunc(FunctionBase):
     def __init__(self):
         self._diffs: PandasContainer[DataFrame] = None
 
-    def calc_principle_components(self):
+    def calc_components(self):
         grpby = self._diffs.data.groupby(level=tuple((i for i in range(self._diffs.data.index.nlevels - 1))),
                                          sort=False)
         components = np.empty((6, len(grpby)), dtype=self._diffs.data.index.levels[-1].dtype)
@@ -100,18 +100,18 @@ class WaveformComponentsFunc(FunctionBase):
         units: dict[str, pq.Quantity] = dict()
         for interval_index_name in self._diffs.data.index.names[:-1]:
             units[interval_index_name] = self._diffs.units[interval_index_name]
-        for column_name in PRINCIPLE_COMPONENTS:
+        for column_name in SPDF_COMPONENTS:
             units[column_name] = self._diffs.units[self._diffs.data.index.names[-1]]
         return units
 
     def execute(self) -> PandasContainer[DataFrame]:
         idx = self._diffs.data.index.droplevel(-1).unique()
-        components = self.calc_principle_components()
-        df = DataFrame(data=components.T, columns=PRINCIPLE_COMPONENTS, index=idx)
+        components = self.calc_components()
+        df = DataFrame(data=components.T, columns=SPDF_COMPONENTS, index=idx)
         return PandasContainer(df, units=self.build_unitdict())
 
     def set_input(self, diffs: PandasContainer[DataFrame]):
         self._diffs = diffs
 
 
-PRINCIPLE_COMPONENTS = tuple((f"P{i + 1}" for i in range(6)))
+SPDF_COMPONENTS = tuple((f"P{i + 1}" for i in range(6)))

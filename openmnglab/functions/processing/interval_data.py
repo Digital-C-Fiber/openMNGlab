@@ -46,7 +46,7 @@ class IntervalDataAcceptor(DefaultPandasSchemaAcceptor[pa.DataFrameSchema]):
         return super_accepts
 
 
-class IntervalDataSchema(PandasDataSchema, IntervalDataAcceptor):
+class IntervalDataDynamicSchema(PandasDataSchema, IntervalDataAcceptor):
     def __init__(self, idx: pa.Index | pa.MultiIndex, first_level: int, *levels: int):
         super().__init__(first_level, *levels, idx=idx)
 
@@ -103,7 +103,7 @@ class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
         return DefaultPandasSchemaAcceptor(pa.SeriesSchema(IntervalDtype)), NumericIndexedListAcceptor()
 
     def production_for(self, window_intervals: IDataSchema[pa.SeriesSchema],
-                       data: IDataSchema[pa.SeriesSchema]) -> IntervalDataSchema:
+                       data: IDataSchema[pa.SeriesSchema]) -> IntervalDataDynamicSchema:
         window_scheme, data_scheme = self.consumes
         assert (window_scheme.accepts(window_intervals))
         assert (data_scheme.accepts(data))
@@ -113,7 +113,7 @@ class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
             idx = pa.MultiIndex([window_intervals.pandera_schema.index, data.pandera_schema.index])
         else:
             idx = pa.MultiIndex([*window_intervals.pandera_schema.index.indexes, data.pandera_schema.index])
-        return IntervalDataSchema(idx, *self._levels)
+        return IntervalDataDynamicSchema(idx, *self._levels)
 
     def new_function(self) -> IntervalDataFunc:
         return IntervalDataFunc(self._levels,

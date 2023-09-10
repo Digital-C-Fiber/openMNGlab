@@ -3,24 +3,24 @@ from abc import ABC
 import pandera as pa
 from pandas import DataFrame
 
-from openmnglab.datamodel.pandas.model import PanderaContainer, PandasDataSchema, DefaultPandasSchemaAcceptor
+from openmnglab.datamodel.pandas.model import PandasDataSchema, DefaultPandasSchemaAcceptor
 from openmnglab.datamodel.pandas.verification import compare_index
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.spdf_features import SPDF_FEATURES, FeatureFunc
-from openmnglab.functions.processing.interval_data import IntervalDataAcceptor, IntervalDataSchema
-from openmnglab.functions.processing.waveform_components import PrincipleComponentsInputSchema, \
-    PrincipleComponentsDynamicOutputSchema
+from openmnglab.functions.processing.interval_data import IntervalDataAcceptor, IntervalDataDynamicSchema
+from openmnglab.functions.processing.spdf_components import SPDFComponentsDynamicSchema, \
+    SPDFComponentsAcceptor
 from openmnglab.model.datamodel.interface import IDataSchema
 from openmnglab.model.planning.interface import IProxyData
 
 
-class SPDFFeaturesAcceptor(DefaultPandasSchemaAcceptor[pa.DataFrameSchema], ABC):
+class SPDFFeaturesAcceptor(DefaultPandasSchemaAcceptor[pa.DataFrameSchema]):
     def __init__(self, index=None):
         super().__init__(pa.DataFrameSchema({
             feature: pa.Column(float, nullable=True) for feature in SPDF_FEATURES}, title="Principle Components", index=index))
 
 
-class SPDFFeaturesSchema(PandasDataSchema, SPDFFeaturesAcceptor):
+class SPDFFeaturesDynamicSchema(PandasDataSchema, SPDFFeaturesAcceptor):
     def __init__(self, idx: pa.Index | pa.MultiIndex):
         super().__init__(index=idx)
 
@@ -38,13 +38,13 @@ class SPDFFeatures(FunctionDefinitionBase[IProxyData[DataFrame]]):
         super().__init__("omngl.spdffeatures")
 
     @property
-    def consumes(self) -> tuple[PrincipleComponentsInputSchema, IntervalDataAcceptor]:
-        return PrincipleComponentsInputSchema(), IntervalDataAcceptor(0, 1, 2)
+    def consumes(self) -> tuple[SPDFComponentsAcceptor, IntervalDataAcceptor]:
+        return SPDFComponentsAcceptor(), IntervalDataAcceptor(0, 1, 2)
 
-    def production_for(self, principle_compo: PrincipleComponentsDynamicOutputSchema,
-                       diffs: IntervalDataSchema) -> SPDFFeaturesSchema:
+    def production_for(self, principle_compo: SPDFComponentsDynamicSchema,
+                       diffs: IntervalDataDynamicSchema) -> SPDFFeaturesDynamicSchema:
         compare_index(principle_compo.pandera_schema.index, pa.MultiIndex(diffs.pandera_schema.index.indexes[:-1]))
-        return SPDFFeaturesSchema(principle_compo.pandera_schema.index)
+        return SPDFFeaturesDynamicSchema(principle_compo.pandera_schema.index)
 
     def new_function(self) -> FeatureFunc:
         return FeatureFunc()
