@@ -24,24 +24,6 @@ class IDataContainer(ABC, Generic[T_co]):
         ...
 
 
-class IDataSchema(ABC):
-    """
-    Scheme for data that is produced by a function.
-    """
-
-    @abstractmethod
-    def validate(self, data_container: IDataContainer) -> bool:
-        """Validates that a data container fits this scheme.
-
-        If this is not the case, the function may either raise an exception containing further details on why the validation
-        failed or just return ``False``
-        :raise DataSchemeConformityError: If the schemes are not compatible to each other and detailed information is available
-        :param data_container: Data container to validate
-        :return: ``True`` if the data container conforms to this scheme, ``False`` otherwise.
-        """
-        ...
-
-
 class ISchemaAcceptor(ABC):
     """
     Scheme for data that is expected as input for a function
@@ -57,6 +39,24 @@ class ISchemaAcceptor(ABC):
         :raise DataSchemeCompatibilityError: If the data schemes are not compatible and further details are available
         :param output_data_scheme: Output data scheme to check for compatibility
         :return: ``True`` if the output data scheme is accepted as input, ``False`` otherwise
+        """
+        ...
+
+
+class IDataSchema(ISchemaAcceptor, ABC):
+    """
+    Scheme for data that is produced by a function.
+    """
+
+    @abstractmethod
+    def validate(self, data_container: IDataContainer) -> bool:
+        """Validates that a data container fits this scheme.
+
+        If this is not the case, the function may either raise an exception containing further details on why the validation
+        failed or just return ``False``
+        :raise DataSchemeConformityError: If the schemes are not compatible to each other and detailed information is available
+        :param data_container: Data container to validate
+        :return: ``True`` if the data container conforms to this scheme, ``False`` otherwise.
         """
         ...
 
