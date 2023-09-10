@@ -85,13 +85,13 @@ Units: {units}
 
 TPandasScheme = TypeVar("TPandasScheme", pa.DataFrameSchema, pa.SeriesSchema)
 
-class IPandasDataScheme(Generic[TPandasScheme], ABC):
+class IPandasDataSchema(Generic[TPandasScheme], ABC):
     @property
     @abstractmethod
     def pandera_schema(self) -> TPandasScheme:
         ...
 
-class PandasDataScheme(Generic[TPandasScheme], IPandasDataScheme[TPandasScheme], ABC):
+class PandasDataSchema(Generic[TPandasScheme], IPandasDataSchema[TPandasScheme], ABC):
 
     def __init__(self, schema: TPandasScheme):
         if not isinstance(schema, (pa.DataFrameSchema, pa.SeriesSchema)):
@@ -104,10 +104,10 @@ class PandasDataScheme(Generic[TPandasScheme], IPandasDataScheme[TPandasScheme],
         return self._schema
 
 
-class PandasInputDataSchema(Generic[TPandasScheme], PandasDataScheme[TPandasScheme], IInputDataSchema):
+class PandasInputDataSchema(Generic[TPandasScheme], PandasDataSchema[TPandasScheme], IInputDataSchema):
 
     def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
-        if not isinstance(output_data_scheme, IPandasDataScheme):
+        if not isinstance(output_data_scheme, IPandasDataSchema):
             raise DataSchemeCompatibilityError(
                 f"Other data scheme of type {type(output_data_scheme).__qualname__} is not a pandas data scheme")
         return compare_schemas(self.pandera_schema, output_data_scheme.pandera_schema)
@@ -115,7 +115,7 @@ class PandasInputDataSchema(Generic[TPandasScheme], PandasDataScheme[TPandasSche
         return data_container
 
 
-class PandasOutputDataSchema(Generic[TPandasScheme], PandasDataScheme[TPandasScheme], IOutputDataSchema):
+class PandasOutputDataSchema(Generic[TPandasScheme], PandasDataSchema[TPandasScheme], IOutputDataSchema):
 
     def validate(self, data_container: IDataContainer) -> bool:
         if not isinstance(data_container, PandasContainer):

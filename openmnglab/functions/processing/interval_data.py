@@ -11,7 +11,7 @@ from pandas import DataFrame, DatetimeTZDtype, PeriodDtype, SparseDtype, Interva
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
 from openmnglab.datamodel.pandas.model import PandasOutputDataSchema, PandasInputDataSchema, \
-    PandasDataScheme
+    PandasDataSchema
 from openmnglab.datamodel.pandas.schemes import generic_interval_list
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.interval_data import IntervalDataFunc, LEVEL_COLUMN
@@ -71,7 +71,7 @@ def default_name_generator(i: int):
     return f"level {i} diff"
 
 
-class IntervalDataBaseSchema(PandasDataScheme[pa.DataFrameSchema], ABC):
+class IntervalDataBaseSchema(PandasDataSchema[pa.DataFrameSchema], ABC):
     def __init__(self, first_level: int, *levels: int):
         super().__init__(
             pa.DataFrameSchema({LEVEL_COLUMN[i]: pa.Column(np.float32) for i in sorted([first_level, *levels])}))
