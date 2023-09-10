@@ -12,12 +12,12 @@ from openmnglab.functions.base import SourceFunctionDefinitionBase
 from openmnglab.functions.input.readers.funcs.spike2_reader import SPIKE2_CHANID, Spike2ReaderFunc, SPIKE2_V_CHAN, \
     SPIKE2_LEVEL, SPIKE2_CODES, SPIKE2_DIGMARK, SPIKE2_KEYBOARD
 from openmnglab.model.datamodel.interface import IDataSchema
-from openmnglab.model.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
 
 
 class Spike2Reader(SourceFunctionDefinitionBase[tuple[
-    IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[
+    IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[
         pd.Series]]]):
     """ Load data from Spike2 recordings exported to MATLAB v7.3+ files
         Attempts to load data from 9 channels. To avoid loading data from a channel, pass ``None`` as a channels name,to avoid loading data from itl.

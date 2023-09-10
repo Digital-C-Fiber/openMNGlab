@@ -6,7 +6,7 @@ from typing import Collection, TypeVar, Generic, Iterable, Mapping, Sequence
 from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
 from openmnglab.model.datamodel.interface import ISchemaAcceptor, IDataSchema
 from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
-from openmnglab.model.planning.interface import IExecutionPlanner, IProxyData
+from openmnglab.model.planning.interface import IExecutionPlanner, IDataReference
 from openmnglab.model.planning.plan.interface import IExecutionPlan, IStage, IVirtualData, IPlannedElement
 from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
 from openmnglab.util.iterables import ensure_iterable, ensure_sequence
@@ -28,7 +28,7 @@ def check_input(expected_schemes: Sequence[ISchemaAcceptor] | ISchemaAcceptor | 
             raise FunctionArgumentSchemaError(pos) from ds_compat_err
 
 
-class ProxyData(IProxyData):
+class DataReference(IDataReference):
     def __init__(self, ref_id: bytes):
         self._ref_id = ref_id
 
@@ -37,8 +37,8 @@ class ProxyData(IProxyData):
         return self._ref_id
 
     @staticmethod
-    def copy_from(other: IProxyData) -> ProxyData:
-        return ProxyData(other.referenced_data_id)
+    def copy_from(other: IDataReference) -> DataReference:
+        return DataReference(other.referenced_data_id)
 
 
 class ExecutionPlan(IExecutionPlan):
@@ -76,10 +76,10 @@ class PlannerBase(IExecutionPlanner, ABC, Generic[_FuncT, _DataT]):
     def _add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: _DataT) -> ProxyRet:
         ...
 
-    def add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: IProxyData) -> ProxyRet:
+    def add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: IDataReference) -> ProxyRet:
         return self._add_function(function, *self._proxy_data_to_concrete(*inp_data))
 
-    def _proxy_data_to_concrete(self, *inp_data: IProxyData) -> Iterable[_DataT]:
+    def _proxy_data_to_concrete(self, *inp_data: IDataReference) -> Iterable[_DataT]:
         for pos, inp in enumerate(inp_data):
             concrete_data = self._data.get(inp.referenced_data_id)
             if concrete_data is None:

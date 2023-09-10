@@ -5,7 +5,7 @@ from openmnglab.datamodel.pandas.model import DefaultPandasSchemaAcceptor, Panda
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.spdf_components import SPDFComponentsFunc, SPDF_COMPONENTS
 from openmnglab.functions.processing.interval_data import IntervalDataAcceptor
-from openmnglab.model.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IDataReference
 
 
 class SPDFComponentsAcceptor(DefaultPandasSchemaAcceptor[pa.DataFrameSchema]):
@@ -24,7 +24,7 @@ class SPDFComponentsDynamicSchema(SPDFComponentsAcceptor, PandasDataSchema):
         super().__init__(index)
 
 
-class SPDFComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
+class SPDFComponents(FunctionDefinitionBase[IDataReference[DataFrame]]):
     """
     Calculates the SPDF components of waveforms.
 

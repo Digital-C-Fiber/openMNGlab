@@ -11,13 +11,13 @@ from openmnglab.model.planning.plan.interface import IExecutionPlan
 class IExecutionPlanner(ABC):
 
     @abstractmethod
-    def add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: IProxyData) -> ProxyRet:
+    def add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: IDataReference) -> ProxyRet:
         ...
 
     def add_source(self, function: ISourceFunctionDefinition[ProxyRet]) -> ProxyRet:
         return self.add_function(function)
 
-    def add_stage(self, function: IFunctionDefinition[ProxyRet], input_0: IProxyData, *other_inputs: IProxyData) -> ProxyRet:
+    def add_stage(self, function: IFunctionDefinition[ProxyRet], input_0: IDataReference, *other_inputs: IDataReference) -> ProxyRet:
         return self.add_function(function, input_0, *other_inputs)
 
     @abstractmethod
@@ -28,7 +28,7 @@ class IExecutionPlanner(ABC):
 DCT = TypeVar('DCT', bound=IDataContainer)
 
 
-class IProxyData(Generic[DCT], ABC ):
+class IDataReference(Generic[DCT], ABC):
 
     @property
     @abstractmethod

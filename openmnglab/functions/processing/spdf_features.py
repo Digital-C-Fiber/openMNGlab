@@ -11,7 +11,7 @@ from openmnglab.functions.processing.interval_data import IntervalDataAcceptor, 
 from openmnglab.functions.processing.spdf_components import SPDFComponentsDynamicSchema, \
     SPDFComponentsAcceptor
 from openmnglab.model.datamodel.interface import IDataSchema
-from openmnglab.model.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IDataReference
 
 
 class SPDFFeaturesAcceptor(DefaultPandasSchemaAcceptor[pa.DataFrameSchema]):
@@ -25,7 +25,7 @@ class SPDFFeaturesDynamicSchema(SPDFFeaturesAcceptor, PandasDataSchema):
         super().__init__(index=idx)
 
 
-class SPDFFeatures(FunctionDefinitionBase[IProxyData[DataFrame]]):
+class SPDFFeatures(FunctionDefinitionBase[IDataReference[DataFrame]]):
     """Calculates the SPDF features of waveforms based on their components and waveforms.
 
     In: [WaveformComponents, IntervalData with levels 0,1,2] WaveformComponents and IntervalData must have the same base multiindex

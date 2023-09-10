@@ -13,7 +13,7 @@ from openmnglab.datamodel.pandas.model import PandasDataSchema
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.model.functions.interface import IFunction
 from openmnglab.functions.processing.funcs.windowing import WindowingFunc
-from openmnglab.model.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
 
 
@@ -38,7 +38,7 @@ class DynamicIndexIntervalSchema(PandasDataSchema[SeriesSchema]):
         return DynamicIndexIntervalSchema(SeriesSchema(IntervalDtype, index=inp.pandera_schema.index, name=name))
 
 
-class Windowing(FunctionDefinitionBase[IProxyData[DataFrame]]):
+class Windowing(FunctionDefinitionBase[IDataReference[DataFrame]]):
     """Takes a set of values and transforms them based on a fixed window.
 
     In: series of numbers

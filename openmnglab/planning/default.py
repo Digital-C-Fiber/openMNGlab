@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from openmnglab.model.datamodel.interface import IDataSchema, ISchemaAcceptor
 from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
-from openmnglab.planning.base import PlannerBase, check_input, ProxyData
+from openmnglab.planning.base import PlannerBase, check_input, DataReference
 from openmnglab.planning.exceptions import PlanningError
-from openmnglab.model.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IDataReference
 from openmnglab.model.planning.plan.interface import IStage, IVirtualData
 from openmnglab.util.hashing import HashBuilder
 from openmnglab.util.iterables import ensure_iterable, unpack_sequence
@@ -83,4 +83,4 @@ class DefaultPlanner(PlannerBase[Stage, VirtualData]):
         self._functions[stage.planning_id] = stage
         for prod in stage.data_out:
             self._data[prod.planning_id] = prod
-        return unpack_sequence(tuple(ProxyData(o.planning_id) for o in stage.data_out))
+        return unpack_sequence(tuple(DataReference(o.planning_id) for o in stage.data_out))

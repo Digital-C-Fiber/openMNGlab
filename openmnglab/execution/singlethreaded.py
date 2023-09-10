@@ -4,7 +4,7 @@ from openmnglab.execution.exceptions import FunctionInputError, FunctionExecutio
 from openmnglab.model.datamodel.interface import IDataContainer
 from openmnglab.model.execution.interface import IExecutor
 from openmnglab.model.functions.interface import IFunction
-from openmnglab.model.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IDataReference
 from openmnglab.model.planning.plan.interface import IExecutionPlan, IVirtualData, IStage
 from openmnglab.util.iterables import ensure_iterable
 
@@ -17,7 +17,7 @@ class SingleThreadedExecutor(IExecutor):
     def data(self) -> Mapping[bytes, IDataContainer]:
         return self._data
 
-    def has_computed(self, proxy_data: IProxyData) -> bool:
+    def has_computed(self, proxy_data: IDataReference) -> bool:
         return proxy_data.referenced_data_id in self._data
 
     @staticmethod

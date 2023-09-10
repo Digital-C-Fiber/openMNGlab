@@ -11,7 +11,7 @@ from openmnglab.datamodel.pandas.model import PandasDataSchema, DefaultPandasSch
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.interval_data import IntervalDataFunc, LEVEL_COLUMN
 from openmnglab.model.datamodel.interface import IDataSchema
-from openmnglab.model.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
 
 
@@ -51,7 +51,7 @@ class IntervalDataDynamicSchema(IntervalDataAcceptor, PandasDataSchema):
         super().__init__(first_level, *levels, idx=idx)
 
 
-class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
+class IntervalData(FunctionDefinitionBase[IDataReference[DataFrame]]):
     """Extracts the data of intervals from a continuous series. Also calculates derivatives or differences between the values.
     Can re-base the timestamps to their relative offset. A derivative is a diff divided by the change of time.
 

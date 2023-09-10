@@ -10,12 +10,12 @@ from openmnglab.datamodel.pandas.schemas import TIMESTAMP, GLOBAL_STIM_ID
 from openmnglab.functions.base import StaticFunctionDefinitionBase
 from openmnglab.functions.plot.funcs.waveforms import WaveformPlotMode, WaveformPlotFunc
 from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
-from openmnglab.model.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
 from openmnglab.util.seaborn import Theme
 
 
-class WaveformPlot(StaticFunctionDefinitionBase[IProxyData[plt.Figure]]):
+class WaveformPlot(StaticFunctionDefinitionBase[IDataReference[plt.Figure]]):
     """Function to plot waveforms. Can either plot average waveforms or each for its own.
     Multi-plots can be created by using the col and row parameters which are passed to the underlying seaborn function.
 

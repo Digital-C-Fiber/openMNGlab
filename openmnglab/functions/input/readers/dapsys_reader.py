@@ -8,11 +8,11 @@ from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.datamodel.pandas.schemas import float_timeseries, sorted_spikes, stimulus_list, SIGNAL, str_eventseries
 from openmnglab.functions.base import SourceFunctionDefinitionBase
 from openmnglab.functions.input.readers.funcs.dapsys_reader import DapsysReaderFunc
-from openmnglab.model.planning.interface import IProxyData
+from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
 
 
-class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series]]]):
+class DapsysReader(SourceFunctionDefinitionBase[tuple[IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series]]]):
     """Loads data from a DAPSYS file
 
     In: nothing
