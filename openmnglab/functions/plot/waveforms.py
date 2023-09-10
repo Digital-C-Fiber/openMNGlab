@@ -11,7 +11,7 @@ from openmnglab.functions.base import StaticFunctionDefinitionBase
 from openmnglab.functions.plot.funcs.waveforms import WaveformPlotMode, WaveformPlotFunc
 from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
 from openmnglab.model.planning.interface import IProxyData
-from openmnglab.util.hashing import Hash
+from openmnglab.util.hashing import HashBuilder
 from openmnglab.util.seaborn import Theme
 
 
@@ -67,7 +67,7 @@ class WaveformPlot(StaticFunctionDefinitionBase[IProxyData[plt.Figure]]):
 
     @property
     def config_hash(self) -> bytes:
-        h = Hash().str(self.mode.name).str(self.column).str(self.stim_idx).str(self.time_col)
+        h = HashBuilder().str(self.mode.name).str(self.column).str(self.stim_idx).str(self.time_col)
         if self.selector is not None:
             h.int(id(self.selector))
         if self.alpha is not None:

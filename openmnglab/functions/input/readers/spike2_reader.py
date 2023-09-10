@@ -13,7 +13,7 @@ from openmnglab.functions.input.readers.funcs.spike2_reader import SPIKE2_CHANID
     SPIKE2_LEVEL, SPIKE2_CODES, SPIKE2_DIGMARK, SPIKE2_KEYBOARD
 from openmnglab.model.datamodel.interface import IDataSchema
 from openmnglab.model.planning.interface import IProxyData
-from openmnglab.util.hashing import Hash
+from openmnglab.util.hashing import HashBuilder
 
 
 class Spike2Reader(SourceFunctionDefinitionBase[tuple[
@@ -86,7 +86,7 @@ class Spike2Reader(SourceFunctionDefinitionBase[tuple[
 
     @property
     def config_hash(self) -> bytes:
-        return Hash().dynamic(self._start) \
+        return HashBuilder().dynamic(self._start) \
             .dynamic(self._end) \
             .dynamic(self._temp_chan) \
             .dynamic(self._signal_chan) \

@@ -12,7 +12,7 @@ except ImportError as _:
     Quantity = None
 
 
-class Hash:
+class HashBuilder:
     def __init__(self):
         self._hash = hashlib.sha3_224()
 

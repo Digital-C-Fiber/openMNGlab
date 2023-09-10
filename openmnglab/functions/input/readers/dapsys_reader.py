@@ -9,7 +9,7 @@ from openmnglab.datamodel.pandas.schemas import float_timeseries, sorted_spikes,
 from openmnglab.functions.base import SourceFunctionDefinitionBase
 from openmnglab.functions.input.readers.funcs.dapsys_reader import DapsysReaderFunc
 from openmnglab.model.planning.interface import IProxyData
-from openmnglab.util.hashing import Hash
+from openmnglab.util.hashing import HashBuilder
 
 
 class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series]]]):
@@ -55,7 +55,7 @@ class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IPr
 
     @property
     def config_hash(self) -> bytes:
-        hasher = Hash()
+        hasher = HashBuilder()
         hasher.path(self._file)
         if self._stim_folder is not None:
             hasher.str(self._stim_folder)

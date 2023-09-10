@@ -3,7 +3,7 @@ from typing import Generic
 
 from openmnglab.model.functions.interface import IFunction, IFunctionDefinition, ISourceFunction, ProxyRet, \
     IStaticFunctionDefinition, ISourceFunctionDefinition
-from openmnglab.util.hashing import Hash
+from openmnglab.util.hashing import HashBuilder
 
 PandasSelector = str | int
 
@@ -35,7 +35,7 @@ class FunctionDefinitionBase(Generic[ProxyRet], IFunctionDefinition[ProxyRet], A
 
     @property
     def identifying_hash(self) -> bytes:
-        hashgen = Hash()
+        hashgen = HashBuilder()
         hashgen.str(self.identifier)
         hashgen.update(self.config_hash)
         return hashgen.digest()

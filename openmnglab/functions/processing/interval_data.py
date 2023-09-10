@@ -12,7 +12,7 @@ from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.interval_data import IntervalDataFunc, LEVEL_COLUMN
 from openmnglab.model.datamodel.interface import IDataSchema
 from openmnglab.model.planning.interface import IProxyData
-from openmnglab.util.hashing import Hash
+from openmnglab.util.hashing import HashBuilder
 
 
 class NumericIndexedListAcceptor(DefaultPandasSchemaAcceptor[pa.SeriesSchema]):
@@ -89,7 +89,7 @@ class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
 
     @property
     def config_hash(self) -> bytes:
-        hsh = Hash()
+        hsh = HashBuilder()
         for i in self._levels:
             hsh.int(i)
         hsh.bool(self._derivatives)

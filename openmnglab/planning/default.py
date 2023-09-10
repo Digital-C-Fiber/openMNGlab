@@ -6,13 +6,13 @@ from openmnglab.planning.base import PlannerBase, check_input, ProxyData
 from openmnglab.planning.exceptions import PlanningError
 from openmnglab.model.planning.interface import IProxyData
 from openmnglab.model.planning.plan.interface import IStage, IVirtualData
-from openmnglab.util.hashing import Hash
+from openmnglab.util.hashing import HashBuilder
 from openmnglab.util.iterables import ensure_iterable, unpack_sequence
 
 
 class Stage(IStage):
     def __init__(self, definition: IFunctionDefinition, *data_in: VirtualData):
-        hashgen = Hash()
+        hashgen = HashBuilder()
         hashgen.update(definition.config_hash)
         for inp in data_in:
             hashgen.update(inp.planning_id)
@@ -55,7 +55,7 @@ class VirtualData(IVirtualData):
     @staticmethod
     def from_function(func: Stage, scheme: IDataSchema, pos: int) -> VirtualData:
         depth = func.depth + 1
-        hashgen = Hash()
+        hashgen = HashBuilder()
         hashgen.int(pos)
         hashgen.update(func.planning_id)
         return VirtualData(depth, hashgen.digest(), scheme, func)

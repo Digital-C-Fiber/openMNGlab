@@ -14,7 +14,7 @@ from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.model.functions.interface import IFunction
 from openmnglab.functions.processing.funcs.windowing import WindowingFunc
 from openmnglab.model.planning.interface import IProxyData
-from openmnglab.util.hashing import Hash
+from openmnglab.util.hashing import HashBuilder
 
 
 class WindowingSchemaAcceptor(ISchemaAcceptor):
@@ -66,7 +66,7 @@ class Windowing(FunctionDefinitionBase[IProxyData[DataFrame]]):
 
     @property
     def config_hash(self) -> bytes:
-        return Hash() \
+        return HashBuilder() \
             .str(self._name) \
             .quantity(self._lo) \
             .quantity(self._hi) \
