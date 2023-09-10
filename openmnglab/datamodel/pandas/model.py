@@ -7,7 +7,7 @@ import pandas as pd
 import pandera as pa
 import quantities as pq
 
-from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError, DataSchemeConformityError
+from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError, DataSchemaConformityError
 from openmnglab.model.datamodel.interface import IDataContainer, IInputDataSchema, IOutputDataSchema, \
     IStaticDataSchema
 from openmnglab.datamodel.pandas.verification import compare_schemas
@@ -108,7 +108,7 @@ class PandasInputDataSchema(Generic[TPandasScheme], PandasDataSchema[TPandasSche
 
     def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
         if not isinstance(output_data_scheme, IPandasDataSchema):
-            raise DataSchemeCompatibilityError(
+            raise DataSchemaCompatibilityError(
                 f"Other data scheme of type {type(output_data_scheme).__qualname__} is not a pandas data scheme")
         return compare_schemas(self.pandera_schema, output_data_scheme.pandera_schema)
     def transform(self, data_container: IDataContainer) -> IDataContainer:
@@ -119,13 +119,13 @@ class PandasOutputDataSchema(Generic[TPandasScheme], PandasDataSchema[TPandasSch
 
     def validate(self, data_container: IDataContainer) -> bool:
         if not isinstance(data_container, PandasContainer):
-            raise DataSchemeConformityError(
+            raise DataSchemaConformityError(
                 f"PandasDataScheme expects a PandasContainer for validation but got an object of type {type(data_container).__qualname__}")
         try:
             _ = self._schema.validate(data_container.data)
             return True
         except Exception as e:
-            raise DataSchemeConformityError("Pandera model validation failed") from e
+            raise DataSchemaConformityError("Pandera model validation failed") from e
 
 
 class PandasStaticDataSchema(Generic[TPandasScheme], PandasInputDataSchema[TPandasScheme],

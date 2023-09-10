@@ -9,7 +9,7 @@ import quantities as pq
 from pandas import DataFrame, DatetimeTZDtype, PeriodDtype, SparseDtype, IntervalDtype, CategoricalDtype, StringDtype, \
     BooleanDtype
 
-from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
+from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
 from openmnglab.datamodel.pandas.model import PandasOutputDataSchema, PandasInputDataSchema, \
     PandasDataSchema
 from openmnglab.datamodel.pandas.schemas import generic_interval_list
@@ -25,10 +25,10 @@ class WindowDataInputSchema(IInputDataSchema):
 
     def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
         if not isinstance(output_data_scheme, PandasOutputDataSchema):
-            raise DataSchemeCompatibilityError("Data scheme is not a pandas data scheme")
+            raise DataSchemaCompatibilityError("Data scheme is not a pandas data scheme")
         schema = output_data_scheme.schema
         if not isinstance(schema, pa.SeriesSchema):
-            raise DataSchemeCompatibilityError("Data scheme is not a series")
+            raise DataSchemaCompatibilityError("Data scheme is not a series")
         schema: pa.SeriesSchema
         assert schema.dtype not in (
             DatetimeTZDtype, CategoricalDtype, PeriodDtype, SparseDtype, IntervalDtype, StringDtype, BooleanDtype)
@@ -47,7 +47,7 @@ class NumericIndexedList(PandasInputDataSchema[pa.SeriesSchema]):
         super_accepts = super().accepts(output_data_scheme)
         output_data_scheme: PandasOutputDataSchema
         if not pa.dtypes.is_numeric(output_data_scheme.pandera_schema.index.dtype):
-            raise DataSchemeCompatibilityError("Requires a numerically series")
+            raise DataSchemaCompatibilityError("Requires a numerically series")
         return super_accepts
 
 
@@ -89,7 +89,7 @@ class IntervalDataInputSchema(IntervalDataBaseSchema, PandasInputDataSchema):
         else:
             num_idx = output_data_scheme.pandera_schema.index
         if not pa.dtypes.is_numeric(num_idx.dtype):
-            raise DataSchemeCompatibilityError(
+            raise DataSchemaCompatibilityError(
                 f'Index (or last index of a multiindex) must be numeric, is "{num_idx.dtype}"')
         return super_accepts
 

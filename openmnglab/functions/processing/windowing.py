@@ -7,7 +7,7 @@ from pandas import DataFrame, DatetimeTZDtype, CategoricalDtype, PeriodDtype, Sp
     StringDtype, BooleanDtype
 from pandera import SeriesSchema
 
-from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
+from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
 from openmnglab.model.datamodel.interface import IDataContainer, IInputDataSchema, IOutputDataSchema
 from openmnglab.datamodel.pandas.model import PandasOutputDataSchema
 from openmnglab.functions.base import FunctionDefinitionBase
@@ -21,10 +21,10 @@ class WindowingInputDataSchema(IInputDataSchema):
 
     def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
         if not isinstance(output_data_scheme, PandasOutputDataSchema):
-            raise DataSchemeCompatibilityError("Data scheme is not a pandas data scheme")
+            raise DataSchemaCompatibilityError("Data scheme is not a pandas data scheme")
         schema = output_data_scheme.pandera_schema
         if not isinstance(schema, SeriesSchema):
-            raise DataSchemeCompatibilityError("Data scheme must be a series")
+            raise DataSchemaCompatibilityError("Data scheme must be a series")
         schema: SeriesSchema
         assert schema.dtype not in (
             DatetimeTZDtype, CategoricalDtype, PeriodDtype, SparseDtype, IntervalDtype, StringDtype, BooleanDtype)
