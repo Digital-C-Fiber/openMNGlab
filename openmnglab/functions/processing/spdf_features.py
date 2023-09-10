@@ -42,11 +42,11 @@ class SPDFFeatures(FunctionDefinitionBase[IProxyData[DataFrame]]):
         return bytes()
 
     @property
-    def consumes(self) -> tuple[SPDFComponentsAcceptor, IntervalDataAcceptor]:
+    def slot_acceptors(self) -> tuple[SPDFComponentsAcceptor, IntervalDataAcceptor]:
         return SPDFComponentsAcceptor(), IntervalDataAcceptor(0, 1, 2)
 
-    def production_for(self, principle_compo: SPDFComponentsDynamicSchema,
-                       diffs: IntervalDataDynamicSchema) -> SPDFFeaturesDynamicSchema:
+    def output_for(self, principle_compo: SPDFComponentsDynamicSchema,
+                   diffs: IntervalDataDynamicSchema) -> SPDFFeaturesDynamicSchema:
         compare_index(principle_compo.pandera_schema.index, pa.MultiIndex(diffs.pandera_schema.index.indexes[:-1]))
         return SPDFFeaturesDynamicSchema(principle_compo.pandera_schema.index)
 

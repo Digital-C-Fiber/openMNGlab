@@ -21,7 +21,7 @@ class Stage(IStage):
         self._definition = definition
         self._data_in = data_in
         self._data_out = tuple(VirtualData.from_function(self, out, i) for i, out in
-                               enumerate(ensure_iterable(definition.production_for(*(d.schema for d in data_in)), IDataSchema)))
+                               enumerate(ensure_iterable(definition.output_for(*(d.schema for d in data_in)), IDataSchema)))
 
     @property
     def definition(self) -> IFunctionDefinition:
@@ -76,7 +76,7 @@ class VirtualData(IVirtualData):
 class DefaultPlanner(PlannerBase[Stage, VirtualData]):
 
     def _add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: VirtualData) -> ProxyRet:
-        check_input(function.consumes, tuple(d.schema for d in inp_data))
+        check_input(function.slot_acceptors, tuple(d.schema for d in inp_data))
         stage = Stage(function, *inp_data)
         if stage.planning_id in self._functions:
             raise PlanningError("A function with the same hash is already planned")

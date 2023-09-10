@@ -75,10 +75,10 @@ class Windowing(FunctionDefinitionBase[IProxyData[DataFrame]]):
             .digest()
 
     @property
-    def consumes(self) -> WindowingSchemaAcceptor:
+    def slot_acceptors(self) -> WindowingSchemaAcceptor:
         return WindowingSchemaAcceptor()
 
-    def production_for(self, inp: PandasDataSchema) -> DynamicIndexIntervalSchema:
+    def output_for(self, inp: PandasDataSchema) -> DynamicIndexIntervalSchema:
         assert isinstance(inp, PandasDataSchema)
         return DynamicIndexIntervalSchema.for_input(inp, self._name)
 

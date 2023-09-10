@@ -42,11 +42,11 @@ class SPDFComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
         return bytes()
 
     @property
-    def consumes(self) -> IntervalDataAcceptor:
+    def slot_acceptors(self) -> IntervalDataAcceptor:
         return IntervalDataAcceptor(0, 1)
 
     @staticmethod
-    def production_for(diffs: PandasDataSchema[pa.DataFrameSchema]) -> SPDFComponentsDynamicSchema:
+    def output_for(diffs: PandasDataSchema[pa.DataFrameSchema]) -> SPDFComponentsDynamicSchema:
         return SPDFComponentsDynamicSchema(pa.MultiIndex(indexes=diffs.pandera_schema.index.indexes[:-1]))
 
     @staticmethod

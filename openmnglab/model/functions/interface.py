@@ -42,7 +42,7 @@ class ISourceFunction(IFunction, ABC):
 ProxyRet = TypeVar('ProxyRet')
 
 
-class IFunctionDefinition(ABC, Generic[ProxyRet]):
+class IFunctionDefinition(Generic[ProxyRet], ABC):
 
     @property
     @abstractmethod
@@ -56,11 +56,11 @@ class IFunctionDefinition(ABC, Generic[ProxyRet]):
 
     @property
     @abstractmethod
-    def consumes(self) -> Optional[Sequence[ISchemaAcceptor] | ISchemaAcceptor]:
+    def slot_acceptors(self) -> Optional[Sequence[ISchemaAcceptor] | ISchemaAcceptor]:
         ...
 
     @abstractmethod
-    def production_for(self, *inputs: IDataSchema) -> Optional[Sequence[IDataSchema] | IDataSchema]:
+    def output_for(self, *inputs: IDataSchema) -> Optional[Sequence[IDataSchema] | IDataSchema]:
         ...
 
     @abstractmethod
@@ -74,17 +74,17 @@ class IStaticFunctionDefinition(Generic[ProxyRet], IFunctionDefinition[ProxyRet]
     def produces(self) -> Optional[Sequence[IDataSchema] | IDataSchema]:
         ...
 
-    def production_for(self, *_: IDataSchema) -> Optional[Sequence[IDataSchema] | IDataSchema]:
+    def output_for(self, *_: IDataSchema) -> Optional[Sequence[IDataSchema] | IDataSchema]:
         return self.produces
 
 
 class ISourceFunctionDefinition(Generic[ProxyRet], IStaticFunctionDefinition[ProxyRet], ABC):
 
     @property
-    def consumes(self) -> None:
+    def slot_acceptors(self) -> None:
         return None
 
-    def production_for(self) -> Optional[Sequence[IDataSchema] | IDataSchema]:
+    def output_for(self) -> Optional[Sequence[IDataSchema] | IDataSchema]:
         return self.produces
 
     @abstractmethod

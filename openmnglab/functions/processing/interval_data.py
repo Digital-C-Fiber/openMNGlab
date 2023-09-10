@@ -98,13 +98,13 @@ class IntervalData(FunctionDefinitionBase[IProxyData[DataFrame]]):
         return hsh.digest()
 
     @property
-    def consumes(self) -> tuple[
+    def slot_acceptors(self) -> tuple[
         DefaultPandasSchemaAcceptor[pa.SeriesSchema], DefaultPandasSchemaAcceptor[pa.SeriesSchema]]:
         return DefaultPandasSchemaAcceptor(pa.SeriesSchema(IntervalDtype)), NumericIndexedListAcceptor()
 
-    def production_for(self, window_intervals: IDataSchema[pa.SeriesSchema],
-                       data: IDataSchema[pa.SeriesSchema]) -> IntervalDataDynamicSchema:
-        window_scheme, data_scheme = self.consumes
+    def output_for(self, window_intervals: IDataSchema[pa.SeriesSchema],
+                   data: IDataSchema[pa.SeriesSchema]) -> IntervalDataDynamicSchema:
+        window_scheme, data_scheme = self.slot_acceptors
         assert (window_scheme.accepts(window_intervals))
         assert (data_scheme.accepts(data))
         window_intervals: PandasDataSchema[pa.SeriesSchema]

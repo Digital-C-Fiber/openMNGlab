@@ -90,7 +90,7 @@ class WaveformPlot(StaticFunctionDefinitionBase[IProxyData[plt.Figure]]):
         return h.digest()
 
     @property
-    def consumes(self) -> DefaultPandasSchemaAcceptor[pd.DataFrame]:
+    def slot_acceptors(self) -> DefaultPandasSchemaAcceptor[pd.DataFrame]:
         return DefaultPandasSchemaAcceptor(DataFrameSchema({
             self.column: Column(float)
         }))
