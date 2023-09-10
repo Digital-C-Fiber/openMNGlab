@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from openmnglab.model.datamodel.interface import IOutputDataSchema, IInputDataSchema
+from openmnglab.model.datamodel.interface import IOutputDataSchema, ISchemaAcceptor
 from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
 from openmnglab.planning.base import PlannerBase, check_input, ProxyData
 from openmnglab.planning.exceptions import PlanningError

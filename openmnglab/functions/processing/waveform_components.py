@@ -3,11 +3,11 @@ from abc import ABC
 import pandera as pa
 from pandas import DataFrame
 
-from openmnglab.datamodel.pandas.model import PandasInputDataSchema, PandasOutputDataSchema, \
+from openmnglab.datamodel.pandas.model import PandasSchemaAcceptor, PandasOutputDataSchema, \
     PandasDataSchema
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.waveform_components import WaveformComponentsFunc, PRINCIPLE_COMPONENTS
-from openmnglab.functions.processing.interval_data import IntervalDataInputSchema
+from openmnglab.functions.processing.interval_data import IntervalDataAcceptor
 from openmnglab.model.planning.interface import IProxyData
 
 
@@ -22,7 +22,7 @@ class PrincipleComponentsBaseSchema(PandasDataSchema[pa.DataFrameSchema], ABC):
             PRINCIPLE_COMPONENTS[5]: pa.Column(float, nullable=True)}, title="Principle Components"))
 
 
-class PrincipleComponentsInputSchema(PrincipleComponentsBaseSchema, PandasInputDataSchema):
+class PrincipleComponentsInputSchema(PrincipleComponentsBaseSchema, PandasSchemaAcceptor):
     ...
 
 
@@ -46,8 +46,8 @@ class WaveformComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
         super().__init__("openmnglab.principlecomponents")
 
     @property
-    def consumes(self) -> IntervalDataInputSchema:
-        return IntervalDataInputSchema(0, 1)
+    def consumes(self) -> IntervalDataAcceptor:
+        return IntervalDataAcceptor(0, 1)
 
     @staticmethod
     def production_for(diffs: PandasOutputDataSchema[pa.DataFrameSchema]) -> PrincipleComponentsDynamicOutputSchema:

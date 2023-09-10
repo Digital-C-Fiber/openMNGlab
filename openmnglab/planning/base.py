@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Collection, TypeVar, Generic, Iterable, Mapping, Sequence
 
 from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
-from openmnglab.model.datamodel.interface import IInputDataSchema, IOutputDataSchema
+from openmnglab.model.datamodel.interface import ISchemaAcceptor, IOutputDataSchema
 from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
 from openmnglab.model.planning.interface import IExecutionPlanner, IProxyData
 from openmnglab.model.planning.plan.interface import IExecutionPlan, IStage, IPlannedData, IPlannedElement
@@ -12,14 +12,14 @@ from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, Fu
 from openmnglab.util.iterables import ensure_iterable, ensure_sequence
 
 
-def check_input(expected_schemes: Sequence[IInputDataSchema] | IInputDataSchema | None,
+def check_input(expected_schemes: Sequence[ISchemaAcceptor] | ISchemaAcceptor | None,
                 actual_schemes: Sequence[IOutputDataSchema] | IOutputDataSchema | None):
-    expected_schemes: Sequence[IInputDataSchema] = ensure_sequence(expected_schemes, IInputDataSchema)
+    expected_schemes: Sequence[ISchemaAcceptor] = ensure_sequence(expected_schemes, ISchemaAcceptor)
     actual_schemes: Sequence[IOutputDataSchema] = ensure_sequence(actual_schemes, IOutputDataSchema)
     if len(expected_schemes) != len(actual_schemes):
         raise InvalidFunctionArgumentCountError(len(expected_schemes), len(actual_schemes))
     for pos, (expected_scheme, actual_scheme) in enumerate(zip(expected_schemes, actual_schemes)):
-        expected_scheme: IInputDataSchema
+        expected_scheme: ISchemaAcceptor
         actual_scheme: IOutputDataSchema
         try:
             if not expected_scheme.accepts(actual_scheme):

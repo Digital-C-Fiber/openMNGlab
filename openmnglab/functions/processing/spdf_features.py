@@ -7,7 +7,7 @@ from openmnglab.datamodel.pandas.model import PandasDataSchema, PandasOutputData
 from openmnglab.datamodel.pandas.verification import compare_index
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.spdf_features import SPDF_FEATURES, FeatureFunc
-from openmnglab.functions.processing.interval_data import IntervalDataInputSchema, IntervalDataOutputSchema
+from openmnglab.functions.processing.interval_data import IntervalDataAcceptor, IntervalDataOutputSchema
 from openmnglab.functions.processing.waveform_components import PrincipleComponentsInputSchema, \
     PrincipleComponentsDynamicOutputSchema
 from openmnglab.model.datamodel.interface import IOutputDataSchema
@@ -39,8 +39,8 @@ class SPDFFeatures(FunctionDefinitionBase[IProxyData[DataFrame]]):
         super().__init__("omngl.spdffeatures")
 
     @property
-    def consumes(self) -> tuple[PrincipleComponentsInputSchema, IntervalDataInputSchema]:
-        return PrincipleComponentsInputSchema(), IntervalDataInputSchema(0, 1, 2)
+    def consumes(self) -> tuple[PrincipleComponentsInputSchema, IntervalDataAcceptor]:
+        return PrincipleComponentsInputSchema(), IntervalDataAcceptor(0, 1, 2)
 
     def production_for(self, principle_compo: PrincipleComponentsDynamicOutputSchema,
                        diffs: IntervalDataOutputSchema) -> SPDFFeatureOutputSchema:
