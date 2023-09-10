@@ -38,6 +38,10 @@ class SPDFComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
         super().__init__("codingchipmunk.spdf.components")
 
     @property
+    def config_hash(self) -> bytes:
+        return bytes()
+
+    @property
     def consumes(self) -> IntervalDataAcceptor:
         return IntervalDataAcceptor(0, 1)
 
@@ -48,3 +52,7 @@ class SPDFComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
     @staticmethod
     def new_function() -> SPDFComponentsFunc:
         return SPDFComponentsFunc()
+
+
+
+

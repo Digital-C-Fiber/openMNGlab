@@ -9,8 +9,7 @@ PandasSelector = str | int
 
 class FunctionBase(IFunction, ABC):
 
-    def validate_input(self) -> bool:
-        return True
+    ...
 
 
 class SourceFunctionBase(FunctionBase, ISourceFunction, ABC):
@@ -28,17 +27,6 @@ class FunctionDefinitionBase(Generic[ProxyRet], IFunctionDefinition[ProxyRet], A
     @property
     def identifier(self) -> str:
         return self._identifier
-
-    @property
-    def config_hash(self) -> bytes:
-        return bytes()
-
-    @property
-    def identifying_hash(self) -> bytes:
-        hashgen = HashBuilder()
-        hashgen.str(self.identifier)
-        hashgen.update(self.config_hash)
-        return hashgen.digest()
 
 
 class StaticFunctionDefinitionBase(Generic[ProxyRet], FunctionDefinitionBase[ProxyRet], IStaticFunctionDefinition[ProxyRet],

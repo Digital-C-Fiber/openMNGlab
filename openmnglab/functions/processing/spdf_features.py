@@ -38,6 +38,10 @@ class SPDFFeatures(FunctionDefinitionBase[IProxyData[DataFrame]]):
         super().__init__("codingchipmunk.spdf.features")
 
     @property
+    def config_hash(self) -> bytes:
+        return bytes()
+
+    @property
     def consumes(self) -> tuple[SPDFComponentsAcceptor, IntervalDataAcceptor]:
         return SPDFComponentsAcceptor(), IntervalDataAcceptor(0, 1, 2)
 

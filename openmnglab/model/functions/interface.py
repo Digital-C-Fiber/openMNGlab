@@ -31,10 +31,6 @@ class IFunction(ABC):
         """
         ...
 
-    @abstractmethod
-    def validate_input(self) -> bool:
-        ...
-
 
 class ISourceFunction(IFunction, ABC):
 
@@ -56,11 +52,6 @@ class IFunctionDefinition(ABC, Generic[ProxyRet]):
     @property
     @abstractmethod
     def config_hash(self) -> bytes:
-        ...
-
-    @property
-    @abstractmethod
-    def identifying_hash(self) -> bytes:
         ...
 
     @property
