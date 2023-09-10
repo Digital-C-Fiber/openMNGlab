@@ -17,7 +17,8 @@ from openmnglab.util.hashing import HashBuilder
 
 
 class Spike2Reader(SourceFunctionDefinitionBase[tuple[
-    IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[
+    IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series],
+    IDataReference[
         pd.Series]]]):
     """ Load data from Spike2 recordings exported to MATLAB v7.3+ files
         Attempts to load data from 9 channels. To avoid loading data from a channel, pass ``None`` as a channels name,to avoid loading data from itl.

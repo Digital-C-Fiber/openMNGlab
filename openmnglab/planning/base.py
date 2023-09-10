@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Collection, TypeVar, Generic, Iterable, Mapping, Sequence
+from typing import TypeVar, Generic, Iterable, Mapping, Sequence
 
 from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
 from openmnglab.model.datamodel.interface import ISchemaAcceptor, IDataSchema
@@ -9,7 +9,7 @@ from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
 from openmnglab.model.planning.interface import IExecutionPlanner, IDataReference
 from openmnglab.model.planning.plan.interface import IExecutionPlan, IStage, IVirtualData, IPlannedElement
 from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
-from openmnglab.util.iterables import ensure_iterable, ensure_sequence
+from openmnglab.util.iterables import ensure_sequence
 
 
 def check_input(expected_schemes: Sequence[ISchemaAcceptor] | ISchemaAcceptor | None,
@@ -63,7 +63,7 @@ _FuncT = TypeVar('_FuncT', bound=IStage)
 _DataT = TypeVar('_DataT', bound=IVirtualData)
 
 
-class PlannerBase( Generic[_FuncT, _DataT], IExecutionPlanner, ABC):
+class PlannerBase(Generic[_FuncT, _DataT], IExecutionPlanner, ABC):
 
     def __init__(self):
         self._functions: dict[bytes, _FuncT] = dict()

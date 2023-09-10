@@ -1,5 +1,3 @@
-from abc import ABC
-
 import pandera as pa
 from pandas import DataFrame
 
@@ -10,14 +8,14 @@ from openmnglab.functions.processing.funcs.spdf_features import SPDF_FEATURES, F
 from openmnglab.functions.processing.interval_data import IntervalDataAcceptor, IntervalDataDynamicSchema
 from openmnglab.functions.processing.spdf_components import SPDFComponentsDynamicSchema, \
     SPDFComponentsAcceptor
-from openmnglab.model.datamodel.interface import IDataSchema
 from openmnglab.model.planning.interface import IDataReference
 
 
 class SPDFFeaturesAcceptor(DefaultPandasSchemaAcceptor[pa.DataFrameSchema]):
     def __init__(self, index=None):
         super().__init__(pa.DataFrameSchema({
-            feature: pa.Column(float, nullable=True) for feature in SPDF_FEATURES}, title="Principle Components", index=index))
+            feature: pa.Column(float, nullable=True) for feature in SPDF_FEATURES}, title="Principle Components",
+            index=index))
 
 
 class SPDFFeaturesDynamicSchema(SPDFFeaturesAcceptor, PandasDataSchema):

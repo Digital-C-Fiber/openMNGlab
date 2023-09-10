@@ -42,8 +42,6 @@ class HashBuilder:
             self.dynamic(v, fail=fail)
         return self
 
-
-
     def dynamic(self, v: Any, fail=True) -> Self:
         if isinstance(v, int):
             return self.int(v)

@@ -59,5 +59,3 @@ class IDataSchema(ISchemaAcceptor, ABC):
         :return: ``True`` if the data container conforms to this scheme, ``False`` otherwise.
         """
         ...
-
-

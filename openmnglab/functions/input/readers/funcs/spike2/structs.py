@@ -72,15 +72,15 @@ class _TimesMixin(_TimeRangeSliceMixin, _Spike2Base):
         return vals
 
     def _binary_search_times(self, val: float, tolerance: float = sys.float_info.epsilon) -> tuple[None, None] | tuple[
-        int|None, int|None]:
+        int | None, int | None]:
         h5ds: h5py.Dataset = self.hdfgroup.h5group[self._TIMES_ITEM_NAME]
         low, high = 0, h5ds.shape[1] - 1
         if low == high:
-            single_val = h5ds[0,0]
+            single_val = h5ds[0, 0]
             if comp_float(val, single_val, delta=tolerance):
                 return low, low
             else:
-                return None,None
+                return None, None
         mid = (high - low) // 2
         low_val, mid_val, high_val = h5ds[0, [low, mid, high]]
         if comp_float(val, low_val, delta=tolerance):
@@ -88,7 +88,7 @@ class _TimesMixin(_TimeRangeSliceMixin, _Spike2Base):
         elif comp_float(val, high_val, delta=tolerance):
             return high, high
         elif val < low_val:
-            return None,0
+            return None, 0
         elif high_val < val:
             return h5ds.shape[1], None
         while high - low > 1:
@@ -208,7 +208,7 @@ class _ValuesMixin(_Spike2Base):
 
 class _CalculatedIndexMixin(_TimeRangeSliceMixin, _LengthMixin, _StartMixin, _IntervalMixin):
 
-    def _calc_closest_idx(self, val: float) -> tuple[int, int] | tuple[None|int, None|int]:
+    def _calc_closest_idx(self, val: float) -> tuple[int, int] | tuple[None | int, None | int]:
         if self.length == 0:
             return None, None
         end = self.start + self.interval * (self.length - 1)

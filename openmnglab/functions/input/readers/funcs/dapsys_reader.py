@@ -12,7 +12,7 @@ from pydapsys import File, StreamType, WaveformPage, Stream, TextPage, Folder
 from pydapsys.toc.exceptions import ToCPathError
 
 from openmnglab.datamodel.pandas.model import PandasContainer
-from openmnglab.datamodel.pandas.schemas import TIMESTAMP, CONT_REC, STIM_TS, STIM_LBL, SPIKE_TS, TRACK, \
+from openmnglab.datamodel.pandas.schemas import TIMESTAMP, STIM_TS, STIM_LBL, SPIKE_TS, TRACK, \
     TRACK_SPIKE_IDX, GLOBAL_STIM_ID, STIM_TYPE_ID, SIGNAL
 from openmnglab.functions.base import SourceFunctionBase
 from openmnglab.util.dicts import get_and_incr

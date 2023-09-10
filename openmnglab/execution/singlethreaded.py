@@ -50,7 +50,7 @@ class SingleThreadedExecutor(IExecutor):
             results: tuple[IDataContainer] = tuple(self._exec_func(func))
             if len(results) != len(stage.data_out):
                 raise FunctionReturnCountMissmatch(expected=len(stage.data_out), actual=len(results))
-            for i,(planned_data_output, actual_data_output) in enumerate(zip(stage.data_out, results)):
+            for i, (planned_data_output, actual_data_output) in enumerate(zip(stage.data_out, results)):
                 actual_data_output: IDataContainer
                 planned_data_output: IVirtualData
                 try:
@@ -59,7 +59,8 @@ class SingleThreadedExecutor(IExecutor):
                     raise Exception(f"Schema validation of output #{i} failed") from e
                 self._data[planned_data_output.planning_id] = actual_data_output
         except Exception as e:
-            raise FunctionExecutionError(f"Failed to execute {stage.definition.identifier} (stage {stage.planning_id.hex()})")
+            raise FunctionExecutionError(
+                f"Failed to execute {stage.definition.identifier} (stage {stage.planning_id.hex()})")
 
     def execute(self, plan: IExecutionPlan, ignore_previous=False):
         for stage in sorted(plan.stages.values(), key=lambda x: x.depth):

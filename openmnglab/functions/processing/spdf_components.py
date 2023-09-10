@@ -52,7 +52,3 @@ class SPDFComponents(FunctionDefinitionBase[IDataReference[DataFrame]]):
     @staticmethod
     def new_function() -> SPDFComponentsFunc:
         return SPDFComponentsFunc()
-
-
-
-

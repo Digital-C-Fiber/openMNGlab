@@ -153,7 +153,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
 
     def _marker_chan_to_series(self, spike2_struct: Spike2Marker | None, name: str,
                                index_name: str = TIMESTAMP) -> pd.Series:
-        times, codes = np.empty(0,dtype=np.float64), np.empty(0, dtype=np.uint32)
+        times, codes = np.empty(0, dtype=np.float64), np.empty(0, dtype=np.uint32)
         if spike2_struct is not None and spike2_struct.length > 0:
             slicer = spike2_struct.timerange_slice(self._start, self._end)
             times = spike2_struct.get_times_slice(slicer)
@@ -164,7 +164,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
 
     def _textmarker_chan_to_series(self, spike2_struct: Spike2Textmark | None, name: str,
                                    index_name: str = TIMESTAMP) -> pd.Series:
-        texts, times, codes = np.empty(0, dtype=str), np.empty(0,dtype=np.float64), np.empty(0, dtype=np.uint32)
+        texts, times, codes = np.empty(0, dtype=str), np.empty(0, dtype=np.float64), np.empty(0, dtype=np.uint32)
         if spike2_struct is not None and spike2_struct.length > 0:
             slicer = spike2_struct.timerange_slice(self._start, self._end)
             times = spike2_struct.get_times_slice(slicer)
@@ -178,7 +178,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
 
     def _unbinned_event_chant_to_series(self, spike2_struct: Spike2UnbinnedEvent | None, name: str,
                                         index_name: str = TIMESTAMP):
-        times, levels = np.empty(0,dtype=np.float64), np.empty(0, dtype=np.int8)
+        times, levels = np.empty(0, dtype=np.float64), np.empty(0, dtype=np.int8)
         if spike2_struct is not None and spike2_struct.length > 0:
             slicer = spike2_struct.timerange_slice(self._start, self._end)
             times = spike2_struct.get_times_slice(slicer)

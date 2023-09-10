@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Iterable, Sequence, Literal, Generic, TypeVar
+from typing import Optional, Iterable, Sequence, Generic, TypeVar
 
 from openmnglab.model.datamodel.interface import IDataContainer, ISchemaAcceptor, IDataSchema
 

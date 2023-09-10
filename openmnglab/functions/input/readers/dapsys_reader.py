@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional, Sequence
 
 import pandas as pd
-from pandera import SeriesSchema, DataFrameSchema
+from pandera import SeriesSchema
 
 from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.datamodel.pandas.schemas import float_timeseries, sorted_spikes, stimulus_list, SIGNAL, str_eventseries
@@ -12,7 +12,9 @@ from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
 
 
-class DapsysReader(SourceFunctionDefinitionBase[tuple[IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series]]]):
+class DapsysReader(SourceFunctionDefinitionBase[tuple[
+    IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series],
+    IDataReference[pd.Series]]]):
     """Loads data from a DAPSYS file
 
     In: nothing
@@ -39,10 +41,10 @@ class DapsysReader(SourceFunctionDefinitionBase[tuple[IDataReference[pd.Series],
     :param responses: Name of the folder containing the responses, defaults to "responses"
     :param tracks: Define which tracks to load from the file. Tracks must be present in the "Tracks for all Responses" folder. "all" loads all tracks found in that subfolder.
     """
-    def __init__(self, file: str | Path, stim_folder: str |None = None, main_pulse: Optional[str] = "Main Pulse",
+
+    def __init__(self, file: str | Path, stim_folder: str | None = None, main_pulse: Optional[str] = "Main Pulse",
                  continuous_recording: Optional[str] = "Continuous Recording", responses="responses",
                  tracks: Optional[Sequence[str] | str] = "all", comments="comments", stimdefs="Stim Def Starts"):
-
         super().__init__("net.codingchipmunk.dapsysreader")
         self._file = file
         self._stim_folder = stim_folder
@@ -67,8 +69,10 @@ class DapsysReader(SourceFunctionDefinitionBase[tuple[IDataReference[pd.Series],
 
     @property
     def produces(self) -> tuple[
-        PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[SeriesSchema]]:
-        return float_timeseries(SIGNAL), stimulus_list(), sorted_spikes(), str_eventseries("comments"), str_eventseries("Stim Def Starts")
+        PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[
+            SeriesSchema], PandasContainer[SeriesSchema]]:
+        return float_timeseries(SIGNAL), stimulus_list(), sorted_spikes(), str_eventseries("comments"), str_eventseries(
+            "Stim Def Starts")
 
     def new_function(self) -> DapsysReaderFunc:
         return DapsysReaderFunc(self._file, self._stim_folder, main_pulse=self._main_pulse,

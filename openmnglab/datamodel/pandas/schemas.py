@@ -1,4 +1,3 @@
-from pandas import IntervalDtype
 from pandera import Column, Index, DataFrameSchema, SeriesSchema, MultiIndex
 
 from openmnglab.datamodel.pandas.model import PandasDataSchema

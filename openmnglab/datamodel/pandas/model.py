@@ -151,11 +151,12 @@ class PandasDataSchema(Generic[TPanderaSchema], IPandasDataSchema[TPanderaSchema
             # zero length multiindeces are currently not correctly evaluated by
             if schema_err.reason_code == pa.errors.SchemaErrorReason.WRONG_DATATYPE and len(
                     data_container.data) == 0 and isinstance(data_container.data.index, pd.MultiIndex) and isinstance(
-                    self.pandera_schema.index, pa.MultiIndex):
+                self.pandera_schema.index, pa.MultiIndex):
                 for index_name, index_dtype in data_container.data.index.dtypes.items():
                     if index_name in self._schema.index.columns:
                         expected_dtype = self._schema.index.columns[index_name].dtype
-                        if not (index_dtype == np.dtype(object) or expected_dtype == index_dtype or np.issubdtype(index_dtype, expected_dtype)):
+                        if not (index_dtype == np.dtype(object) or expected_dtype == index_dtype or np.issubdtype(
+                                index_dtype, expected_dtype)):
                             raise Exception(
                                 f"Index column {index_name} was expected to be type '{expected_dtype}', but is '{index_dtype}")
 

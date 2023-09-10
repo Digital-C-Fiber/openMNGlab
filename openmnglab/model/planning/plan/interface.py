@@ -55,5 +55,3 @@ class IExecutionPlan(ABC):
     @abstractmethod
     def planned_data(self) -> Mapping[bytes, IVirtualData]:
         ...
-
-

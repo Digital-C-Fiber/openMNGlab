@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from openmnglab.model.datamodel.interface import IDataSchema, ISchemaAcceptor
+from openmnglab.model.datamodel.interface import IDataSchema
 from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
+from openmnglab.model.planning.plan.interface import IStage, IVirtualData
 from openmnglab.planning.base import PlannerBase, check_input, DataReference
 from openmnglab.planning.exceptions import PlanningError
-from openmnglab.model.planning.interface import IDataReference
-from openmnglab.model.planning.plan.interface import IStage, IVirtualData
 from openmnglab.util.hashing import HashBuilder
 from openmnglab.util.iterables import ensure_iterable, unpack_sequence
 
@@ -21,7 +20,8 @@ class Stage(IStage):
         self._definition = definition
         self._data_in = data_in
         self._data_out = tuple(VirtualData.from_function(self, out, i) for i, out in
-                               enumerate(ensure_iterable(definition.output_for(*(d.schema for d in data_in)), IDataSchema)))
+                               enumerate(
+                                   ensure_iterable(definition.output_for(*(d.schema for d in data_in)), IDataSchema)))
 
     @property
     def definition(self) -> IFunctionDefinition:

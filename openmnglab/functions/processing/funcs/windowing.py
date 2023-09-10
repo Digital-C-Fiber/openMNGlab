@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Tuple
-
 import numpy as np
 import pandas
 import quantities as pq
@@ -31,14 +29,15 @@ class WindowingFunc(FunctionBase):
         def to_interval(val):
             return Interval(val + lo, val + hi) if val is not None else None
 
-        #window_series: Series = origin_series.transform(to_interval)
-
+        # window_series: Series = origin_series.transform(to_interval)
 
         if len(origin_series) > 0:
             window_series: Series = origin_series.transform(to_interval)
         else:
             if isinstance(origin_series.index, pandas.MultiIndex):
-                idx = pandas.MultiIndex.from_arrays([np.empty(0, dtype=lvl.dtype) for lvl in origin_series.index.levels], names=[lvl.name for lvl in origin_series.index.levels])
+                idx = pandas.MultiIndex.from_arrays(
+                    [np.empty(0, dtype=lvl.dtype) for lvl in origin_series.index.levels],
+                    names=[lvl.name for lvl in origin_series.index.levels])
             elif isinstance(origin_series.index, pandas.Index):
                 idx = pandas.Index(np.empty(0, dtype=origin_series.index.dtype), name=origin_series.index.name)
             window_series = Series(data=[], dtype=IntervalDtype(), index=idx)

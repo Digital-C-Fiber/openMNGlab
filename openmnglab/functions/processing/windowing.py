@@ -8,11 +8,11 @@ from pandas import DataFrame, DatetimeTZDtype, CategoricalDtype, PeriodDtype, Sp
 from pandera import SeriesSchema
 
 from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
-from openmnglab.model.datamodel.interface import IDataContainer, ISchemaAcceptor, IDataSchema
 from openmnglab.datamodel.pandas.model import PandasDataSchema
 from openmnglab.functions.base import FunctionDefinitionBase
-from openmnglab.model.functions.interface import IFunction
 from openmnglab.functions.processing.funcs.windowing import WindowingFunc
+from openmnglab.model.datamodel.interface import ISchemaAcceptor, IDataSchema
+from openmnglab.model.functions.interface import IFunction
 from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
 
@@ -53,7 +53,6 @@ class Windowing(FunctionDefinitionBase[IDataReference[DataFrame]]):
 
     def __init__(self, offset_low: pq.Quantity, offset_high: pq.Quantity, name: str,
                  closed: Literal["left", "right", "both", "neither"] = "right"):
-
         FunctionDefinitionBase.__init__(self, "openmnglab.windowing")
         assert (isinstance(offset_low, pq.Quantity))
         assert (isinstance(offset_high, pq.Quantity))
