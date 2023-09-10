@@ -34,11 +34,11 @@ class WindowingInputDataSchema(IInputDataSchema):
         return data_container
 
 
-class DynamicIndexIntervalScheme(PandasOutputDataSchema[SeriesSchema]):
+class DynamicIndexIntervalSchema(PandasOutputDataSchema[SeriesSchema]):
 
     @staticmethod
-    def for_input(inp: PandasOutputDataSchema[SeriesSchema], name: str) -> DynamicIndexIntervalScheme:
-        return DynamicIndexIntervalScheme(SeriesSchema(IntervalDtype, index=inp.pandera_schema.index, name=name))
+    def for_input(inp: PandasOutputDataSchema[SeriesSchema], name: str) -> DynamicIndexIntervalSchema:
+        return DynamicIndexIntervalSchema(SeriesSchema(IntervalDtype, index=inp.pandera_schema.index, name=name))
 
 
 class Windowing(FunctionDefinitionBase[IProxyData[DataFrame]]):
@@ -81,9 +81,9 @@ class Windowing(FunctionDefinitionBase[IProxyData[DataFrame]]):
     def consumes(self) -> WindowingInputDataSchema:
         return WindowingInputDataSchema()
 
-    def production_for(self, inp: PandasOutputDataSchema) -> DynamicIndexIntervalScheme:
+    def production_for(self, inp: PandasOutputDataSchema) -> DynamicIndexIntervalSchema:
         assert isinstance(inp, PandasOutputDataSchema)
-        return DynamicIndexIntervalScheme.for_input(inp, self._name)
+        return DynamicIndexIntervalSchema.for_input(inp, self._name)
 
     def new_function(self) -> IFunction:
         return WindowingFunc(self._lo, self._hi, self._name, closed=self._closed)
