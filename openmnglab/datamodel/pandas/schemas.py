@@ -2,7 +2,7 @@ import numpy as np
 from pandas import IntervalDtype
 from pandera import Column, Index, DataFrameSchema, SeriesSchema, MultiIndex
 
-from openmnglab.datamodel.pandas.model import PandasStaticDataSchema
+from openmnglab.datamodel.pandas.model import PandasDataSchema
 
 TRACK = "track"
 SPIKE_TS = "spike_ts"
@@ -23,34 +23,34 @@ STIM_TYPE_ID = "stime type id"
 COMMENT = "comment"
 
 
-def time_waveform() -> PandasStaticDataSchema[SeriesSchema]:
-    return PandasStaticDataSchema(SeriesSchema(np.float32, index=Index(float)))
+def time_waveform() -> PandasDataSchema[SeriesSchema]:
+    return PandasDataSchema(SeriesSchema(np.float32, index=Index(float)))
 
 
-def int_list() -> PandasStaticDataSchema[SeriesSchema]:
-    return PandasStaticDataSchema(SeriesSchema(int, index=Index(int)))
+def int_list() -> PandasDataSchema[SeriesSchema]:
+    return PandasDataSchema(SeriesSchema(int, index=Index(int)))
 
 
-def float_list() -> PandasStaticDataSchema[SeriesSchema]:
-    return PandasStaticDataSchema(SeriesSchema(float, index=Index(float)))
+def float_list() -> PandasDataSchema[SeriesSchema]:
+    return PandasDataSchema(SeriesSchema(float, index=Index(float)))
 
 
-def str_float_list() -> PandasStaticDataSchema[SeriesSchema]:
-    return PandasStaticDataSchema(SeriesSchema(str, index=Index(float)))
+def str_float_list() -> PandasDataSchema[SeriesSchema]:
+    return PandasDataSchema(SeriesSchema(str, index=Index(float)))
 
 
-def generic_interval_list() -> PandasStaticDataSchema[SeriesSchema]:
-    return PandasStaticDataSchema(SeriesSchema(IntervalDtype))
+def generic_interval_list() -> PandasDataSchema[SeriesSchema]:
+    return PandasDataSchema(SeriesSchema(IntervalDtype))
 
 
-def stimulus_list() -> PandasStaticDataSchema[SeriesSchema]:
-    return PandasStaticDataSchema(SeriesSchema(float, index=MultiIndex(
+def stimulus_list() -> PandasDataSchema[SeriesSchema]:
+    return PandasDataSchema(SeriesSchema(float, index=MultiIndex(
         indexes=[Index(int, name=GLOBAL_STIM_ID), Index(str, name=STIM_TYPE), Index(int, name=STIM_TYPE_ID)]),
                                                name=STIM_TS))
 
 
-def related_spikes() -> PandasStaticDataSchema[DataFrameSchema]:
-    return PandasStaticDataSchema(DataFrameSchema({
+def related_spikes() -> PandasDataSchema[DataFrameSchema]:
+    return PandasDataSchema(DataFrameSchema({
         SPIKE_TS: Column(float),
         STIM_IDX: Column(int)
     },
@@ -58,8 +58,8 @@ def related_spikes() -> PandasStaticDataSchema[DataFrameSchema]:
         name="related spikes"))
 
 
-def sorted_spikes() -> PandasStaticDataSchema[SeriesSchema]:
-    return PandasStaticDataSchema(SeriesSchema(float,
+def sorted_spikes() -> PandasDataSchema[SeriesSchema]:
+    return PandasDataSchema(SeriesSchema(float,
                                                index=MultiIndex(
                                                    indexes=[Index(int, name=GLOBAL_STIM_ID), Index(str, name=TRACK),
                                                             Index(int, name=TRACK_SPIKE_IDX)]),
