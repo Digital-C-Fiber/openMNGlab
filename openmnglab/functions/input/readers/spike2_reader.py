@@ -65,7 +65,6 @@ class Spike2Reader(SourceFunctionDefinitionBase[tuple[
                  temp_unit: pq.Quantity = pq.celsius,
                  v_chan_unit: pq.Quantity = pq.dimensionless,
                  time_unit: pq.Quantity = pq.second):
-
         super().__init__("codingchipmunk.spike2loader")
         self._start = start
         self._end = end

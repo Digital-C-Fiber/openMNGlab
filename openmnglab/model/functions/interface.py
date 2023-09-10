@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Iterable, Sequence, Literal, Generic, TypeVar
 
-from openmnglab.model.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme
+from openmnglab.model.datamodel.interface import IDataContainer, IInputDataSchema, IOutputDataScheme
 
 
 class IFunction(ABC):
@@ -65,7 +65,7 @@ class IFunctionDefinition(ABC, Generic[ProxyRet]):
 
     @property
     @abstractmethod
-    def consumes(self) -> Optional[Sequence[IInputDataScheme] | IInputDataScheme]:
+    def consumes(self) -> Optional[Sequence[IInputDataSchema] | IInputDataSchema]:
         ...
 
     @abstractmethod

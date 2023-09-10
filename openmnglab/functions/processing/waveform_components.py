@@ -3,7 +3,7 @@ from abc import ABC
 import pandera as pa
 from pandas import DataFrame
 
-from openmnglab.datamodel.pandas.model import PandasInputDataScheme, PandasOutputDataScheme, \
+from openmnglab.datamodel.pandas.model import PandasInputDataSchema, PandasOutputDataScheme, \
     PandasDataScheme
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.waveform_components import WaveformComponentsFunc, PRINCIPLE_COMPONENTS
@@ -22,7 +22,7 @@ class PrincipleComponentsBaseScheme(PandasDataScheme[pa.DataFrameSchema], ABC):
             PRINCIPLE_COMPONENTS[5]: pa.Column(float, nullable=True)}, title="Principle Components"))
 
 
-class PrincipleComponentsInputScheme(PrincipleComponentsBaseScheme, PandasInputDataScheme):
+class PrincipleComponentsInputScheme(PrincipleComponentsBaseScheme, PandasInputDataSchema):
     ...
 
 

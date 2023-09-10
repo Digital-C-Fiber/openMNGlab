@@ -8,7 +8,7 @@ from pandas import DataFrame, DatetimeTZDtype, CategoricalDtype, PeriodDtype, Sp
 from pandera import SeriesSchema
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
-from openmnglab.model.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme
+from openmnglab.model.datamodel.interface import IDataContainer, IInputDataSchema, IOutputDataScheme
 from openmnglab.datamodel.pandas.model import PandasOutputDataScheme
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.model.functions.interface import IFunction
@@ -17,7 +17,7 @@ from openmnglab.model.planning.interface import IProxyData
 from openmnglab.util.hashing import Hash
 
 
-class WindowingInputDataScheme(IInputDataScheme):
+class WindowingInputDataSchema(IInputDataSchema):
 
     def accepts(self, output_data_scheme: IOutputDataScheme) -> bool:
         if not isinstance(output_data_scheme, PandasOutputDataScheme):
@@ -78,8 +78,8 @@ class Windowing(FunctionDefinitionBase[IProxyData[DataFrame]]):
             .digest()
 
     @property
-    def consumes(self) -> WindowingInputDataScheme:
-        return WindowingInputDataScheme()
+    def consumes(self) -> WindowingInputDataSchema:
+        return WindowingInputDataSchema()
 
     def production_for(self, inp: PandasOutputDataScheme) -> DynamicIndexIntervalScheme:
         assert isinstance(inp, PandasOutputDataScheme)

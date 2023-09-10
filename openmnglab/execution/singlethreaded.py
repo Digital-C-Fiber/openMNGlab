@@ -52,7 +52,7 @@ class SingleThreadedExecutor(IExecutor):
         for planned_data_output, actual_data_output in zip(stage.data_out, results):
             actual_data_output: IDataContainer
             planned_data_output: IPlannedData
-            # planned_data_output.schema.validate(actual_data_output)
+            planned_data_output.schema.validate(actual_data_output)
             self._data[planned_data_output.calculated_hash] = actual_data_output
 
     def execute(self, plan: IExecutionPlan, ignore_previous=False):

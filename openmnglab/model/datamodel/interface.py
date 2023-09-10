@@ -42,7 +42,7 @@ class IOutputDataScheme(ABC):
         ...
 
 
-class IInputDataScheme(ABC):
+class IInputDataSchema(ABC):
     """
     Scheme for data that is expected as input for a function
     """
@@ -73,7 +73,7 @@ class IInputDataScheme(ABC):
         ...
 
 
-class IStaticDataScheme(IOutputDataScheme, IInputDataScheme, ABC):
+class IStaticDataSchema(IOutputDataScheme, IInputDataSchema, ABC):
     """
     A data scheme that behaves the same for in- and outputs
     """

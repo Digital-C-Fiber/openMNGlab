@@ -5,7 +5,7 @@ import pandas as pd
 from pandera import DataFrameSchema, Column
 
 from openmnglab.datamodel.matplot.model import MatPlotlibSchema
-from openmnglab.datamodel.pandas.model import PandasInputDataScheme
+from openmnglab.datamodel.pandas.model import PandasInputDataSchema
 from openmnglab.datamodel.pandas.schemes import TIMESTAMP, GLOBAL_STIM_ID
 from openmnglab.functions.base import StaticFunctionDefinitionBase
 from openmnglab.functions.plot.funcs.waveforms import WaveformPlotMode, WaveformPlotFunc
@@ -90,8 +90,8 @@ class WaveformPlot(StaticFunctionDefinitionBase[IProxyData[plt.Figure]]):
         return h.digest()
 
     @property
-    def consumes(self) -> PandasInputDataScheme[pd.DataFrame]:
-        return PandasInputDataScheme(DataFrameSchema({
+    def consumes(self) -> PandasInputDataSchema[pd.DataFrame]:
+        return PandasInputDataSchema(DataFrameSchema({
             self.column: Column(float)
         }))
 

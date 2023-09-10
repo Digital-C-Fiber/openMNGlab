@@ -8,8 +8,8 @@ import pandera as pa
 import quantities as pq
 
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError, DataSchemeConformityError
-from openmnglab.model.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme, \
-    IStaticDataScheme
+from openmnglab.model.datamodel.interface import IDataContainer, IInputDataSchema, IOutputDataScheme, \
+    IStaticDataSchema
 from openmnglab.datamodel.pandas.verification import compare_schemas
 from openmnglab.util.pandas import pandas_names
 
@@ -104,7 +104,7 @@ class PandasDataScheme(Generic[TPandasScheme], IPandasDataScheme[TPandasScheme],
         return self._schema
 
 
-class PandasInputDataScheme(Generic[TPandasScheme], PandasDataScheme[TPandasScheme], IInputDataScheme):
+class PandasInputDataSchema(Generic[TPandasScheme], PandasDataScheme[TPandasScheme], IInputDataSchema):
 
     def accepts(self, output_data_scheme: IOutputDataScheme) -> bool:
         if not isinstance(output_data_scheme, IPandasDataScheme):
@@ -128,6 +128,6 @@ class PandasOutputDataScheme(Generic[TPandasScheme], PandasDataScheme[TPandasSch
             raise DataSchemeConformityError("Pandera model validation failed") from e
 
 
-class PandasStaticDataScheme(Generic[TPandasScheme], PandasInputDataScheme[TPandasScheme],
-                             PandasOutputDataScheme[TPandasScheme], IStaticDataScheme):
+class PandasStaticDataScheme(Generic[TPandasScheme], PandasInputDataSchema[TPandasScheme],
+                             PandasOutputDataScheme[TPandasScheme], IStaticDataSchema):
     ...

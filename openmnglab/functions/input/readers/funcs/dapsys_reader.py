@@ -8,7 +8,7 @@ import pandas as pd
 import quantities as pq
 from numba import njit
 from numpy import float32, float64
-from pydapsys import File, StreamType, WaveformPage, Stream, TextPage, Folder, PageType
+from pydapsys import File, StreamType, WaveformPage, Stream, TextPage, Folder
 from pydapsys.toc.exceptions import ToCPathError
 
 from openmnglab.datamodel.pandas.model import PandasContainer
@@ -27,13 +27,15 @@ def _kernel_offset_assign(target: np.array, calc_add, calc_mul, pos_offset, n):
 @njit
 def find_nearest_i(array, value):
     idx = np.searchsorted(array, value, side="left")
-    if idx > 0 and (idx == len(array) or math.fabs(value - array[idx-1]) < math.fabs(value - array[idx])):
-        return idx-1
+    if idx > 0 and (idx == len(array) or math.fabs(value - array[idx - 1]) < math.fabs(value - array[idx])):
+        return idx - 1
     else:
         return idx
 
+
 class DapsysReaderFunc(SourceFunctionBase):
     """Implementation of a reader for DAPSYS"""
+
     def __init__(self, file_path: str | Path, stim_folder: str | None = None, main_pulse: str = "Main Pulse",
                  continuous_recording: Optional[str] = "Continuous Recording", responses="responses",
                  tracks: Optional[Sequence[str] | str] = "all", comments="comments", stimdefs="Stim Def Starts"):
@@ -120,7 +122,6 @@ class DapsysReaderFunc(SourceFunctionBase):
         return pd.Series(data=labels, copy=False,
                          index=pd.Index(timestamps, copy=False, name=TIMESTAMP), name=series_name)
 
-
     def get_main_pulses(self) -> tuple[pd.Series, dict]:
         file = self.file
         self._log.debug("processing stimuli")
@@ -201,7 +202,9 @@ class DapsysReaderFunc(SourceFunctionBase):
                          index=pd.MultiIndex.from_arrays([responding_to, track_labels, track_response_number],
                                                          names=(GLOBAL_STIM_ID, TRACK, TRACK_SPIKE_IDX)))
 
-    def execute(self) -> tuple[PandasContainer[pd.Series], PandasContainer[pd.Series], PandasContainer[pd.Series], PandasContainer[pd.Series], PandasContainer[pd.Series]]:
+    def execute(self) -> tuple[
+        PandasContainer[pd.Series], PandasContainer[pd.Series], PandasContainer[pd.Series], PandasContainer[pd.Series],
+        PandasContainer[pd.Series]]:
         self._log.info("Executing function")
         self._log.info("Loading continuous recording")
         cont_rec = self.get_continuous_recording()
@@ -220,5 +223,5 @@ class DapsysReaderFunc(SourceFunctionBase):
             PandasContainer(tracks,
                             {GLOBAL_STIM_ID: pq.dimensionless, SPIKE_TS: pq.s, TRACK: pq.dimensionless,
                              TRACK_SPIKE_IDX: pq.dimensionless}), \
-            PandasContainer(comments, {TIMESTAMP: pq.s, comments.name: pq.dimensionless}),\
+            PandasContainer(comments, {TIMESTAMP: pq.s, comments.name: pq.dimensionless}), \
             PandasContainer(stimdefs, {TIMESTAMP: pq.s, stimdefs.name: pq.dimensionless})
