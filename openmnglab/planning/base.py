@@ -29,16 +29,16 @@ def check_input(expected_schemes: Sequence[ISchemaAcceptor] | ISchemaAcceptor | 
 
 
 class ProxyData(IProxyData):
-    def __init__(self, planned_hash: bytes):
-        self._planned_hash = planned_hash
+    def __init__(self, ref_id: bytes):
+        self._ref_id = ref_id
 
     @property
-    def planning_id(self) -> bytes:
-        return self._planned_hash
+    def referenced_data_id(self) -> bytes:
+        return self._ref_id
 
     @staticmethod
     def copy_from(other: IProxyData) -> ProxyData:
-        return ProxyData(other.planning_id)
+        return ProxyData(other.referenced_data_id)
 
 
 class ExecutionPlan(IExecutionPlan):
@@ -81,8 +81,8 @@ class PlannerBase(IExecutionPlanner, ABC, Generic[_FuncT, _DataT]):
 
     def _proxy_data_to_concrete(self, *inp_data: IProxyData) -> Iterable[_DataT]:
         for pos, inp in enumerate(inp_data):
-            concrete_data = self._data.get(inp.planning_id)
+            concrete_data = self._data.get(inp.referenced_data_id)
             if concrete_data is None:
                 raise PlanningError(
-                    f"Argument at position {pos} with hash {inp.planning_id.hex()} is not part of this plan and therefore cannot be used as an argument in it")
+                    f"Argument at position {pos} with hash {inp.referenced_data_id.hex()} is not part of this plan and therefore cannot be used as an argument in it")
             yield concrete_data

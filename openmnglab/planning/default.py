@@ -83,4 +83,4 @@ class DefaultPlanner(PlannerBase[Stage, VirtualData]):
         self._functions[stage.planning_id] = stage
         for prod in stage.data_out:
             self._data[prod.planning_id] = prod
-        return unpack_sequence(tuple(ProxyData.copy_from(o) for o in stage.data_out))
+        return unpack_sequence(tuple(ProxyData(o.planning_id) for o in stage.data_out))

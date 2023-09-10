@@ -18,7 +18,7 @@ class SingleThreadedExecutor(IExecutor):
         return self._data
 
     def has_computed(self, proxy_data: IProxyData) -> bool:
-        return proxy_data.planning_id in self._data
+        return proxy_data.referenced_data_id in self._data
 
     @staticmethod
     def _set_func_input(func: IFunction, *inp: IDataContainer):

@@ -6,7 +6,6 @@ from typing import TypeVar, Generic
 from openmnglab.model.datamodel.interface import IDataContainer
 from openmnglab.model.functions.interface import IFunctionDefinition, ISourceFunctionDefinition, ProxyRet
 from openmnglab.model.planning.plan.interface import IExecutionPlan
-from openmnglab.model.planning.shared import IHashIdentifiedElement
 
 
 class IExecutionPlanner(ABC):
@@ -29,5 +28,10 @@ class IExecutionPlanner(ABC):
 DCT = TypeVar('DCT', bound=IDataContainer)
 
 
-class IProxyData(IHashIdentifiedElement, ABC, Generic[DCT]):
-    ...
+class IProxyData(Generic[DCT], ABC ):
+
+    @property
+    @abstractmethod
+    def referenced_data_id(self) -> bytes:
+        ...
+
