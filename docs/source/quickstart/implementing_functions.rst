@@ -154,13 +154,13 @@ which implements some default behaviours to reduce the required amount of boiler
 
         @property
         def config_hash(self) -> bytes:
-            return super().config_hash
+            return bytes()
 
         @property
-        def consumes(self) -> Optional[Sequence[IInputDataScheme] | IInputDataScheme]:
+        def slot_acceptors(self) -> Optional[Sequence[ISchemaAcceptor] | ISchemaAcceptor]:
             pass
 
-        def production_for(self, *inputs: IInputDataScheme) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
+        def output_for(self, *inputs: IDataSchema) -> Optional[Sequence[IDataSchema] | IDataSchema]:
             pass
 
         def new_function(self) -> IFunction:
@@ -184,38 +184,32 @@ Config hash
 """""""""""
 
 We will have to specify the :attr:`~openmnglab.model.functions.interface.IFunctionDefinition.config_hash`. This property is used to calculate a hash unique for the configuration of the function, so calculated data can be uniquely identified later.
-Add our sole config argument to the constructor and return the hash of it. You should use :class:`openmnglab.util.hashing.Hash` for an easy, fluent and typed wrapper around Pythons hashing functions.
-
-.. note::
-    :class:`~openmnglab.functions.base.FunctionDefinitionBase` implements :attr:`~openmnglab.model.functions.interface.IFunctionDefinition.identifying_hash`
-    by combining the hash of the function id with the result of :attr:`~openmnglab.model.functions.interface.IFunctionDefinition.config_hash`.
-
-.. note::
-    Data ids is calculated by combining the result of :attr:`~openmnglab.model.functions.interface.IFunctionDefinition.identifying_hash` with the number of the output and
-    the ids of the input data (if any). This allows unique identification of data throughout the execution.
+Add our sole config argument to the constructor and return the hash of it. You should use :class:`openmnglab.util.hashing.HashBuilder` for an easy, fluent and typed wrapper around Pythons hashing functions.
 
 .. code-block:: python
 
     @property
     def config_hash(self) -> bytes:
-        return Hash().int(self.chosen_series).digest()
+        return HashBuilder().int(self.chosen_series).digest()
 
 Data schemas
 """"""""""""
-In the next step, we will define the dataschemas our function will consume and produce. As we do not have specific requirements, we can just return a new `PandasInputDataScheme` with an empty `SeriesSchema`, to just accept any series whatsoever.
+Every function must define its slots (inputs) and acceptors to validate incoming data schemas. As our only requirement for the two slots is, that the input slots get series, we can just return instances of the default pandas acceptor populated with an empty Pandera series schema.
 
 .. code-block:: python
 
     @property
-    def consumes(self) -> tuple[PandasInputDataScheme[SeriesSchema],PandasInputDataScheme[SeriesSchema]]:
-        return PandasInputDataScheme(SeriesSchema()),PandasInputDataScheme(SeriesSchema())
+    def slot_acceptors(self) -> tuple[ISchemaAcceptor,ISchemaAcceptor]:
+        return DefaultPandasSchemaAcceptor(pa.SeriesSchema()), DefaultPandasSchemaAcceptor(pa.SeriesSchema())
 
 
-we will also have to implement a function that will return the data schema for a concrete set of inputs. In our case, we can predict the concrete schema of the returned series based on our `chosen_series` parameter:
+
+To tell the planner what concrete data we will return, we must implement the output_for method. In this method we can produce DataSchemas based on the concrete incoming schemas and the configuration of our function.
+In this case our output is the exact series chosen by the parameter, so we can just return the associated schema. The executor will validate that the concrete data returned by our function implementation matches the one we returned here.
 
 .. code-block:: python
 
-    def production_for(self, schema_a: PandasOutputDataScheme[SeriesSchema], schema_b: PandasOutputDataScheme[SeriesSchema]) -> tuple[PandasOutputDataScheme[SeriesSchema]]:
+    def output_for(self, schema_a: PandasDataSchema[SeriesSchema], schema_b: PandasDataSchema[SeriesSchema]) -> PandasDataSchema[SeriesSchema]:
         return schema_a if self.chosen_series == 0 else schema_b
 
 
@@ -231,12 +225,11 @@ Complete implementation
 .. code-block:: python
 
     import pandas as pd
-    from pandera import SeriesSchema
+    import pandera as pa
 
-    from openmnglab.datamodel.pandas.model import PandasContainer, PandasOutputDataScheme, \
-        PandasInputDataScheme
+    from openmnglab.datamodel.pandas.model import PandasContainer, PandasDataSchema
     from openmnglab.functions.base import FunctionBase, FunctionDefinitionBase
-    from openmnglab.util.hashing import Hash
+    from openmnglab.util.hashing import HashBuilder
 
 
     class SeriesChooserFunc(FunctionBase):
@@ -246,7 +239,7 @@ Complete implementation
             self.series_b_container: PandasContainer[pd.Series] = None
             self.chosen_series = chosen_series
 
-        def execute(self) -> tuple[PandasContainer[pd.Series]]:
+        def execute(self) -> PandasContainer[pd.Series]:
             chosen_container = self.series_a_container if self.chosen_series == 0 else self.series_b_container
             return_container = PandasContainer(chosen_container.data, chosen_container.units)
             # remember to return a tuple
@@ -264,15 +257,16 @@ Complete implementation
 
         @property
         def config_hash(self) -> bytes:
-            return Hash().int(self.chosen_series).digest()
+            return HashBuilder().int(self.chosen_series).digest()
 
         @property
-        def consumes(self) -> tuple[PandasInputDataScheme[SeriesSchema], PandasInputDataScheme[SeriesSchema]]:
-            return PandasInputDataScheme(SeriesSchema()), PandasInputDataScheme(SeriesSchema())
+        def slot_acceptors(self) -> tuple[PandasDataSchema[pa.SeriesSchema], PandasDataSchema[pa.SeriesSchema]]:
+            return PandasDataSchema(pa.SeriesSchema()), PandasDataSchema(pa.SeriesSchema())
 
-        def production_for(self, schema_a: PandasOutputDataScheme[SeriesSchema],
-                           schema_b: PandasOutputDataScheme[SeriesSchema]) -> tuple[PandasOutputDataScheme[SeriesSchema]]:
+        def output_for(self, schema_a: PandasDataSchema[pa.SeriesSchema],
+                           schema_b: PandasDataSchema[pa.SeriesSchema]) -> PandasDataSchema[pa.SeriesSchema]:
             return schema_a if self.chosen_series == 0 else schema_b
 
         def new_function(self) -> SeriesChooserFunc:
             return SeriesChooserFunc(self.chosen_series)
+
