@@ -83,7 +83,7 @@ Units: {units}
         return PandasContainer(self.data.copy(), self.units.copy())
 
 
-TPanderaSchema = TypeVar("TPandasScheme", pa.DataFrameSchema, pa.SeriesSchema)
+TPanderaSchema = TypeVar("TPanderaSchema", pa.DataFrameSchema, pa.SeriesSchema)
 
 
 class DefaultPandasSchemaAcceptor(Generic[TPanderaSchema], ISchemaAcceptor):
@@ -101,7 +101,7 @@ class DefaultPandasSchemaAcceptor(Generic[TPanderaSchema], ISchemaAcceptor):
         return compare_schemas(self._schema, output_data_scheme.pandera_schema)
 
 
-class IPandasDataSchema(Generic[TPanderaSchema], IDataSchema, ABC):
+class IPandasDataSchema(Generic[TPanderaSchema], ABC):
     """Contains a Pandera schema with all elements named"""
 
     @property
@@ -110,9 +110,13 @@ class IPandasDataSchema(Generic[TPanderaSchema], IDataSchema, ABC):
         ...
 
 
-class PandasDataSchema(Generic[TPanderaSchema], DefaultPandasSchemaAcceptor, IPandasDataSchema):
+class PandasDataSchema(Generic[TPanderaSchema], IPandasDataSchema[TPanderaSchema], DefaultPandasSchemaAcceptor[TPanderaSchema]):
     """Implements IDataSchema for PanderaContainer. Will ensure that all elements in the schema are named.
     """
+
+    def __init__(self, schema: TPanderaSchema):
+        super().__init__(schema)
+        self.ensure_all_schema_elements_named(schema)
 
     @staticmethod
     def ensure_all_schema_elements_named(schema: TPanderaSchema) -> bool:
