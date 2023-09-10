@@ -60,18 +60,6 @@ class ISchemaAcceptor(ABC):
         """
         ...
 
-    @abstractmethod
-    def transform(self, data_container: IDataContainer) -> IDataContainer:
-        """Transform a data container to fit this scheme
-
-        Modifies the contents of the data container so they fit an anonymous data scheme which is actually accepted by the function.
-        MAY return the input-object without modification.
-
-        :param data_container: Data container containing the data which is expected to be passed to this function
-        :return: A modified dataset from the input data container or the same object
-        """
-        ...
-
 
 class IStaticDataSchema(IOutputDataSchema, ISchemaAcceptor, ABC):
     """

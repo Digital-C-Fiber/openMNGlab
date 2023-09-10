@@ -22,6 +22,3 @@ class MatPlotlibSchema(IStaticDataSchema):
 
     def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
         return isinstance(output_data_scheme, MatPlotLibContainer)
-
-    def transform(self, data_container: IDataContainer) -> IDataContainer:
-        return data_container

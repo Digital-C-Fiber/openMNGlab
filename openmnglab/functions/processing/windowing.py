@@ -30,9 +30,6 @@ class WindowingSchemaAcceptor(ISchemaAcceptor):
             DatetimeTZDtype, CategoricalDtype, PeriodDtype, SparseDtype, IntervalDtype, StringDtype, BooleanDtype)
         return True
 
-    def transform(self, data_container: IDataContainer) -> IDataContainer:
-        return data_container
-
 
 class DynamicIndexIntervalSchema(PandasOutputDataSchema[SeriesSchema]):
 

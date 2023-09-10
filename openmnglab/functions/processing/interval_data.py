@@ -34,9 +34,6 @@ class WindowDataInputSchema(ISchemaAcceptor):
             DatetimeTZDtype, CategoricalDtype, PeriodDtype, SparseDtype, IntervalDtype, StringDtype, BooleanDtype)
         return True
 
-    def transform(self, data_container: IDataContainer) -> IDataContainer:
-        return data_container
-
 
 class NumericIndexedList(PandasSchemaAcceptor[pa.SeriesSchema]):
 

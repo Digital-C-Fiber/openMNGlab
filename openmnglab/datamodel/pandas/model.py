@@ -111,8 +111,6 @@ class PandasSchemaAcceptor(Generic[TPandasScheme], PandasDataSchema[TPandasSchem
             raise DataSchemaCompatibilityError(
                 f"Other data scheme of type {type(output_data_scheme).__qualname__} is not a pandas data scheme")
         return compare_schemas(self.pandera_schema, output_data_scheme.pandera_schema)
-    def transform(self, data_container: IDataContainer) -> IDataContainer:
-        return data_container
 
 
 class PandasOutputDataSchema(Generic[TPandasScheme], PandasDataSchema[TPandasScheme], IOutputDataSchema):
