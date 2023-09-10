@@ -21,4 +21,4 @@ class IExecutor(ABC):
         ...
 
     def get(self, proxy_data: IProxyData[DCT]) -> Optional[DCT]:
-        return self.data.get(proxy_data.calculated_hash) if self.has_computed(proxy_data) else None
+        return self.data.get(proxy_data.planning_id) if self.has_computed(proxy_data) else None

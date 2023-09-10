@@ -18,7 +18,7 @@ class SingleThreadedExecutor(IExecutor):
         return self._data
 
     def has_computed(self, proxy_data: IProxyData) -> bool:
-        return proxy_data.calculated_hash in self._data
+        return proxy_data.planning_id in self._data
 
     @staticmethod
     def _set_func_input(func: IFunction, *inp: IDataContainer):
@@ -44,7 +44,7 @@ class SingleThreadedExecutor(IExecutor):
         .. warn:: Caller must ensure that required input data of the stage is present in :attr:`~.data`
         """
         try:
-            input_values = tuple(self._data[dependency.calculated_hash] for dependency in stage.data_in)
+            input_values = tuple(self._data[dependency.planning_id] for dependency in stage.data_in)
             func = stage.definition.new_function()
             self._set_func_input(func, *input_values)
             results: tuple[IDataContainer] = tuple(self._exec_func(func))
@@ -57,12 +57,12 @@ class SingleThreadedExecutor(IExecutor):
                     planned_data_output.schema.validate(actual_data_output)
                 except Exception as e:
                     raise Exception(f"Schema validation of output #{i} failed") from e
-                self._data[planned_data_output.calculated_hash] = actual_data_output
+                self._data[planned_data_output.planning_id] = actual_data_output
         except Exception as e:
-            raise FunctionExecutionError(f"Failed to execute {stage.definition.identifier} (stage {stage.calculated_hash.hex()})")
+            raise FunctionExecutionError(f"Failed to execute {stage.definition.identifier} (stage {stage.planning_id.hex()})")
 
     def execute(self, plan: IExecutionPlan, ignore_previous=False):
         for stage in sorted(plan.stages.values(), key=lambda x: x.depth):
             if ignore_previous or not all(
-                    planned_output.calculated_hash in self._data for planned_output in stage.data_out):
+                    planned_output.planning_id in self._data for planned_output in stage.data_out):
                 self.compute_stage(stage)

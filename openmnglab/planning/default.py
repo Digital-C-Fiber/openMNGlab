@@ -15,7 +15,7 @@ class Stage(IStage):
         hashgen = Hash()
         hashgen.update(definition.config_hash)
         for inp in data_in:
-            hashgen.update(inp.calculated_hash)
+            hashgen.update(inp.planning_id)
         self._calculated_hash = hashgen.digest()
         self._depth = max((d.depth for d in data_in), default=0)
         self._definition = definition
@@ -36,7 +36,7 @@ class Stage(IStage):
         return self._data_out
 
     @property
-    def calculated_hash(self) -> bytes:
+    def planning_id(self) -> bytes:
         return self._calculated_hash
 
     @property
@@ -57,7 +57,7 @@ class VirtualData(IVirtualData):
         depth = func.depth + 1
         hashgen = Hash()
         hashgen.int(pos)
-        hashgen.update(func.calculated_hash)
+        hashgen.update(func.planning_id)
         return VirtualData(depth, hashgen.digest(), scheme, func)
 
     @property
@@ -69,7 +69,7 @@ class VirtualData(IVirtualData):
         return self._depth
 
     @property
-    def calculated_hash(self) -> bytes:
+    def planning_id(self) -> bytes:
         return self._calculated_hash
 
 
@@ -78,9 +78,9 @@ class DefaultPlanner(PlannerBase[Stage, VirtualData]):
     def _add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: VirtualData) -> ProxyRet:
         check_input(function.consumes, tuple(d.schema for d in inp_data))
         stage = Stage(function, *inp_data)
-        if stage.calculated_hash in self._functions:
+        if stage.planning_id in self._functions:
             raise PlanningError("A function with the same hash is already planned")
-        self._functions[stage.calculated_hash] = stage
+        self._functions[stage.planning_id] = stage
         for prod in stage.data_out:
-            self._data[prod.calculated_hash] = prod
+            self._data[prod.planning_id] = prod
         return unpack_sequence(tuple(ProxyData.copy_from(o) for o in stage.data_out))

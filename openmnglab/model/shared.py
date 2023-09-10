@@ -6,5 +6,5 @@ from abc import ABC, abstractmethod
 class IHashIdentifiedElement(ABC):
     @property
     @abstractmethod
-    def calculated_hash(self) -> bytes:
+    def planning_id(self) -> bytes:
         ...

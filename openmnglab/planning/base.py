@@ -33,19 +33,19 @@ class ProxyData(IProxyData):
         self._planned_hash = planned_hash
 
     @property
-    def calculated_hash(self) -> bytes:
+    def planning_id(self) -> bytes:
         return self._planned_hash
 
     @staticmethod
     def copy_from(other: IProxyData) -> ProxyData:
-        return ProxyData(other.calculated_hash)
+        return ProxyData(other.planning_id)
 
 
 class ExecutionPlan(IExecutionPlan):
     def __init__(self, functions: Iterable[IStage] | Mapping[bytes, IStage],
                  data: Iterable[IVirtualData] | Mapping[bytes, IVirtualData]):
         def to_mapping(param: Iterable[IPlannedElement] | Mapping[bytes, IPlannedElement]):
-            return param if isinstance(param, Mapping) else {element.calculated_hash: element for element in param}
+            return param if isinstance(param, Mapping) else {element.planning_id: element for element in param}
 
         self._functions: Mapping[bytes, IStage] = to_mapping(functions)
         self._proxy_data: Mapping[bytes, IVirtualData] = to_mapping(data)
@@ -81,8 +81,8 @@ class PlannerBase(IExecutionPlanner, ABC, Generic[_FuncT, _DataT]):
 
     def _proxy_data_to_concrete(self, *inp_data: IProxyData) -> Iterable[_DataT]:
         for pos, inp in enumerate(inp_data):
-            concrete_data = self._data.get(inp.calculated_hash)
+            concrete_data = self._data.get(inp.planning_id)
             if concrete_data is None:
                 raise PlanningError(
-                    f"Argument at position {pos} with hash {inp.calculated_hash.hex()} is not part of this plan and therefore cannot be used as an argument in it")
+                    f"Argument at position {pos} with hash {inp.planning_id.hex()} is not part of this plan and therefore cannot be used as an argument in it")
             yield concrete_data
