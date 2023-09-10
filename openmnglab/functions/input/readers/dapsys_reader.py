@@ -68,7 +68,7 @@ class DapsysReader(SourceFunctionDefinitionBase[tuple[IProxyData[pd.Series], IPr
     @property
     def produces(self) -> tuple[
         PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[SeriesSchema]]:
-        return float_timeseries(SIGNAL), stimulus_list(), sorted_spikes(), str_eventseries("t"), str_eventseries("a")
+        return float_timeseries(SIGNAL), stimulus_list(), sorted_spikes(), str_eventseries("comments"), str_eventseries("Stim Def Starts")
 
     def new_function(self) -> DapsysReaderFunc:
         return DapsysReaderFunc(self._file, self._stim_folder, main_pulse=self._main_pulse,

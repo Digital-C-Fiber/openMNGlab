@@ -217,7 +217,7 @@ class DapsysReaderFunc(SourceFunctionBase):
         self._log.info("Loading tracks")
         tracks = self.get_tracks_for_responses(idmap)
         self._log.info("Processing finished")
-        return PandasContainer(cont_rec, {CONT_REC: pq.V, TIMESTAMP: pq.s}), \
+        return PandasContainer(cont_rec, {SIGNAL: pq.V, TIMESTAMP: pq.s}), \
             PandasContainer(pulses, {GLOBAL_STIM_ID: pq.dimensionless, STIM_TYPE_ID: pq.dimensionless, STIM_TS: pq.s,
                                      STIM_LBL: pq.dimensionless}), \
             PandasContainer(tracks,
