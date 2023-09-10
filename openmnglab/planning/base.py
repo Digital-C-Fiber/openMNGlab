@@ -7,7 +7,7 @@ from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
 from openmnglab.model.datamodel.interface import ISchemaAcceptor, IDataSchema
 from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
 from openmnglab.model.planning.interface import IExecutionPlanner, IProxyData
-from openmnglab.model.planning.plan.interface import IExecutionPlan, IStage, IPlannedData, IPlannedElement
+from openmnglab.model.planning.plan.interface import IExecutionPlan, IStage, IVirtualData, IPlannedElement
 from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
 from openmnglab.util.iterables import ensure_iterable, ensure_sequence
 
@@ -43,24 +43,24 @@ class ProxyData(IProxyData):
 
 class ExecutionPlan(IExecutionPlan):
     def __init__(self, functions: Iterable[IStage] | Mapping[bytes, IStage],
-                 data: Iterable[IPlannedData] | Mapping[bytes, IPlannedData]):
+                 data: Iterable[IVirtualData] | Mapping[bytes, IVirtualData]):
         def to_mapping(param: Iterable[IPlannedElement] | Mapping[bytes, IPlannedElement]):
             return param if isinstance(param, Mapping) else {element.calculated_hash: element for element in param}
 
         self._functions: Mapping[bytes, IStage] = to_mapping(functions)
-        self._proxy_data: Mapping[bytes, IPlannedData] = to_mapping(data)
+        self._proxy_data: Mapping[bytes, IVirtualData] = to_mapping(data)
 
     @property
     def stages(self) -> Mapping[bytes, IStage]:
         return self._functions
 
     @property
-    def planned_data(self) -> Mapping[bytes, IPlannedData]:
+    def planned_data(self) -> Mapping[bytes, IVirtualData]:
         return self._proxy_data
 
 
 _FuncT = TypeVar('_FuncT', bound=IStage)
-_DataT = TypeVar('_DataT', bound=IPlannedData)
+_DataT = TypeVar('_DataT', bound=IVirtualData)
 
 
 class PlannerBase(IExecutionPlanner, ABC, Generic[_FuncT, _DataT]):

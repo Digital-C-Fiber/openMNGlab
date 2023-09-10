@@ -5,7 +5,7 @@ from openmnglab.model.datamodel.interface import IDataContainer
 from openmnglab.model.execution.interface import IExecutor
 from openmnglab.model.functions.interface import IFunction
 from openmnglab.model.planning.interface import IProxyData
-from openmnglab.model.planning.plan.interface import IExecutionPlan, IPlannedData, IStage
+from openmnglab.model.planning.plan.interface import IExecutionPlan, IVirtualData, IStage
 from openmnglab.util.iterables import ensure_iterable
 
 
@@ -52,7 +52,7 @@ class SingleThreadedExecutor(IExecutor):
                 raise FunctionReturnCountMissmatch(expected=len(stage.data_out), actual=len(results))
             for i,(planned_data_output, actual_data_output) in enumerate(zip(stage.data_out, results)):
                 actual_data_output: IDataContainer
-                planned_data_output: IPlannedData
+                planned_data_output: IVirtualData
                 try:
                     planned_data_output.schema.validate(actual_data_output)
                 except Exception as e:

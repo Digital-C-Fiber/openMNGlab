@@ -15,7 +15,7 @@ class IPlannedElement(IHashIdentifiedElement, ABC):
         ...
 
 
-class IPlannedData(IPlannedElement, ABC):
+class IVirtualData(IPlannedElement, ABC):
     @property
     @abstractmethod
     def schema(self) -> IDataSchema:
@@ -30,12 +30,12 @@ class IStage(IPlannedElement, ABC):
 
     @property
     @abstractmethod
-    def data_in(self) -> Sequence[IPlannedData]:
+    def data_in(self) -> Sequence[IVirtualData]:
         ...
 
     @property
     @abstractmethod
-    def data_out(self) -> Sequence[IPlannedData]:
+    def data_out(self) -> Sequence[IVirtualData]:
         ...
 
 
@@ -48,7 +48,7 @@ class IExecutionPlan(ABC):
 
     @property
     @abstractmethod
-    def planned_data(self) -> Mapping[bytes, IPlannedData]:
+    def planned_data(self) -> Mapping[bytes, IVirtualData]:
         ...
 
 
