@@ -51,18 +51,18 @@ class NumericIndexedList(PandasInputDataSchema[pa.SeriesSchema]):
         return super_accepts
 
 
-class DynamicIndexWindowDataScheme(PandasOutputDataSchema[pa.SeriesSchema]):
+class DynamicIndexWindowDataSchema(PandasOutputDataSchema[pa.SeriesSchema]):
 
     @staticmethod
     def for_input(inp_series: PandasOutputDataSchema[pa.SeriesSchema],
                   inp_interval: PandasOutputDataSchema[pa.SeriesSchema],
-                  name: str) -> DynamicIndexWindowDataScheme:
+                  name: str) -> DynamicIndexWindowDataSchema:
         if inp_interval.pandera_schema.dtype != IntervalDtype:
             raise Exception("Input interval does not contain intervals!")
         interval_indexes = [pa.Index(int, name="interval_idx")] if not isinstance(inp_interval.pandera_schema.index,
                                                                                   pa.MultiIndex) else inp_interval.pandera_schema.index.indexes[
                                                                                                       :-1]
-        return DynamicIndexWindowDataScheme(pa.SeriesSchema(inp_series.pandera_schema.dtype, index=pa.MultiIndex(
+        return DynamicIndexWindowDataSchema(pa.SeriesSchema(inp_series.pandera_schema.dtype, index=pa.MultiIndex(
             indexes=[*interval_indexes,
                      pa.Index(inp_series.pandera_schema.dtype, name=inp_series.pandera_schema.name)]), name=name))
 
