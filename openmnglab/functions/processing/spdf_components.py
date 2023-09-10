@@ -35,7 +35,7 @@ class SPDFComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
     """
 
     def __init__(self):
-        super().__init__("openmnglab.principlecomponents")
+        super().__init__("codingchipmunk.spdf.components")
 
     @property
     def consumes(self) -> IntervalDataAcceptor:
@@ -43,7 +43,7 @@ class SPDFComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
 
     @staticmethod
     def production_for(diffs: PandasDataSchema[pa.DataFrameSchema]) -> SPDFComponentsDynamicSchema:
-        return SPDFComponentsDynamicSchema(diffs.pandera_schema.index)
+        return SPDFComponentsDynamicSchema(pa.MultiIndex(indexes=diffs.pandera_schema.index.indexes[:-1]))
 
     @staticmethod
     def new_function() -> SPDFComponentsFunc:
