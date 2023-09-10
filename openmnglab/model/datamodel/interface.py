@@ -61,8 +61,3 @@ class IDataSchema(ISchemaAcceptor, ABC):
         ...
 
 
-class IStaticDataSchema(IDataSchema, ISchemaAcceptor, ABC):
-    """
-    A data scheme that behaves the same for in- and outputs
-    """
-    ...

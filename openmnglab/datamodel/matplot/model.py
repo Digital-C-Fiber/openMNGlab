@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from openmnglab.model.datamodel.interface import IDataContainer, T_co, IStaticDataSchema, IDataSchema
+from openmnglab.model.datamodel.interface import IDataContainer, T_co, IDataSchema
 
 
 class MatPlotLibContainer(IDataContainer[plt.Figure]):
@@ -16,7 +16,7 @@ class MatPlotLibContainer(IDataContainer[plt.Figure]):
         raise NotImplementedError("deep copy cannot be implemented for matplotlib figures")
 
 
-class MatPlotlibSchema(IStaticDataSchema):
+class MatPlotlibSchema(IDataSchema):
     def validate(self, data_container: IDataContainer) -> bool:
         return isinstance(data_container, MatPlotLibContainer) and data_container.data is not None
 

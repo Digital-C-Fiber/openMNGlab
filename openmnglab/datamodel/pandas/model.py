@@ -9,8 +9,7 @@ import quantities as pq
 
 from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError, DataSchemaConformityError
 from openmnglab.datamodel.pandas.verification import compare_schemas
-from openmnglab.model.datamodel.interface import IDataContainer, ISchemaAcceptor, IDataSchema, \
-    IStaticDataSchema
+from openmnglab.model.datamodel.interface import IDataContainer, ISchemaAcceptor, IDataSchema
 from openmnglab.util.pandas import pandas_names
 
 TPandas = TypeVar('TPandas', pd.Series, pd.DataFrame)
