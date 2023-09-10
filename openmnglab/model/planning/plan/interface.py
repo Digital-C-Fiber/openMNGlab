@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Mapping, Sequence
 
-from openmnglab.model.datamodel.interface import IOutputDataSchema
+from openmnglab.model.datamodel.interface import IDataSchema
 from openmnglab.model.functions.interface import IFunctionDefinition
 from openmnglab.model.shared import IHashIdentifiedElement
 
@@ -18,7 +18,7 @@ class IPlannedElement(IHashIdentifiedElement, ABC):
 class IPlannedData(IPlannedElement, ABC):
     @property
     @abstractmethod
-    def schema(self) -> IOutputDataSchema:
+    def schema(self) -> IDataSchema:
         ...
 
 

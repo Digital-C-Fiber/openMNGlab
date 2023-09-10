@@ -8,8 +8,8 @@ from pandas import DataFrame, DatetimeTZDtype, CategoricalDtype, PeriodDtype, Sp
 from pandera import SeriesSchema
 
 from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
-from openmnglab.model.datamodel.interface import IDataContainer, ISchemaAcceptor, IOutputDataSchema
-from openmnglab.datamodel.pandas.model import PandasOutputDataSchema
+from openmnglab.model.datamodel.interface import IDataContainer, ISchemaAcceptor, IDataSchema
+from openmnglab.datamodel.pandas.model import PandasDataSchema
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.model.functions.interface import IFunction
 from openmnglab.functions.processing.funcs.windowing import WindowingFunc
@@ -19,8 +19,8 @@ from openmnglab.util.hashing import Hash
 
 class WindowingSchemaAcceptor(ISchemaAcceptor):
 
-    def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
-        if not isinstance(output_data_scheme, PandasOutputDataSchema):
+    def accepts(self, output_data_scheme: IDataSchema) -> bool:
+        if not isinstance(output_data_scheme, PandasDataSchema):
             raise DataSchemaCompatibilityError("Data scheme is not a pandas data scheme")
         schema = output_data_scheme.pandera_schema
         if not isinstance(schema, SeriesSchema):
@@ -31,10 +31,10 @@ class WindowingSchemaAcceptor(ISchemaAcceptor):
         return True
 
 
-class DynamicIndexIntervalSchema(PandasOutputDataSchema[SeriesSchema]):
+class DynamicIndexIntervalSchema(PandasDataSchema[SeriesSchema]):
 
     @staticmethod
-    def for_input(inp: PandasOutputDataSchema[SeriesSchema], name: str) -> DynamicIndexIntervalSchema:
+    def for_input(inp: PandasDataSchema[SeriesSchema], name: str) -> DynamicIndexIntervalSchema:
         return DynamicIndexIntervalSchema(SeriesSchema(IntervalDtype, index=inp.pandera_schema.index, name=name))
 
 
@@ -78,8 +78,8 @@ class Windowing(FunctionDefinitionBase[IProxyData[DataFrame]]):
     def consumes(self) -> WindowingSchemaAcceptor:
         return WindowingSchemaAcceptor()
 
-    def production_for(self, inp: PandasOutputDataSchema) -> DynamicIndexIntervalSchema:
-        assert isinstance(inp, PandasOutputDataSchema)
+    def production_for(self, inp: PandasDataSchema) -> DynamicIndexIntervalSchema:
+        assert isinstance(inp, PandasDataSchema)
         return DynamicIndexIntervalSchema.for_input(inp, self._name)
 
     def new_function(self) -> IFunction:

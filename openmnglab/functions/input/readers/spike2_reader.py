@@ -11,7 +11,7 @@ from openmnglab.datamodel.pandas.schemas import TIMESTAMP, SIGNAL, MASS, TEMPERA
 from openmnglab.functions.base import SourceFunctionDefinitionBase
 from openmnglab.functions.input.readers.funcs.spike2_reader import SPIKE2_CHANID, Spike2ReaderFunc, SPIKE2_V_CHAN, \
     SPIKE2_LEVEL, SPIKE2_CODES, SPIKE2_DIGMARK, SPIKE2_KEYBOARD
-from openmnglab.model.datamodel.interface import IOutputDataSchema
+from openmnglab.model.datamodel.interface import IDataSchema
 from openmnglab.model.planning.interface import IProxyData
 from openmnglab.util.hashing import Hash
 
@@ -105,7 +105,7 @@ class Spike2Reader(SourceFunctionDefinitionBase[tuple[
             .digest()
 
     @property
-    def produces(self) -> Optional[Sequence[IOutputDataSchema] | IOutputDataSchema]:
+    def produces(self) -> Optional[Sequence[IDataSchema] | IDataSchema]:
         return PandasStaticDataSchema(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=SIGNAL)), \
             PandasStaticDataSchema(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=MASS)), \
             PandasStaticDataSchema(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=TEMPERATURE)), \

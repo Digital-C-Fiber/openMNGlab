@@ -9,7 +9,7 @@ import quantities as pq
 
 from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError, DataSchemaConformityError
 from openmnglab.datamodel.pandas.verification import compare_schemas
-from openmnglab.model.datamodel.interface import IDataContainer, ISchemaAcceptor, IOutputDataSchema, \
+from openmnglab.model.datamodel.interface import IDataContainer, ISchemaAcceptor, IDataSchema, \
     IStaticDataSchema
 from openmnglab.util.pandas import pandas_names
 
@@ -108,14 +108,14 @@ class PandasDataSchemaBase(Generic[TPandasScheme], IPandasDataSchema[TPandasSche
 
 class PandasSchemaAcceptor(Generic[TPandasScheme], PandasDataSchemaBase[TPandasScheme], ISchemaAcceptor):
 
-    def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
+    def accepts(self, output_data_scheme: IDataSchema) -> bool:
         if not isinstance(output_data_scheme, IPandasDataSchema):
             raise DataSchemaCompatibilityError(
                 f"Other data scheme of type {type(output_data_scheme).__qualname__} is not a pandas data scheme")
         return compare_schemas(self.pandera_schema, output_data_scheme.pandera_schema)
 
 
-class PandasOutputDataSchema(Generic[TPandasScheme], PandasDataSchemaBase[TPandasScheme], IOutputDataSchema):
+class PandasDataSchema(Generic[TPandasScheme], PandasDataSchemaBase[TPandasScheme], IDataSchema):
 
     def validate(self, data_container: IDataContainer) -> bool:
         if not isinstance(data_container, PandasContainer):
@@ -129,5 +129,5 @@ class PandasOutputDataSchema(Generic[TPandasScheme], PandasDataSchemaBase[TPanda
 
 
 class PandasStaticDataSchema(Generic[TPandasScheme], PandasSchemaAcceptor[TPandasScheme],
-                             PandasOutputDataSchema[TPandasScheme], IStaticDataSchema):
+                             PandasDataSchema[TPandasScheme], IStaticDataSchema):
     ...

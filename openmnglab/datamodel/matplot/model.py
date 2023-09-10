@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from openmnglab.model.datamodel.interface import IDataContainer, T_co, IStaticDataSchema, IOutputDataSchema
+from openmnglab.model.datamodel.interface import IDataContainer, T_co, IStaticDataSchema, IDataSchema
 
 
 class MatPlotLibContainer(IDataContainer[plt.Figure]):
@@ -20,5 +20,5 @@ class MatPlotlibSchema(IStaticDataSchema):
     def validate(self, data_container: IDataContainer) -> bool:
         return isinstance(data_container, MatPlotLibContainer) and data_container.data is not None
 
-    def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
+    def accepts(self, output_data_scheme: IDataSchema) -> bool:
         return isinstance(output_data_scheme, MatPlotLibContainer)

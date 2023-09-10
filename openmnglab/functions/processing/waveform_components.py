@@ -3,7 +3,7 @@ from abc import ABC
 import pandera as pa
 from pandas import DataFrame
 
-from openmnglab.datamodel.pandas.model import PandasSchemaAcceptor, PandasOutputDataSchema, \
+from openmnglab.datamodel.pandas.model import PandasSchemaAcceptor, PandasDataSchema, \
     PandasDataSchemaBase
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.waveform_components import WaveformComponentsFunc, PRINCIPLE_COMPONENTS
@@ -26,7 +26,7 @@ class PrincipleComponentsInputSchema(PrincipleComponentsBaseSchema, PandasSchema
     ...
 
 
-class PrincipleComponentsDynamicOutputSchema(PrincipleComponentsBaseSchema, PandasOutputDataSchema):
+class PrincipleComponentsDynamicOutputSchema(PrincipleComponentsBaseSchema, PandasDataSchema):
     def __init__(self, index: pa.MultiIndex | pa.Index):
         super().__init__()
         self.pandera_schema.index = index
@@ -50,7 +50,7 @@ class WaveformComponents(FunctionDefinitionBase[IProxyData[DataFrame]]):
         return IntervalDataAcceptor(0, 1)
 
     @staticmethod
-    def production_for(diffs: PandasOutputDataSchema[pa.DataFrameSchema]) -> PrincipleComponentsDynamicOutputSchema:
+    def production_for(diffs: PandasDataSchema[pa.DataFrameSchema]) -> PrincipleComponentsDynamicOutputSchema:
         return PrincipleComponentsDynamicOutputSchema(diffs.pandera_schema.index)
 
     @staticmethod
