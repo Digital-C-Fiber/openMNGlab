@@ -8,7 +8,7 @@ from matplotlib.axes import Axes
 
 from openmnglab.datamodel.matplot.model import MatPlotLibContainer
 from openmnglab.datamodel.pandas.model import PandasContainer
-from openmnglab.datamodel.pandas.schemes import TIMESTAMP, TRACK, GLOBAL_STIM_ID
+from openmnglab.datamodel.pandas.schemas import TIMESTAMP, TRACK, GLOBAL_STIM_ID
 from openmnglab.functions.base import FunctionBase
 from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
 from openmnglab.util.seaborn import Theme

@@ -10,7 +10,7 @@ import quantities as pq
 from pandas import Index
 
 from openmnglab.datamodel.pandas.model import PandasContainer
-from openmnglab.datamodel.pandas.schemes import TIMESTAMP, SIGNAL, MASS, TEMPERATURE, COMMENT
+from openmnglab.datamodel.pandas.schemas import TIMESTAMP, SIGNAL, MASS, TEMPERATURE, COMMENT
 from openmnglab.functions.base import SourceFunctionBase
 from openmnglab.functions.input.readers.funcs.dapsys_reader import _kernel_offset_assign
 from openmnglab.functions.input.readers.funcs.spike2.hdfmat import HDFMatGroup, HDFMatFile

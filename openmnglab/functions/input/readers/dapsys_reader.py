@@ -5,7 +5,7 @@ import pandas as pd
 from pandera import SeriesSchema, DataFrameSchema
 
 from openmnglab.datamodel.pandas.model import PandasDataSchema
-from openmnglab.datamodel.pandas.schemes import time_waveform, str_float_list, sorted_spikes, stimulus_list
+from openmnglab.datamodel.pandas.schemas import time_waveform, str_float_list, sorted_spikes, stimulus_list
 from openmnglab.functions.base import SourceFunctionDefinitionBase
 from openmnglab.functions.input.readers.funcs.dapsys_reader import DapsysReaderFunc
 from openmnglab.model.planning.interface import IProxyData

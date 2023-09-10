@@ -7,7 +7,7 @@ import quantities as pq
 from pandera import SeriesSchema, Index, MultiIndex, Category
 
 from openmnglab.datamodel.pandas.model import PandasStaticDataSchema
-from openmnglab.datamodel.pandas.schemes import TIMESTAMP, SIGNAL, MASS, TEMPERATURE
+from openmnglab.datamodel.pandas.schemas import TIMESTAMP, SIGNAL, MASS, TEMPERATURE
 from openmnglab.functions.base import SourceFunctionDefinitionBase
 from openmnglab.functions.input.readers.funcs.spike2_reader import SPIKE2_CHANID, Spike2ReaderFunc, SPIKE2_V_CHAN, \
     SPIKE2_LEVEL, SPIKE2_CODES, SPIKE2_DIGMARK, SPIKE2_KEYBOARD

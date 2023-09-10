@@ -6,7 +6,7 @@ from pandera import DataFrameSchema, Column
 
 from openmnglab.datamodel.matplot.model import MatPlotlibSchema
 from openmnglab.datamodel.pandas.model import PandasInputDataSchema
-from openmnglab.datamodel.pandas.schemes import TIMESTAMP, GLOBAL_STIM_ID
+from openmnglab.datamodel.pandas.schemas import TIMESTAMP, GLOBAL_STIM_ID
 from openmnglab.functions.base import StaticFunctionDefinitionBase
 from openmnglab.functions.plot.funcs.waveforms import WaveformPlotMode, WaveformPlotFunc
 from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN

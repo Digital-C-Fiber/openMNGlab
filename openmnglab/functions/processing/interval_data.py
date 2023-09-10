@@ -12,7 +12,7 @@ from pandas import DataFrame, DatetimeTZDtype, PeriodDtype, SparseDtype, Interva
 from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
 from openmnglab.datamodel.pandas.model import PandasOutputDataSchema, PandasInputDataSchema, \
     PandasDataSchema
-from openmnglab.datamodel.pandas.schemes import generic_interval_list
+from openmnglab.datamodel.pandas.schemas import generic_interval_list
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.interval_data import IntervalDataFunc, LEVEL_COLUMN
 from openmnglab.model.datamodel.interface import IDataContainer, IInputDataSchema, IOutputDataSchema
