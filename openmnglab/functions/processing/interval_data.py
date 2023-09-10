@@ -46,7 +46,7 @@ class IntervalDataAcceptor(DefaultPandasSchemaAcceptor[pa.DataFrameSchema]):
         return super_accepts
 
 
-class IntervalDataDynamicSchema(PandasDataSchema, IntervalDataAcceptor):
+class IntervalDataDynamicSchema(IntervalDataAcceptor, PandasDataSchema):
     def __init__(self, idx: pa.Index | pa.MultiIndex, first_level: int, *levels: int):
         super().__init__(first_level, *levels, idx=idx)
 
