@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Optional, TypeVar, Generic
+from typing import TypeVar, Generic
 
 from openmnglab.model.datamodel.interface import IDataContainer
 from openmnglab.model.functions.interface import IFunctionDefinition, ISourceFunctionDefinition, ProxyRet
 from openmnglab.model.planning.plan.interface import IExecutionPlan
-from openmnglab.model.shared import IHashIdentifiedElement
+from openmnglab.model.planning.shared import IHashIdentifiedElement
 
 
 class IExecutionPlanner(ABC):
