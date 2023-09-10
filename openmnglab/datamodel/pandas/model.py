@@ -8,9 +8,9 @@ import pandera as pa
 import quantities as pq
 
 from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError, DataSchemaConformityError
+from openmnglab.datamodel.pandas.verification import compare_schemas
 from openmnglab.model.datamodel.interface import IDataContainer, ISchemaAcceptor, IOutputDataSchema, \
     IStaticDataSchema
-from openmnglab.datamodel.pandas.verification import compare_schemas
 from openmnglab.util.pandas import pandas_names
 
 TPandas = TypeVar('TPandas', pd.Series, pd.DataFrame)
@@ -43,8 +43,6 @@ class PandasContainer(IDataContainer[TPandas], Generic[TPandas]):
         else:
             raise TypeError("Passed object is neither a pandas dataframe nor a series")
 
-
-
     def __init__(self, data: TPandas, units: dict[str, pq.Quantity]):
         if not isinstance(data, (pd.Series, pd.DataFrame)):
             raise TypeError(
@@ -72,7 +70,9 @@ class PandasContainer(IDataContainer[TPandas], Generic[TPandas]):
         return self._units
 
     def __repr__(self):
-        index_names = (self.data.index.name,) if not isinstance(self.data.index, pd.MultiIndex) else (idx.name for idx in self.data.index.levels)
+        index_names = (self.data.index.name,) if not isinstance(self.data.index, pd.MultiIndex) else (idx.name for idx
+                                                                                                      in
+                                                                                                      self.data.index.levels)
         col_names = (self.data.name,) if isinstance(self.data, pd.Series) else self.data.columns
         units = ",".join((f"'{col}':{self.units[col].dimensionality}" for col in (*index_names, *col_names)))
         return f"""PandasContainer @{id(self)}
@@ -85,13 +85,15 @@ Units: {units}
 
 TPandasScheme = TypeVar("TPandasScheme", pa.DataFrameSchema, pa.SeriesSchema)
 
+
 class IPandasDataSchema(Generic[TPandasScheme], ABC):
     @property
     @abstractmethod
     def pandera_schema(self) -> TPandasScheme:
         ...
 
-class PandasDataSchema(Generic[TPandasScheme], IPandasDataSchema[TPandasScheme], ABC):
+
+class PandasDataSchemaBase(Generic[TPandasScheme], IPandasDataSchema[TPandasScheme], ABC):
 
     def __init__(self, schema: TPandasScheme):
         if not isinstance(schema, (pa.DataFrameSchema, pa.SeriesSchema)):
@@ -104,7 +106,7 @@ class PandasDataSchema(Generic[TPandasScheme], IPandasDataSchema[TPandasScheme],
         return self._schema
 
 
-class PandasSchemaAcceptor(Generic[TPandasScheme], PandasDataSchema[TPandasScheme], ISchemaAcceptor):
+class PandasSchemaAcceptor(Generic[TPandasScheme], PandasDataSchemaBase[TPandasScheme], ISchemaAcceptor):
 
     def accepts(self, output_data_scheme: IOutputDataSchema) -> bool:
         if not isinstance(output_data_scheme, IPandasDataSchema):
@@ -113,7 +115,7 @@ class PandasSchemaAcceptor(Generic[TPandasScheme], PandasDataSchema[TPandasSchem
         return compare_schemas(self.pandera_schema, output_data_scheme.pandera_schema)
 
 
-class PandasOutputDataSchema(Generic[TPandasScheme], PandasDataSchema[TPandasScheme], IOutputDataSchema):
+class PandasOutputDataSchema(Generic[TPandasScheme], PandasDataSchemaBase[TPandasScheme], IOutputDataSchema):
 
     def validate(self, data_container: IDataContainer) -> bool:
         if not isinstance(data_container, PandasContainer):

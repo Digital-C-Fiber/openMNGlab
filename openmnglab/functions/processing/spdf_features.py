@@ -3,7 +3,7 @@ from abc import ABC
 import pandera as pa
 from pandas import DataFrame
 
-from openmnglab.datamodel.pandas.model import PandasDataSchema, PandasOutputDataSchema
+from openmnglab.datamodel.pandas.model import PandasDataSchemaBase, PandasOutputDataSchema
 from openmnglab.datamodel.pandas.verification import compare_index
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.spdf_features import SPDF_FEATURES, FeatureFunc
@@ -14,7 +14,7 @@ from openmnglab.model.datamodel.interface import IOutputDataSchema
 from openmnglab.model.planning.interface import IProxyData
 
 
-class SPDFFeaturesBaseSchema(PandasDataSchema[pa.DataFrameSchema], ABC):
+class SPDFFeaturesBaseSchema(PandasDataSchemaBase[pa.DataFrameSchema], ABC):
     def __init__(self):
         super().__init__(pa.DataFrameSchema({
             feature: pa.Column(float, nullable=True) for feature in SPDF_FEATURES}, title="Principle Components"))
