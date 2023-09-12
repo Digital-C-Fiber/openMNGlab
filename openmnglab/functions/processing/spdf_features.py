@@ -1,7 +1,7 @@
 import pandera as pa
 from pandas import DataFrame
 
-from openmnglab.datamodel.pandas.model import PandasDataSchema, DefaultPandasSchemaAcceptor
+from openmnglab.datamodel.pandas.model import PandasDataSchema, PanderaSchemaAcceptor
 from openmnglab.datamodel.pandas.verification import compare_index
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.spdf_features import SPDF_FEATURES, FeatureFunc
@@ -11,7 +11,7 @@ from openmnglab.functions.processing.spdf_components import SPDFComponentsDynami
 from openmnglab.model.planning.interface import IDataReference
 
 
-class SPDFFeaturesAcceptor(DefaultPandasSchemaAcceptor[pa.DataFrameSchema]):
+class SPDFFeaturesAcceptor(PanderaSchemaAcceptor[pa.DataFrameSchema]):
     def __init__(self, index=None):
         super().__init__(pa.DataFrameSchema({
             feature: pa.Column(float, nullable=True) for feature in SPDF_FEATURES}, title="Principle Components",

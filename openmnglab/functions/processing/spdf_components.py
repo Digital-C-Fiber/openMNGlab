@@ -1,14 +1,14 @@
 import pandera as pa
 from pandas import DataFrame
 
-from openmnglab.datamodel.pandas.model import DefaultPandasSchemaAcceptor, PandasDataSchema
+from openmnglab.datamodel.pandas.model import PanderaSchemaAcceptor, PandasDataSchema
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.spdf_components import SPDFComponentsFunc, SPDF_COMPONENTS
 from openmnglab.functions.processing.interval_data import IntervalDataAcceptor
 from openmnglab.model.planning.interface import IDataReference
 
 
-class SPDFComponentsAcceptor(DefaultPandasSchemaAcceptor[pa.DataFrameSchema]):
+class SPDFComponentsAcceptor(PanderaSchemaAcceptor[pa.DataFrameSchema]):
     def __init__(self, index=None):
         super().__init__(pa.DataFrameSchema({
             SPDF_COMPONENTS[0]: pa.Column(float, nullable=True),

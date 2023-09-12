@@ -10,7 +10,7 @@ import openmnglab.datamodel.pandas.schemas as schema
 from openmnglab.datamodel.pandas.model import PandasDataSchema
 from openmnglab.functions.base import SourceFunctionDefinitionBase
 from openmnglab.functions.input.readers.funcs.spike2_reader import SPIKE2_CHANID, Spike2ReaderFunc, SPIKE2_V_CHAN, \
-    SPIKE2_LEVEL, SPIKE2_CODES, SPIKE2_DIGMARK, SPIKE2_KEYBOARD
+    SPIKE2_EXTPULSES, SPIKE2_CODES, SPIKE2_DIGMARK, SPIKE2_KEYBOARD
 from openmnglab.model.datamodel.interface import IDataSchema
 from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
@@ -109,7 +109,7 @@ class Spike2Reader(SourceFunctionDefinitionBase[tuple[
     def produces(self) -> Optional[Sequence[IDataSchema] | IDataSchema]:
         return schema.float_timeseries(schema.SIGNAL), schema.float_timeseries(schema.MASS), schema.float_timeseries(
             schema.TEMPERATURE), schema.float_timeseries(SPIKE2_V_CHAN), \
-            PandasDataSchema(SeriesSchema(np.int8, index=Index(float, name=schema.TIMESTAMP), name=SPIKE2_LEVEL)), \
+            PandasDataSchema(SeriesSchema(np.int8, index=Index(float, name=schema.TIMESTAMP), name=SPIKE2_EXTPULSES)), \
             PandasDataSchema(SeriesSchema(str, index=MultiIndex(
                 indexes=[Index(float, name=schema.TIMESTAMP), Index(np.uint32, name=SPIKE2_CODES)]),
                                           name=schema.COMMENT)), \

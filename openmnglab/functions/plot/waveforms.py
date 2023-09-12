@@ -6,7 +6,7 @@ from pandera import DataFrameSchema, Column
 
 import openmnglab.datamodel.pandas.schemas as schema
 from openmnglab.datamodel.matplot.model import MatPlotlibSchema
-from openmnglab.datamodel.pandas.model import DefaultPandasSchemaAcceptor
+from openmnglab.datamodel.pandas.model import PanderaSchemaAcceptor
 from openmnglab.functions.base import StaticFunctionDefinitionBase
 from openmnglab.functions.plot.funcs.waveforms import WaveformPlotMode, WaveformPlotFunc
 from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
@@ -90,8 +90,8 @@ class WaveformPlot(StaticFunctionDefinitionBase[IDataReference[plt.Figure]]):
         return h.digest()
 
     @property
-    def slot_acceptors(self) -> DefaultPandasSchemaAcceptor[pd.DataFrame]:
-        return DefaultPandasSchemaAcceptor(DataFrameSchema({
+    def slot_acceptors(self) -> PanderaSchemaAcceptor[pd.DataFrame]:
+        return PanderaSchemaAcceptor(DataFrameSchema({
             self.column: Column(float)
         }))
 

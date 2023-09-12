@@ -16,7 +16,7 @@ import openmnglab.datamodel.pandas.schemas as schema
 from openmnglab.functions.base import SourceFunctionBase
 from openmnglab.util.dicts import get_and_incr
 
-STIMDEFS = "stimulus definitions"
+DPS_STIMDEFS = "stimulus definitions"
 
 @njit
 def _kernel_offset_assign(target: np.array, calc_add, calc_mul, pos_offset, n):
@@ -210,7 +210,7 @@ class DapsysReaderFunc(SourceFunctionBase):
         self._log.info("Loading comments")
         comments = self._load_textstream(self._comments, series_name=schema.COMMENT)
         self._log.info("Loading stimdefs")
-        stimdefs = self._load_textstream(f"{self.stim_folder}/{self._stimdefs}", series_name=STIMDEFS)
+        stimdefs = self._load_textstream(f"{self.stim_folder}/{self._stimdefs}", series_name=DPS_STIMDEFS)
         self._log.info("Loading pulses")
         pulses, idmap = self.get_main_pulses()
         self._log.info("Loading tracks")

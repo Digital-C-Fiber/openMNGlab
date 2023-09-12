@@ -7,7 +7,7 @@ from pandera import SeriesSchema
 from openmnglab.datamodel.pandas.model import PandasContainer
 import openmnglab.datamodel.pandas.schemas as schema
 from openmnglab.functions.base import SourceFunctionDefinitionBase
-from openmnglab.functions.input.readers.funcs.dapsys_reader import DapsysReaderFunc, STIMDEFS
+from openmnglab.functions.input.readers.funcs.dapsys_reader import DapsysReaderFunc, DPS_STIMDEFS
 from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
 
@@ -72,7 +72,7 @@ class DapsysReader(SourceFunctionDefinitionBase[tuple[
         PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[
             SeriesSchema], PandasContainer[SeriesSchema]]:
         return schema.float_timeseries(schema.SIGNAL), schema.stimulus_list(), schema.sorted_spikes(), schema.str_eventseries(schema.COMMENT), schema.str_eventseries(
-            STIMDEFS)
+            DPS_STIMDEFS)
 
     def new_function(self) -> DapsysReaderFunc:
         return DapsysReaderFunc(self._file, self._stim_folder, main_pulse=self._main_pulse,

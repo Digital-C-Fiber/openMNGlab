@@ -7,7 +7,7 @@ import quantities as pq
 from pandas import DataFrame, IntervalDtype
 
 from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
-from openmnglab.datamodel.pandas.model import PandasDataSchema, DefaultPandasSchemaAcceptor
+from openmnglab.datamodel.pandas.model import PandasDataSchema, PanderaSchemaAcceptor
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.interval_data import IntervalDataFunc, LEVEL_COLUMN
 from openmnglab.model.datamodel.interface import IDataSchema
@@ -15,7 +15,7 @@ from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
 
 
-class NumericIndexedListAcceptor(DefaultPandasSchemaAcceptor[pa.SeriesSchema]):
+class NumericIndexedListAcceptor(PanderaSchemaAcceptor[pa.SeriesSchema]):
 
     def __init__(self):
         super().__init__(pa.SeriesSchema())
@@ -28,7 +28,7 @@ class NumericIndexedListAcceptor(DefaultPandasSchemaAcceptor[pa.SeriesSchema]):
         return super_accepts
 
 
-class IntervalDataAcceptor(DefaultPandasSchemaAcceptor[pa.DataFrameSchema]):
+class IntervalDataAcceptor(PanderaSchemaAcceptor[pa.DataFrameSchema]):
     def __init__(self, first_level: int, *levels: int, idx=None):
         super().__init__(
             pa.DataFrameSchema({LEVEL_COLUMN[i]: pa.Column(float) for i in sorted([first_level, *levels])}, index=idx))
@@ -99,8 +99,8 @@ class IntervalData(FunctionDefinitionBase[IDataReference[DataFrame]]):
 
     @property
     def slot_acceptors(self) -> tuple[
-        DefaultPandasSchemaAcceptor[pa.SeriesSchema], DefaultPandasSchemaAcceptor[pa.SeriesSchema]]:
-        return DefaultPandasSchemaAcceptor(pa.SeriesSchema(IntervalDtype)), NumericIndexedListAcceptor()
+        PanderaSchemaAcceptor[pa.SeriesSchema], PanderaSchemaAcceptor[pa.SeriesSchema]]:
+        return PanderaSchemaAcceptor(pa.SeriesSchema(IntervalDtype)), NumericIndexedListAcceptor()
 
     def output_for(self, window_intervals: IDataSchema[pa.SeriesSchema],
                    data: IDataSchema[pa.SeriesSchema]) -> IntervalDataDynamicSchema:

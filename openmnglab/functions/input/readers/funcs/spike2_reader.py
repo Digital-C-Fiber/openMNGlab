@@ -19,7 +19,7 @@ import openmnglab.datamodel.pandas.schemas as schema
 
 SPIKE2_CHANID = int | str
 
-SPIKE2_LEVEL = "level"
+SPIKE2_EXTPULSES = "external pulses"
 SPIKE2_V_CHAN = "V chan"
 SPIKE2_DIGMARK = "digmark"
 SPIKE2_KEYBOARD = "keyboard"
@@ -195,7 +195,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
     def _load_unbinned_event(self, chan_struct: dict | None, quantity: pq.Quantity = pq.dimensionless,
                              time_quantity: pq.Quantity = pq.second):
         parsed_struct = spike2_struct(chan_struct) if chan_struct is not None else None
-        series = self._unbinned_event_chant_to_series(parsed_struct, SPIKE2_LEVEL)
+        series = self._unbinned_event_chant_to_series(parsed_struct, SPIKE2_EXTPULSES)
         return PandasContainer(series, {series.name: quantity, series.index.name: time_quantity})
 
     def _load_texts(self, chan_struct: dict | None, time_quantity: pq.Quantity = pq.second, name: str | None = None):

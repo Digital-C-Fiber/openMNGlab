@@ -86,7 +86,7 @@ Units: {units}
 TPanderaSchema = TypeVar("TPanderaSchema", pa.DataFrameSchema, pa.SeriesSchema)
 
 
-class DefaultPandasSchemaAcceptor(Generic[TPanderaSchema], ISchemaAcceptor):
+class PanderaSchemaAcceptor(Generic[TPanderaSchema], ISchemaAcceptor):
 
     def __init__(self, schema: TPanderaSchema):
         if not isinstance(schema, (pa.DataFrameSchema, pa.SeriesSchema)):
@@ -111,7 +111,7 @@ class IPandasDataSchema(Generic[TPanderaSchema], IDataSchema, ABC):
 
 
 class PandasDataSchema(Generic[TPanderaSchema], IPandasDataSchema[TPanderaSchema],
-                       DefaultPandasSchemaAcceptor[TPanderaSchema]):
+                       PanderaSchemaAcceptor[TPanderaSchema]):
     """Implements IDataSchema for PanderaContainer. Will ensure that all elements in the schema are named.
     """
 
