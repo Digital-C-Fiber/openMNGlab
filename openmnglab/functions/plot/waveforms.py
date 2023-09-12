@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from pandera import DataFrameSchema, Column
 
+import openmnglab.datamodel.pandas.schemas as schema
 from openmnglab.datamodel.matplot.model import MatPlotlibSchema
 from openmnglab.datamodel.pandas.model import DefaultPandasSchemaAcceptor
-from openmnglab.datamodel.pandas.schemas import TIMESTAMP, GLOBAL_STIM_ID
 from openmnglab.functions.base import StaticFunctionDefinitionBase
 from openmnglab.functions.plot.funcs.waveforms import WaveformPlotMode, WaveformPlotFunc
 from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
@@ -49,7 +49,7 @@ class WaveformPlot(StaticFunctionDefinitionBase[IDataReference[plt.Figure]]):
                  theme: Optional[Theme] = None,
                  col: Optional[str] = None,
                  color_dict: Optional[dict[str, str]] = None,
-                 time_col: str = TIMESTAMP, stim_idx: str = GLOBAL_STIM_ID, **sns_args):
+                 time_col: str = schema.TIMESTAMP, stim_idx: str = schema.STIM_IDX, **sns_args):
 
         super().__init__("omnglab.plotting.waveform")
         self.mode = mode if isinstance(mode, WaveformPlotMode) else WaveformPlotMode(mode.lower())

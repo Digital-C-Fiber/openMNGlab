@@ -5,9 +5,9 @@ import pandas as pd
 from pandera import SeriesSchema
 
 from openmnglab.datamodel.pandas.model import PandasContainer
-from openmnglab.datamodel.pandas.schemas import float_timeseries, sorted_spikes, stimulus_list, SIGNAL, str_eventseries
+import openmnglab.datamodel.pandas.schemas as schema
 from openmnglab.functions.base import SourceFunctionDefinitionBase
-from openmnglab.functions.input.readers.funcs.dapsys_reader import DapsysReaderFunc
+from openmnglab.functions.input.readers.funcs.dapsys_reader import DapsysReaderFunc, STIMDEFS
 from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
 
@@ -71,8 +71,8 @@ class DapsysReader(SourceFunctionDefinitionBase[tuple[
     def produces(self) -> tuple[
         PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[SeriesSchema], PandasContainer[
             SeriesSchema], PandasContainer[SeriesSchema]]:
-        return float_timeseries(SIGNAL), stimulus_list(), sorted_spikes(), str_eventseries("comments"), str_eventseries(
-            "Stim Def Starts")
+        return schema.float_timeseries(schema.SIGNAL), schema.stimulus_list(), schema.sorted_spikes(), schema.str_eventseries(schema.COMMENT), schema.str_eventseries(
+            STIMDEFS)
 
     def new_function(self) -> DapsysReaderFunc:
         return DapsysReaderFunc(self._file, self._stim_folder, main_pulse=self._main_pulse,

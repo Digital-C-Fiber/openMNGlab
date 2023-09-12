@@ -10,12 +10,12 @@ import quantities as pq
 from pandas import Index
 
 from openmnglab.datamodel.pandas.model import PandasContainer
-from openmnglab.datamodel.pandas.schemas import TIMESTAMP, SIGNAL, MASS, TEMPERATURE, COMMENT
 from openmnglab.functions.base import SourceFunctionBase
 from openmnglab.functions.input.readers.funcs.dapsys_reader import _kernel_offset_assign
 from openmnglab.functions.input.readers.funcs.spike2.hdfmat import HDFMatGroup, HDFMatFile
 from openmnglab.functions.input.readers.funcs.spike2.structs import Spike2Realwave, Spike2Waveform, Spike2Marker, \
     Spike2Textmark, Spike2UnbinnedEvent, spike2_struct
+import openmnglab.datamodel.pandas.schemas as schema
 
 SPIKE2_CHANID = int | str
 
@@ -135,7 +135,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
         return channel_struct.get("title", "unknown channel")
 
     def _waveform_chan_to_series(self, spike2_struct: Spike2Realwave | Spike2Waveform | None,
-                                 name: str, index_name: str = TIMESTAMP) -> pd.Series:
+                                 name: str, index_name: str = schema.TIMESTAMP) -> pd.Series:
         values, times = np.empty(0, dtype=np.float64), np.empty(0, dtype=np.float64)
         if spike2_struct is not None and spike2_struct.length > 0:
             slicer = spike2_struct.timerange_slice(self._start, self._end)
@@ -152,7 +152,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
         return series
 
     def _marker_chan_to_series(self, spike2_struct: Spike2Marker | None, name: str,
-                               index_name: str = TIMESTAMP) -> pd.Series:
+                               index_name: str = schema.TIMESTAMP) -> pd.Series:
         times, codes = np.empty(0, dtype=np.float64), np.empty(0, dtype=np.uint32)
         if spike2_struct is not None and spike2_struct.length > 0:
             slicer = spike2_struct.timerange_slice(self._start, self._end)
@@ -163,7 +163,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
         return series
 
     def _textmarker_chan_to_series(self, spike2_struct: Spike2Textmark | None, name: str,
-                                   index_name: str = TIMESTAMP) -> pd.Series:
+                                   index_name: str = schema.TIMESTAMP) -> pd.Series:
         texts, times, codes = np.empty(0, dtype=str), np.empty(0, dtype=np.float64), np.empty(0, dtype=np.uint32)
         if spike2_struct is not None and spike2_struct.length > 0:
             slicer = spike2_struct.timerange_slice(self._start, self._end)
@@ -177,7 +177,7 @@ class Spike2ReaderFunc(SourceFunctionBase):
         return series
 
     def _unbinned_event_chant_to_series(self, spike2_struct: Spike2UnbinnedEvent | None, name: str,
-                                        index_name: str = TIMESTAMP):
+                                        index_name: str = schema.TIMESTAMP):
         times, levels = np.empty(0, dtype=np.float64), np.empty(0, dtype=np.int8)
         if spike2_struct is not None and spike2_struct.length > 0:
             slicer = spike2_struct.timerange_slice(self._start, self._end)
@@ -214,12 +214,12 @@ class Spike2ReaderFunc(SourceFunctionBase):
     def execute(self) -> tuple[PandasContainer, ...]:
         with HDFMatFile(self._path, 'r') as f:
             channels = Spike2ReaderFunc.Spike2Channels(f)
-            sig = self._load_sig_chan(channels.get_chan(self._signal_chan), self._signal_unit, name=SIGNAL)
-            mass = self._load_sig_chan(channels.get_chan(self._mass), self._mass_unit, name=MASS)
-            temp = self._load_sig_chan(channels.get_chan(self._temp_chan), self._temp_unit, name=TEMPERATURE)
+            sig = self._load_sig_chan(channels.get_chan(self._signal_chan), self._signal_unit, name=schema.SIGNAL)
+            mass = self._load_sig_chan(channels.get_chan(self._mass), self._mass_unit, name=schema.MASS)
+            temp = self._load_sig_chan(channels.get_chan(self._temp_chan), self._temp_unit, name=schema.TEMPERATURE)
             v_chan = self._load_sig_chan(channels.get_chan(self._v_chan), self._v_chan_unit, name=SPIKE2_V_CHAN)
             ext_pul = self._load_unbinned_event(channels.get_chan(self._ext_pul))
-            comments = self._load_texts(channels.get_chan(self._comments), name=COMMENT)
+            comments = self._load_texts(channels.get_chan(self._comments), name=schema.COMMENT)
             dig_mark = self._load_marker(channels.get_chan(self._digmark), name=SPIKE2_DIGMARK)
             keyboard = self._load_marker(channels.get_chan(self._keyboard), name=SPIKE2_KEYBOARD)
         return sig, mass, temp, v_chan, ext_pul, comments, dig_mark, keyboard

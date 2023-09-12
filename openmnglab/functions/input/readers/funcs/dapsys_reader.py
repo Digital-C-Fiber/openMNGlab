@@ -12,11 +12,11 @@ from pydapsys import File, StreamType, WaveformPage, Stream, TextPage, Folder
 from pydapsys.toc.exceptions import ToCPathError
 
 from openmnglab.datamodel.pandas.model import PandasContainer
-from openmnglab.datamodel.pandas.schemas import TIMESTAMP, STIM_TS, STIM_LBL, SPIKE_TS, TRACK, \
-    TRACK_SPIKE_IDX, GLOBAL_STIM_ID, STIM_TYPE_ID, SIGNAL
+import openmnglab.datamodel.pandas.schemas as schema
 from openmnglab.functions.base import SourceFunctionBase
 from openmnglab.util.dicts import get_and_incr
 
+STIMDEFS = "stimulus definitions"
 
 @njit
 def _kernel_offset_assign(target: np.array, calc_add, calc_mul, pos_offset, n):
@@ -101,10 +101,10 @@ class DapsysReaderFunc(SourceFunctionBase):
             self._log.debug("finished loading continuous recording")
         else:
             self._log.warning("No continuous recording in file")
-        return pd.Series(data=values.astype(float64), index=pd.Index(data=timestamps, copy=False, name=TIMESTAMP),
-                         name=SIGNAL, copy=False)
+        return pd.Series(data=values.astype(float64), index=pd.Index(data=timestamps, copy=False, name=schema.TIMESTAMP),
+                         name=schema.SIGNAL, copy=False)
 
-    def _load_textstream(self, path: str) -> pd.Series:
+    def _load_textstream(self, path: str, series_name: Optional[str] = None) -> pd.Series:
         file = self.file
         try:
             stream: Stream = file.toc.path(path)
@@ -118,9 +118,10 @@ class DapsysReaderFunc(SourceFunctionBase):
             page: TextPage
             timestamps[i] = page.timestamp_a
             labels[i] = page.text
-        series_name = path.split('/')[-1]
+        if not series_name:
+            series_name = path.split('/')[-1]
         return pd.Series(data=labels, copy=False,
-                         index=pd.Index(timestamps, copy=False, name=TIMESTAMP), name=series_name)
+                         index=pd.Index(timestamps, copy=False, name=schema.TIMESTAMP), name=series_name)
 
     def get_main_pulses(self) -> tuple[pd.Series, dict]:
         file = self.file
@@ -133,7 +134,6 @@ class DapsysReaderFunc(SourceFunctionBase):
             self._log.warning("pulses not found in file")
             page_ids = tuple()
         timestamps = np.empty(len(page_ids), dtype=float64)
-        lbl_num = np.empty(len(page_ids), dtype=np.uint)
         """The sequence number for the entry of the stimulus label (i.e. the second entry of 'main pulse')"""
         labels = [""] * len(page_ids)
         """The label pulse labels"""
@@ -147,13 +147,12 @@ class DapsysReaderFunc(SourceFunctionBase):
             page: TextPage
             timestamps[i] = page.timestamp_a
             labels[i] = page.text
-            lbl_num[i] = get_and_incr(counter, page.text)
             timestamp_to_stimid[page.timestamp_a] = i
         self._log.debug("finished stimuli")
         return pd.Series(data=timestamps, copy=False,
-                         index=pd.MultiIndex.from_arrays([np.arange(len(page_ids)), labels, lbl_num],
-                                                         names=[GLOBAL_STIM_ID, STIM_LBL, STIM_TYPE_ID]),
-                         name=STIM_TS), timestamp_to_stimid
+                         index=pd.MultiIndex.from_arrays([np.arange(len(page_ids)), labels],
+                                                         names=[schema.STIM_IDX, schema.STIM_TYPE]),
+                         name=schema.STIM_TS), timestamp_to_stimid
 
     def get_tracks_for_responses(self, idmap: dict) -> pd.Series:
         file = self.file
@@ -198,9 +197,9 @@ class DapsysReaderFunc(SourceFunctionBase):
                     sorted_ids_slice = sorted_ids_slice[nearest_offset_i:]
                     n += 1
         self._log.debug("streams finished")
-        return pd.Series(data=response_timestamps, copy=False, name=SPIKE_TS,
+        return pd.Series(data=response_timestamps, copy=False, name=schema.SPIKE_TS,
                          index=pd.MultiIndex.from_arrays([responding_to, track_labels, track_response_number],
-                                                         names=(GLOBAL_STIM_ID, TRACK, TRACK_SPIKE_IDX)))
+                                                         names=(schema.STIM_IDX, schema.TRACK, schema.TRACK_SPIKE_IDX)))
 
     def execute(self) -> tuple[
         PandasContainer[pd.Series], PandasContainer[pd.Series], PandasContainer[pd.Series], PandasContainer[pd.Series],
@@ -209,19 +208,19 @@ class DapsysReaderFunc(SourceFunctionBase):
         self._log.info("Loading continuous recording")
         cont_rec = self.get_continuous_recording()
         self._log.info("Loading comments")
-        comments = self._load_textstream(self._comments)
+        comments = self._load_textstream(self._comments, series_name=schema.COMMENT)
         self._log.info("Loading stimdefs")
-        stimdefs = self._load_textstream(f"{self.stim_folder}/{self._stimdefs}")
+        stimdefs = self._load_textstream(f"{self.stim_folder}/{self._stimdefs}", series_name=STIMDEFS)
         self._log.info("Loading pulses")
         pulses, idmap = self.get_main_pulses()
         self._log.info("Loading tracks")
         tracks = self.get_tracks_for_responses(idmap)
         self._log.info("Processing finished")
-        return PandasContainer(cont_rec, {SIGNAL: pq.V, TIMESTAMP: pq.s}), \
-            PandasContainer(pulses, {GLOBAL_STIM_ID: pq.dimensionless, STIM_TYPE_ID: pq.dimensionless, STIM_TS: pq.s,
-                                     STIM_LBL: pq.dimensionless}), \
+        return PandasContainer(cont_rec, {schema.SIGNAL: pq.V, schema.TIMESTAMP: pq.s}), \
+            PandasContainer(pulses, {schema.STIM_IDX: pq.dimensionless,  schema.STIM_TS: pq.s,
+                                     schema.STIM_TYPE: pq.dimensionless}), \
             PandasContainer(tracks,
-                            {GLOBAL_STIM_ID: pq.dimensionless, SPIKE_TS: pq.s, TRACK: pq.dimensionless,
-                             TRACK_SPIKE_IDX: pq.dimensionless}), \
-            PandasContainer(comments, {TIMESTAMP: pq.s, comments.name: pq.dimensionless}), \
-            PandasContainer(stimdefs, {TIMESTAMP: pq.s, stimdefs.name: pq.dimensionless})
+                            {schema.STIM_IDX: pq.dimensionless, schema.SPIKE_TS: pq.s, schema.TRACK: pq.dimensionless,
+                             schema.TRACK_SPIKE_IDX: pq.dimensionless}), \
+            PandasContainer(comments, {schema.TIMESTAMP: pq.s, comments.name: pq.dimensionless}), \
+            PandasContainer(stimdefs, {schema.TIMESTAMP: pq.s, stimdefs.name: pq.dimensionless})

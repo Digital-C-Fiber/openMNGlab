@@ -1,23 +1,17 @@
-from pandera import Column, Index, DataFrameSchema, SeriesSchema, MultiIndex
+from pandera import Column, Index, DataFrameSchema, SeriesSchema, MultiIndex, Category
 
 from openmnglab.datamodel.pandas.model import PandasDataSchema
 
 TRACK = "track"
-SPIKE_TS = "spike_ts"
-SPIKE_IDX = "spike_idx"
-STIM_IDX = "stim_idx"
-STIM_TS = "stim_ts"
-STIM_LBL = "stim_label"
-RESP_IDX = "resp_idx"
+SPIKE_TS = "spike timestamp"
+STIM_IDX = "stimulus index"
+STIM_TS = "stimulus timestamp"
 TRACK_SPIKE_IDX = "track_spike_idx"
 TIMESTAMP = "timestamp"
 SIGNAL = "signal"
 TEMPERATURE = "temperature"
 MASS = "mass"
-CONT_REC = "continuous recording"
-GLOBAL_STIM_ID = "global stim id"
-STIM_TYPE = "global stim name"
-STIM_TYPE_ID = "stime type id"
+STIM_TYPE = "stimulus type"
 COMMENT = "comment"
 
 
@@ -31,22 +25,13 @@ def str_eventseries(name: str, index_name: str = TIMESTAMP) -> PandasDataSchema[
 
 def stimulus_list() -> PandasDataSchema[SeriesSchema]:
     return PandasDataSchema(SeriesSchema(float, index=MultiIndex(
-        indexes=[Index(int, name=GLOBAL_STIM_ID), Index(str, name=STIM_TYPE), Index(int, name=STIM_TYPE_ID)]),
+        indexes=[Index(int, name=STIM_IDX), Index(Category, name=STIM_TYPE)]),
                                          name=STIM_TS))
-
-
-def related_spikes() -> PandasDataSchema[DataFrameSchema]:
-    return PandasDataSchema(DataFrameSchema({
-        SPIKE_TS: Column(float),
-        STIM_IDX: Column(int)
-    },
-        index=Index(int, name=SPIKE_IDX),
-        name="related spikes"))
 
 
 def sorted_spikes() -> PandasDataSchema[SeriesSchema]:
     return PandasDataSchema(SeriesSchema(float,
                                          index=MultiIndex(
-                                             indexes=[Index(int, name=GLOBAL_STIM_ID), Index(str, name=TRACK),
+                                             indexes=[Index(int, name=STIM_IDX), Index(str, name=TRACK),
                                                       Index(int, name=TRACK_SPIKE_IDX)]),
                                          name=SPIKE_TS))
