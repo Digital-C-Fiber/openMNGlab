@@ -2,7 +2,9 @@ from typing import TypeVar, Type, Iterable, Sequence, Callable
 
 T = TypeVar('T')
 
-def ensure_sequence(inp: Iterable[T] | T | None, type: Type[T], sequence_constructor: Callable[[Iterable[T]], Sequence[T]] = tuple) -> Sequence[T]:
+
+def ensure_sequence(inp: Iterable[T] | T | None, type: Type[T],
+                    sequence_constructor: Callable[[Iterable[T]], Sequence[T]] = tuple) -> Sequence[T]:
     """Ensures that the input is a sequence.
 
     .. seealso::
@@ -33,6 +35,7 @@ def ensure_sequence(inp: Iterable[T] | T | None, type: Type[T], sequence_constru
         return inp
     else:
         return sequence_constructor(inp)
+
 
 def ensure_iterable(inp: Iterable[T] | T | None, type: Type[T]) -> Iterable[T]:
     """Ensures that the input is an iterable of the given type.

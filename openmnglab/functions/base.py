@@ -3,14 +3,12 @@ from typing import Generic
 
 from openmnglab.model.functions.interface import IFunction, IFunctionDefinition, ISourceFunction, ProxyRet, \
     IStaticFunctionDefinition, ISourceFunctionDefinition
-from openmnglab.util.hashing import Hash
 
 PandasSelector = str | int
 
-class FunctionBase(IFunction, ABC):
 
-    def validate_input(self) -> bool:
-        return True
+class FunctionBase(IFunction, ABC):
+    ...
 
 
 class SourceFunctionBase(FunctionBase, ISourceFunction, ABC):
@@ -29,19 +27,9 @@ class FunctionDefinitionBase(Generic[ProxyRet], IFunctionDefinition[ProxyRet], A
     def identifier(self) -> str:
         return self._identifier
 
-    @property
-    def config_hash(self) -> bytes:
-        return bytes()
 
-    @property
-    def identifying_hash(self) -> bytes:
-        hashgen = Hash()
-        hashgen.str(self.identifier)
-        hashgen.update(self.config_hash)
-        return hashgen.digest()
-
-
-class StaticFunctionDefinitionBase(Generic[ProxyRet], FunctionDefinitionBase[ProxyRet], IStaticFunctionDefinition[ProxyRet],
+class StaticFunctionDefinitionBase(Generic[ProxyRet], FunctionDefinitionBase[ProxyRet],
+                                   IStaticFunctionDefinition[ProxyRet],
                                    ABC):
     ...
 

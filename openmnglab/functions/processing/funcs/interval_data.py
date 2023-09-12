@@ -130,8 +130,8 @@ class IntervalDataFunc(FunctionBase):
                 multiindex_codes = extend_multiindex_f(intervals.index.codes, interval_ranges, codes)
                 levels = (*intervals.index.levels, index_values)
             else:
-                multiindex_codes = [[] for _ in range(len(intervals.index.names)+1)]
-                levels = [tuple() for _ in range(len(intervals.index.names)+1)]
+                multiindex_codes = [[] for _ in range(len(intervals.index.names) + 1)]
+                levels = [tuple() for _ in range(len(intervals.index.names) + 1)]
 
             new_multiindex = MultiIndex(levels=levels,
                                         names=[*intervals.index.names,

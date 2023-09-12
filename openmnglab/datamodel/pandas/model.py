@@ -3,14 +3,14 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic
 
+import numpy as np
 import pandas as pd
 import pandera as pa
 import quantities as pq
 
-from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError, DataSchemeConformityError
-from openmnglab.model.datamodel.interface import IDataContainer, IInputDataScheme, IOutputDataScheme, \
-    IStaticDataScheme
+from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError, DataSchemaConformityError
 from openmnglab.datamodel.pandas.verification import compare_schemas
+from openmnglab.model.datamodel.interface import IDataContainer, ISchemaAcceptor, IDataSchema
 from openmnglab.util.pandas import pandas_names
 
 TPandas = TypeVar('TPandas', pd.Series, pd.DataFrame)
@@ -43,8 +43,6 @@ class PandasContainer(IDataContainer[TPandas], Generic[TPandas]):
         else:
             raise TypeError("Passed object is neither a pandas dataframe nor a series")
 
-
-
     def __init__(self, data: TPandas, units: dict[str, pq.Quantity]):
         if not isinstance(data, (pd.Series, pd.DataFrame)):
             raise TypeError(
@@ -72,7 +70,9 @@ class PandasContainer(IDataContainer[TPandas], Generic[TPandas]):
         return self._units
 
     def __repr__(self):
-        index_names = (self.data.index.name,) if not isinstance(self.data.index, pd.MultiIndex) else (idx.name for idx in self.data.index.levels)
+        index_names = (self.data.index.name,) if not isinstance(self.data.index, pd.MultiIndex) else (idx.name for idx
+                                                                                                      in
+                                                                                                      self.data.index.levels)
         col_names = (self.data.name,) if isinstance(self.data, pd.Series) else self.data.columns
         units = ",".join((f"'{col}':{self.units[col].dimensionality}" for col in (*index_names, *col_names)))
         return f"""PandasContainer @{id(self)}
@@ -83,51 +83,84 @@ Units: {units}
         return PandasContainer(self.data.copy(), self.units.copy())
 
 
-TPandasScheme = TypeVar("TPandasScheme", pa.DataFrameSchema, pa.SeriesSchema)
+TPanderaSchema = TypeVar("TPanderaSchema", pa.DataFrameSchema, pa.SeriesSchema)
 
-class IPandasDataScheme(Generic[TPandasScheme], ABC):
-    @property
-    @abstractmethod
-    def pandera_schema(self) -> TPandasScheme:
-        ...
 
-class PandasDataScheme(Generic[TPandasScheme], IPandasDataScheme[TPandasScheme], ABC):
+class PanderaSchemaAcceptor(Generic[TPanderaSchema], ISchemaAcceptor):
 
-    def __init__(self, schema: TPandasScheme):
+    def __init__(self, schema: TPanderaSchema):
         if not isinstance(schema, (pa.DataFrameSchema, pa.SeriesSchema)):
             raise TypeError(
                 f"Argument 'model' must be either a pandas series or a dataframe, is {type(schema).__qualname__}")
         self._schema = schema
 
+    def accepts(self, output_data_scheme: IDataSchema) -> bool:
+        if not isinstance(output_data_scheme, IPandasDataSchema):
+            raise DataSchemaCompatibilityError(
+                f"Other data scheme of type {type(output_data_scheme).__qualname__} is not a pandas data schema")
+        return compare_schemas(self._schema, output_data_scheme.pandera_schema)
+
+
+class IPandasDataSchema(Generic[TPanderaSchema], IDataSchema, ABC):
+    """Contains a Pandera schema with all elements named"""
+
     @property
-    def pandera_schema(self) -> TPandasScheme:
+    @abstractmethod
+    def pandera_schema(self) -> TPanderaSchema:
+        ...
+
+
+class PandasDataSchema(Generic[TPanderaSchema], IPandasDataSchema[TPanderaSchema],
+                       PanderaSchemaAcceptor[TPanderaSchema]):
+    """Implements IDataSchema for PanderaContainer. Will ensure that all elements in the schema are named.
+    """
+
+    def __init__(self, schema: TPanderaSchema):
+        super().__init__(schema)
+        self.ensure_all_schema_elements_named(schema)
+
+    @staticmethod
+    def ensure_all_schema_elements_named(schema: TPanderaSchema) -> bool:
+        if isinstance(schema, pa.SeriesSchema):
+            if not schema.name:
+                raise KeyError("Series defined by the series schema is not named")
+        elif not isinstance(schema, pa.DataFrameSchema):
+            raise TypeError(
+                f"Argument 'model' must be either a pandas series or a dataframe, is {type(schema).__qualname__}")
+        if not schema.index:
+            raise KeyError("Schema is missing an index")
+        if isinstance(schema.index, pa.Index) and not schema.index.name:
+            raise KeyError("Index is not named")
+        elif isinstance(schema.index, pa.MultiIndex):
+            for i, l in enumerate(schema.index.indexes):
+                if not l.name:
+                    raise KeyError(f"Index level {i} is not named")
+        return True
+
+    @property
+    def pandera_schema(self) -> TPanderaSchema:
         return self._schema
-
-
-class PandasInputDataScheme(Generic[TPandasScheme], PandasDataScheme[TPandasScheme], IInputDataScheme):
-
-    def accepts(self, output_data_scheme: IOutputDataScheme) -> bool:
-        if not isinstance(output_data_scheme, IPandasDataScheme):
-            raise DataSchemeCompatibilityError(
-                f"Other data scheme of type {type(output_data_scheme).__qualname__} is not a pandas data scheme")
-        return compare_schemas(self.pandera_schema, output_data_scheme.pandera_schema)
-    def transform(self, data_container: IDataContainer) -> IDataContainer:
-        return data_container
-
-
-class PandasOutputDataScheme(Generic[TPandasScheme], PandasDataScheme[TPandasScheme], IOutputDataScheme):
 
     def validate(self, data_container: IDataContainer) -> bool:
         if not isinstance(data_container, PandasContainer):
-            raise DataSchemeConformityError(
-                f"PandasDataScheme expects a PandasContainer for validation but got an object of type {type(data_container).__qualname__}")
+            raise DataSchemaConformityError(
+                f"PandasDataSchema expects a PandasContainer for validation but got an object of type {type(data_container).__qualname__}")
         try:
             _ = self._schema.validate(data_container.data)
-            return True
+        except pa.errors.SchemaError as schema_err:
+            # zero length multiindeces are currently not correctly evaluated by
+            if schema_err.reason_code == pa.errors.SchemaErrorReason.WRONG_DATATYPE and len(
+                    data_container.data) == 0 and isinstance(data_container.data.index, pd.MultiIndex) and isinstance(
+                self.pandera_schema.index, pa.MultiIndex):
+                for index_name, index_dtype in data_container.data.index.dtypes.items():
+                    if index_name in self._schema.index.columns:
+                        expected_dtype = self._schema.index.columns[index_name].dtype
+                        if not (index_dtype == np.dtype(object) or expected_dtype == index_dtype or np.issubdtype(
+                                index_dtype, expected_dtype)):
+                            raise Exception(
+                                f"Index column {index_name} was expected to be type '{expected_dtype}', but is '{index_dtype}")
+
         except Exception as e:
-            raise DataSchemeConformityError("Pandera model validation failed") from e
+            raise DataSchemaConformityError("Pandera model validation failed") from e
 
-
-class PandasStaticDataScheme(Generic[TPandasScheme], PandasInputDataScheme[TPandasScheme],
-                             PandasOutputDataScheme[TPandasScheme], IStaticDataScheme):
-    ...
+        return True

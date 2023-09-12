@@ -1,69 +1,69 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Collection, TypeVar, Generic, Iterable, Mapping, Sequence
+from typing import TypeVar, Generic, Iterable, Mapping, Sequence
 
-from openmnglab.datamodel.exceptions import DataSchemeCompatibilityError
-from openmnglab.model.datamodel.interface import IInputDataScheme, IOutputDataScheme
+from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
+from openmnglab.model.datamodel.interface import ISchemaAcceptor, IDataSchema
 from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
-from openmnglab.model.planning.interface import IExecutionPlanner, IProxyData
-from openmnglab.model.planning.plan.interface import IExecutionPlan, IStage, IPlannedData, IPlannedElement
+from openmnglab.model.planning.interface import IExecutionPlanner, IDataReference
+from openmnglab.model.planning.plan.interface import IExecutionPlan, IStage, IVirtualData, IPlannedElement
 from openmnglab.planning.exceptions import InvalidFunctionArgumentCountError, FunctionArgumentSchemaError, PlanningError
-from openmnglab.util.iterables import ensure_iterable, ensure_sequence
+from openmnglab.util.iterables import ensure_sequence
 
 
-def check_input(expected_schemes: Sequence[IInputDataScheme] | IInputDataScheme | None,
-                actual_schemes: Sequence[IOutputDataScheme] | IOutputDataScheme | None):
-    expected_schemes: Sequence[IInputDataScheme] = ensure_sequence(expected_schemes, IInputDataScheme)
-    actual_schemes: Sequence[IOutputDataScheme] = ensure_sequence(actual_schemes, IOutputDataScheme)
+def check_input(expected_schemes: Sequence[ISchemaAcceptor] | ISchemaAcceptor | None,
+                actual_schemes: Sequence[IDataSchema] | IDataSchema | None):
+    expected_schemes: Sequence[ISchemaAcceptor] = ensure_sequence(expected_schemes, ISchemaAcceptor)
+    actual_schemes: Sequence[IDataSchema] = ensure_sequence(actual_schemes, IDataSchema)
     if len(expected_schemes) != len(actual_schemes):
         raise InvalidFunctionArgumentCountError(len(expected_schemes), len(actual_schemes))
     for pos, (expected_scheme, actual_scheme) in enumerate(zip(expected_schemes, actual_schemes)):
-        expected_scheme: IInputDataScheme
-        actual_scheme: IOutputDataScheme
+        expected_scheme: ISchemaAcceptor
+        actual_scheme: IDataSchema
         try:
             if not expected_scheme.accepts(actual_scheme):
-                raise DataSchemeCompatibilityError("Expected scheme is not compatible with actual scheme")
-        except DataSchemeCompatibilityError as ds_compat_err:
+                raise DataSchemaCompatibilityError("Expected scheme is not compatible with actual scheme")
+        except DataSchemaCompatibilityError as ds_compat_err:
             raise FunctionArgumentSchemaError(pos) from ds_compat_err
 
 
-class ProxyData(IProxyData):
-    def __init__(self, planned_hash: bytes):
-        self._planned_hash = planned_hash
+class DataReference(IDataReference):
+    def __init__(self, ref_id: bytes):
+        self._ref_id = ref_id
 
     @property
-    def calculated_hash(self) -> bytes:
-        return self._planned_hash
+    def referenced_data_id(self) -> bytes:
+        return self._ref_id
 
     @staticmethod
-    def copy_from(other: IProxyData) -> ProxyData:
-        return ProxyData(other.calculated_hash)
+    def copy_from(other: IDataReference) -> DataReference:
+        return DataReference(other.referenced_data_id)
 
 
 class ExecutionPlan(IExecutionPlan):
     def __init__(self, functions: Iterable[IStage] | Mapping[bytes, IStage],
-                 data: Iterable[IPlannedData] | Mapping[bytes, IPlannedData]):
+                 data: Iterable[IVirtualData] | Mapping[bytes, IVirtualData]):
         def to_mapping(param: Iterable[IPlannedElement] | Mapping[bytes, IPlannedElement]):
-            return param if isinstance(param, Mapping) else {element.calculated_hash: element for element in param}
+            return param if isinstance(param, Mapping) else {element.planning_id: element for element in param}
 
         self._functions: Mapping[bytes, IStage] = to_mapping(functions)
-        self._proxy_data: Mapping[bytes, IPlannedData] = to_mapping(data)
+        self._proxy_data: Mapping[bytes, IVirtualData] = to_mapping(data)
 
     @property
     def stages(self) -> Mapping[bytes, IStage]:
         return self._functions
 
     @property
-    def planned_data(self) -> Mapping[bytes, IPlannedData]:
+    def planned_data(self) -> Mapping[bytes, IVirtualData]:
         return self._proxy_data
 
 
 _FuncT = TypeVar('_FuncT', bound=IStage)
-_DataT = TypeVar('_DataT', bound=IPlannedData)
+_DataT = TypeVar('_DataT', bound=IVirtualData)
 
 
-class PlannerBase(IExecutionPlanner, ABC, Generic[_FuncT, _DataT]):
+class PlannerBase(Generic[_FuncT, _DataT], IExecutionPlanner, ABC):
 
     def __init__(self):
         self._functions: dict[bytes, _FuncT] = dict()
@@ -76,13 +76,13 @@ class PlannerBase(IExecutionPlanner, ABC, Generic[_FuncT, _DataT]):
     def _add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: _DataT) -> ProxyRet:
         ...
 
-    def add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: IProxyData) -> ProxyRet:
-        return self._add_function(function, *self._proxy_data_to_concrete(*inp_data))
+    def add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: IDataReference) -> ProxyRet:
+        return self._add_function(function, *self._get_referenced_virt_data(*inp_data))
 
-    def _proxy_data_to_concrete(self, *inp_data: IProxyData) -> Iterable[_DataT]:
+    def _get_referenced_virt_data(self, *inp_data: IDataReference) -> Iterable[_DataT]:
         for pos, inp in enumerate(inp_data):
-            concrete_data = self._data.get(inp.calculated_hash)
+            concrete_data = self._data.get(inp.referenced_data_id)
             if concrete_data is None:
                 raise PlanningError(
-                    f"Argument at position {pos} with hash {inp.calculated_hash.hex()} is not part of this plan and therefore cannot be used as an argument in it")
+                    f"Argument at position {pos} with hash {inp.referenced_data_id.hex()} is not part of this plan and therefore cannot be used as an argument in it")
             yield concrete_data

@@ -1,10 +1,10 @@
-class DataSchemeError(Exception):
+class DataSchemaError(Exception):
     ...
 
 
-class DataSchemeCompatibilityError(DataSchemeError):
+class DataSchemaCompatibilityError(DataSchemaError):
     ...
 
 
-class DataSchemeConformityError(DataSchemeError):
+class DataSchemaConformityError(DataSchemaError):
     ...

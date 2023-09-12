@@ -3,22 +3,27 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Mapping, Sequence
 
-from openmnglab.model.datamodel.interface import IOutputDataScheme
+from openmnglab.model.datamodel.interface import IDataSchema
 from openmnglab.model.functions.interface import IFunctionDefinition
-from openmnglab.model.shared import IHashIdentifiedElement
 
 
-class IPlannedElement(IHashIdentifiedElement, ABC):
+class IPlannedElement(ABC):
+
+    @property
+    @abstractmethod
+    def planning_id(self) -> bytes:
+        ...
+
     @property
     @abstractmethod
     def depth(self) -> int:
         ...
 
 
-class IPlannedData(IPlannedElement, ABC):
+class IVirtualData(IPlannedElement, ABC):
     @property
     @abstractmethod
-    def schema(self) -> IOutputDataScheme:
+    def schema(self) -> IDataSchema:
         ...
 
 
@@ -30,12 +35,12 @@ class IStage(IPlannedElement, ABC):
 
     @property
     @abstractmethod
-    def data_in(self) -> Sequence[IPlannedData]:
+    def data_in(self) -> Sequence[IVirtualData]:
         ...
 
     @property
     @abstractmethod
-    def data_out(self) -> Sequence[IPlannedData]:
+    def data_out(self) -> Sequence[IVirtualData]:
         ...
 
 
@@ -48,7 +53,5 @@ class IExecutionPlan(ABC):
 
     @property
     @abstractmethod
-    def planned_data(self) -> Mapping[bytes, IPlannedData]:
+    def planned_data(self) -> Mapping[bytes, IVirtualData]:
         ...
-
-

@@ -6,18 +6,19 @@ import pandas as pd
 import quantities as pq
 from pandera import SeriesSchema, Index, MultiIndex, Category
 
-from openmnglab.datamodel.pandas.model import PandasStaticDataScheme
-from openmnglab.datamodel.pandas.schemes import TIMESTAMP, SIGNAL, MASS, TEMPERATURE
+import openmnglab.datamodel.pandas.schemas as schema
+from openmnglab.datamodel.pandas.model import PandasDataSchema
 from openmnglab.functions.base import SourceFunctionDefinitionBase
 from openmnglab.functions.input.readers.funcs.spike2_reader import SPIKE2_CHANID, Spike2ReaderFunc, SPIKE2_V_CHAN, \
-    SPIKE2_LEVEL, SPIKE2_CODES, SPIKE2_DIGMARK, SPIKE2_KEYBOARD
-from openmnglab.model.datamodel.interface import IOutputDataScheme
-from openmnglab.model.planning.interface import IProxyData
-from openmnglab.util.hashing import Hash
+    SPIKE2_EXTPULSES, SPIKE2_CODES, SPIKE2_DIGMARK, SPIKE2_KEYBOARD
+from openmnglab.model.datamodel.interface import IDataSchema
+from openmnglab.model.planning.interface import IDataReference
+from openmnglab.util.hashing import HashBuilder
 
 
 class Spike2Reader(SourceFunctionDefinitionBase[tuple[
-    IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[pd.Series], IProxyData[
+    IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series], IDataReference[pd.Series],
+    IDataReference[
         pd.Series]]]):
     """ Load data from Spike2 recordings exported to MATLAB v7.3+ files
         Attempts to load data from 9 channels. To avoid loading data from a channel, pass ``None`` as a channels name,to avoid loading data from itl.
@@ -65,7 +66,6 @@ class Spike2Reader(SourceFunctionDefinitionBase[tuple[
                  temp_unit: pq.Quantity = pq.celsius,
                  v_chan_unit: pq.Quantity = pq.dimensionless,
                  time_unit: pq.Quantity = pq.second):
-
         super().__init__("codingchipmunk.spike2loader")
         self._start = start
         self._end = end
@@ -87,7 +87,7 @@ class Spike2Reader(SourceFunctionDefinitionBase[tuple[
 
     @property
     def config_hash(self) -> bytes:
-        return Hash().dynamic(self._start) \
+        return HashBuilder().dynamic(self._start) \
             .dynamic(self._end) \
             .dynamic(self._temp_chan) \
             .dynamic(self._signal_chan) \
@@ -106,16 +106,15 @@ class Spike2Reader(SourceFunctionDefinitionBase[tuple[
             .digest()
 
     @property
-    def produces(self) -> Optional[Sequence[IOutputDataScheme] | IOutputDataScheme]:
-        return PandasStaticDataScheme(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=SIGNAL)), \
-            PandasStaticDataScheme(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=MASS)), \
-            PandasStaticDataScheme(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=TEMPERATURE)), \
-            PandasStaticDataScheme(SeriesSchema(float, index=Index(float, name=TIMESTAMP), name=SPIKE2_V_CHAN)), \
-            PandasStaticDataScheme(SeriesSchema(np.int8, index=Index(float, name=TIMESTAMP), name=SPIKE2_LEVEL)), \
-            PandasStaticDataScheme(SeriesSchema(str, index=MultiIndex(
-                indexes=[Index(float, name=TIMESTAMP), Index(np.uint32, name=SPIKE2_CODES)]))), \
-            PandasStaticDataScheme(SeriesSchema(Category, index=(Index(float, name=TIMESTAMP)), name=SPIKE2_DIGMARK)), \
-            PandasStaticDataScheme(SeriesSchema(Category, index=(Index(float, name=TIMESTAMP)), name=SPIKE2_KEYBOARD))
+    def produces(self) -> Optional[Sequence[IDataSchema] | IDataSchema]:
+        return schema.float_timeseries(schema.SIGNAL), schema.float_timeseries(schema.MASS), schema.float_timeseries(
+            schema.TEMPERATURE), schema.float_timeseries(SPIKE2_V_CHAN), \
+            PandasDataSchema(SeriesSchema(np.int8, index=Index(float, name=schema.TIMESTAMP), name=SPIKE2_EXTPULSES)), \
+            PandasDataSchema(SeriesSchema(str, index=MultiIndex(
+                indexes=[Index(float, name=schema.TIMESTAMP), Index(np.uint32, name=SPIKE2_CODES)]),
+                                          name=schema.COMMENT)), \
+            PandasDataSchema(SeriesSchema(Category, index=(Index(float, name=schema.TIMESTAMP)), name=SPIKE2_DIGMARK)), \
+            PandasDataSchema(SeriesSchema(Category, index=(Index(float, name=schema.TIMESTAMP)), name=SPIKE2_KEYBOARD))
 
     def new_function(self) -> Spike2ReaderFunc:
         return Spike2ReaderFunc(start=self._start,

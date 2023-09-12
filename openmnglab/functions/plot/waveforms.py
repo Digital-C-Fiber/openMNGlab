@@ -4,18 +4,18 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from pandera import DataFrameSchema, Column
 
+import openmnglab.datamodel.pandas.schemas as schema
 from openmnglab.datamodel.matplot.model import MatPlotlibSchema
-from openmnglab.datamodel.pandas.model import PandasInputDataScheme
-from openmnglab.datamodel.pandas.schemes import TIMESTAMP, GLOBAL_STIM_ID
+from openmnglab.datamodel.pandas.model import PanderaSchemaAcceptor
 from openmnglab.functions.base import StaticFunctionDefinitionBase
 from openmnglab.functions.plot.funcs.waveforms import WaveformPlotMode, WaveformPlotFunc
 from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
-from openmnglab.model.planning.interface import IProxyData
-from openmnglab.util.hashing import Hash
+from openmnglab.model.planning.interface import IDataReference
+from openmnglab.util.hashing import HashBuilder
 from openmnglab.util.seaborn import Theme
 
 
-class WaveformPlot(StaticFunctionDefinitionBase[IProxyData[plt.Figure]]):
+class WaveformPlot(StaticFunctionDefinitionBase[IDataReference[plt.Figure]]):
     """Function to plot waveforms. Can either plot average waveforms or each for its own.
     Multi-plots can be created by using the col and row parameters which are passed to the underlying seaborn function.
 
@@ -49,7 +49,7 @@ class WaveformPlot(StaticFunctionDefinitionBase[IProxyData[plt.Figure]]):
                  theme: Optional[Theme] = None,
                  col: Optional[str] = None,
                  color_dict: Optional[dict[str, str]] = None,
-                 time_col: str = TIMESTAMP, stim_idx: str = GLOBAL_STIM_ID, **sns_args):
+                 time_col: str = schema.TIMESTAMP, stim_idx: str = schema.STIM_IDX, **sns_args):
 
         super().__init__("omnglab.plotting.waveform")
         self.mode = mode if isinstance(mode, WaveformPlotMode) else WaveformPlotMode(mode.lower())
@@ -67,7 +67,7 @@ class WaveformPlot(StaticFunctionDefinitionBase[IProxyData[plt.Figure]]):
 
     @property
     def config_hash(self) -> bytes:
-        h = Hash().str(self.mode.name).str(self.column).str(self.stim_idx).str(self.time_col)
+        h = HashBuilder().str(self.mode.name).str(self.column).str(self.stim_idx).str(self.time_col)
         if self.selector is not None:
             h.int(id(self.selector))
         if self.alpha is not None:
@@ -90,8 +90,8 @@ class WaveformPlot(StaticFunctionDefinitionBase[IProxyData[plt.Figure]]):
         return h.digest()
 
     @property
-    def consumes(self) -> PandasInputDataScheme[pd.DataFrame]:
-        return PandasInputDataScheme(DataFrameSchema({
+    def slot_acceptors(self) -> PanderaSchemaAcceptor[pd.DataFrame]:
+        return PanderaSchemaAcceptor(DataFrameSchema({
             self.column: Column(float)
         }))
 

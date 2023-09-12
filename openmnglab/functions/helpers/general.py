@@ -175,8 +175,3 @@ def slice_diffs_flat(series, *slices: tuple[int, int], diff_levels: int = 0,
         dtype = type(series[0])
         func = _slice_diff
     return _slice_diffs_flat(series, slices, diff_levels, func, dtype)
-
-
-
-
-

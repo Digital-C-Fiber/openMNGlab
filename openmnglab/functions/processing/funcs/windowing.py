@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Tuple
-
+import numpy as np
+import pandas
 import quantities as pq
-from pandas import Series, Interval
+from pandas import Series, Interval, IntervalDtype
 
 from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.functions.base import FunctionBase
@@ -29,7 +29,18 @@ class WindowingFunc(FunctionBase):
         def to_interval(val):
             return Interval(val + lo, val + hi) if val is not None else None
 
-        window_series = origin_series.transform(to_interval)
+        # window_series: Series = origin_series.transform(to_interval)
+
+        if len(origin_series) > 0:
+            window_series: Series = origin_series.transform(to_interval)
+        else:
+            if isinstance(origin_series.index, pandas.MultiIndex):
+                idx = pandas.MultiIndex.from_arrays(
+                    [np.empty(0, dtype=lvl.dtype) for lvl in origin_series.index.levels],
+                    names=[lvl.name for lvl in origin_series.index.levels])
+            elif isinstance(origin_series.index, pandas.Index):
+                idx = pandas.Index(np.empty(0, dtype=origin_series.index.dtype), name=origin_series.index.name)
+            window_series = Series(data=[], dtype=IntervalDtype(), index=idx)
         window_series.name = self._name
         q_dict = get_index_quantities(self._target_series_container)
         q_dict[window_series.name] = series_quantity

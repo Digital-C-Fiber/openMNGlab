@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Sequence, Optional
+
 import seaborn as sns
 
 
@@ -19,5 +20,3 @@ class Theme:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         sns.reset_orig()
-
-

@@ -8,7 +8,7 @@ from matplotlib.axes import Axes
 
 from openmnglab.datamodel.matplot.model import MatPlotLibContainer
 from openmnglab.datamodel.pandas.model import PandasContainer
-from openmnglab.datamodel.pandas.schemes import TIMESTAMP, TRACK, GLOBAL_STIM_ID
+import openmnglab.datamodel.pandas.schemas as schema
 from openmnglab.functions.base import FunctionBase
 from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
 from openmnglab.util.seaborn import Theme
@@ -27,7 +27,7 @@ class WaveformPlotFunc(FunctionBase):
                  theme: Optional[Theme] = None,
                  col: Optional[str] = None,
                  color_dict: Optional[dict[str, str]] = None,
-                 time_col: str = TIMESTAMP, stim_idx: str = GLOBAL_STIM_ID, **sns_args):
+                 time_col: str = schema.TIMESTAMP, stim_idx: str = schema.STIM_IDX, **sns_args):
         def identity(x):
             return x
 
@@ -41,8 +41,8 @@ class WaveformPlotFunc(FunctionBase):
         self.data_container = None
         self._alpha = alpha if row != stim_idx != col else 1
         self.figargs = fig_args if fig_args is not None else dict()
-        self.timestamp_field = TIMESTAMP
-        self.track_index = TRACK
+        self.timestamp_field = schema.TIMESTAMP
+        self.track_index = schema.TRACK
         self.time_col = time_col
         self.colors = color_dict
         self.stim_idx = stim_idx
@@ -65,7 +65,7 @@ class WaveformPlotFunc(FunctionBase):
         ax: Axes
         lineplot_kwargs.update(self.sns_args)
         fig, ax = plt.subplots(**self.figargs)
-        sns.lineplot(data=self.data, x=self.time_col, y=self.column, palette=self.colors, hue=TRACK, ax=ax,
+        sns.lineplot(data=self.data, x=self.time_col, y=self.column, palette=self.colors, hue=self.track_index, ax=ax,
                      **lineplot_kwargs)
         ax.set_xlabel(f"{self.time_col} [{self.data_container.units[self.time_col].dimensionality.latex}]")
         ax.set_ylabel(f"{self.column} [{self.data_container.units[self.column].dimensionality.latex}]")
@@ -73,7 +73,7 @@ class WaveformPlotFunc(FunctionBase):
 
     def _plot_rel(self, **lineplot_kwargs) -> plt.Figure:
         facet: sns.FacetGrid
-        facet = sns.relplot(data=self.data, x=self.time_col, y=self.column, palette=self.colors, hue=TRACK,
+        facet = sns.relplot(data=self.data, x=self.time_col, y=self.column, palette=self.colors, hue=self.track_index,
                             row=self.row,
                             col=self.col, kind="line", **lineplot_kwargs)
         for axs_row in facet.axes:

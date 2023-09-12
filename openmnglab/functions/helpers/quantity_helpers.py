@@ -13,4 +13,5 @@ def rescale_pq(base: pq.Quantity, *quant: pq.Quantity) -> tuple[pq.Quantity, ...
 
 
 def magnitudes(*quantities: pq.Quantity, unpack: bool = True) -> tuple:
-    return tuple(np_val if not unpack or np_val.ndim > 0 else np_val.item() for np_val in (q.magnitude for q in quantities))
+    return tuple(
+        np_val if not unpack or np_val.ndim > 0 else np_val.item() for np_val in (q.magnitude for q in quantities))

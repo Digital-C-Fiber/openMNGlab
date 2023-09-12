@@ -12,7 +12,7 @@ except ImportError as _:
     Quantity = None
 
 
-class Hash:
+class HashBuilder:
     def __init__(self):
         self._hash = hashlib.sha3_224()
 
@@ -41,8 +41,6 @@ class Hash:
             self.dynamic(k, fail=fail)
             self.dynamic(v, fail=fail)
         return self
-
-
 
     def dynamic(self, v: Any, fail=True) -> Self:
         if isinstance(v, int):
