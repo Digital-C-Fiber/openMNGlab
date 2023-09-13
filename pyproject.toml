@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openmnglab"
-version = "0.2.0"
+version = "0.2.1"
 description = "A Python framework for microneurography analysis"
 authors = ["Peter Konradi <codingchipmunk@posteo.net>"]
 license = "MIT"
