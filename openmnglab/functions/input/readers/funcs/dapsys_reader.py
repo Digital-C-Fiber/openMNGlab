@@ -23,7 +23,6 @@ def _kernel_offset_assign(target: np.array, calc_add, calc_mul, pos_offset, n):
     for i in range(n):
         target[pos_offset + i] = calc_add + i * calc_mul
 
-
 @njit
 def find_nearest_i(array, value):
     idx = np.searchsorted(array, value, side="left")
@@ -182,16 +181,16 @@ class DapsysReaderFunc(SourceFunctionBase):
         track_labels = list()
         if n_responses > 0:
             n = 0
-            sorted_ids = np.sort(np.fromiter(idmap.keys(), dtype=float))
-            sorted_ids_slice = sorted_ids
-            sorted_idx_offset = 0
             self._log.info(f"processing streams ({n_responses} responses total)")
+            sorted_ids = np.sort(np.fromiter(idmap.keys(), dtype=float))
+
             for stream in streams:
                 track_labels.extend(stream.name for _ in range(len(stream.page_ids)))
+                sorted_idx_offset, sorted_ids_slice = 0, sorted_ids
+                track_response_number[n:n+len(stream.page_ids)] = np.arange(len(stream.page_ids), dtype=track_response_number.dtype)
                 for i, stim in enumerate(file.pages[page_id] for page_id in stream.page_ids):
                     stim: TextPage
                     response_timestamps[n] = stim.timestamp_a
-                    track_response_number[n] = i
                     nearest_offset_i = find_nearest_i(sorted_ids_slice[sorted_idx_offset:], stim.timestamp_a)
                     responding_to[n] = idmap[sorted_ids_slice[nearest_offset_i]]
                     sorted_ids_slice = sorted_ids_slice[nearest_offset_i:]
