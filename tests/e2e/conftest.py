@@ -19,13 +19,10 @@ def pytest_generate_tests(metafunc):
     for fixture in metafunc.fixturenames:
         if fixture.startswith('file_'):
             if 'dapsys' in fixture:
-                print(DAPSYS_TESTDATA_ROOT.absolute())
                 tests = list(DAPSYS_TESTDATA_ROOT.rglob(DAPSYS_TESTDATA_GLOB))
-                print(fixture, tests)
                 metafunc.parametrize(fixture, tests, scope="class")
             elif 'spike2' in fixture:
                 tests = list(SPIKE2_TESTDATA_ROOT.rglob(SPIKE2_TESTDATA_GLOB))
-                print(fixture, tests)
                 metafunc.parametrize(fixture, tests , scope="class")
 
 
