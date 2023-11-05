@@ -1,0 +1,24 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: OpenMNGLab
+message: 'If you use this software, please cite it as below.'
+type: software
+authors:
+  - family-names: Konradi
+    given-names: Peter
+    orcid: 'https://orcid.org/0000-0001-7755-0199'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.8331924
+    description: all versions
+repository-code: 'https://github.com/Digital-C-Fiber/openMNGlab'
+repository: 'https://zenodo.org/records/8341948'
+repository-artifact: 'https://pypi.org/project/openmnglab/'
+keywords:
+  - microneurography
+  - electrophysiology
+license: MIT
+version: 0.2.1
+date-released: '2023-09-10'

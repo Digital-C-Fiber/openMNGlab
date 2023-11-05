@@ -6,6 +6,8 @@ authors = ["Peter Konradi <codingchipmunk@posteo.net>"]
 license = "MIT"
 readme = "README.md"
 keywords = ["microneurography", "neurophysiology", "electrophysiology"]
+repository = "https://github.com/Digital-C-Fiber/openMNGlab"
+documentation = "https://openmnglab.readthedocs.io/en/latest/"
 classifiers = ["Development Status :: 3 - Alpha",
     "Intended Audience :: Developers", "Intended Audience :: Science/Research",
     "Intended Audience :: Healthcare Industry",
