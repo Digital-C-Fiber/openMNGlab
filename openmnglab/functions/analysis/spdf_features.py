@@ -4,9 +4,9 @@ from pandas import DataFrame
 from openmnglab.datamodel.pandas.model import PandasDataSchema, PanderaSchemaAcceptor
 from openmnglab.datamodel.pandas.verification import compare_index
 from openmnglab.functions.base import FunctionDefinitionBase
-from openmnglab.functions.processing.funcs.spdf_features import SPDF_FEATURES, FeatureFunc
+from openmnglab.functions.analysis.funcs.spdf_features import SPDF_FEATURES, FeatureFunc
 from openmnglab.functions.processing.windows import WindowDataAcceptor, WindowDataDynamicSchema
-from openmnglab.functions.processing.spdf_components import SPDFComponentsDynamicSchema, \
+from openmnglab.functions.analysis.spdf_components import SPDFComponentsDynamicSchema, \
     SPDFComponentsAcceptor
 from openmnglab.model.planning.interface import IDataReference
 

@@ -3,7 +3,7 @@ from pandas import DataFrame
 
 from openmnglab.datamodel.pandas.model import PanderaSchemaAcceptor, PandasDataSchema
 from openmnglab.functions.base import FunctionDefinitionBase
-from openmnglab.functions.processing.funcs.spdf_components import SPDFComponentsFunc, SPDF_COMPONENTS
+from openmnglab.functions.analysis.funcs.spdf_components import SPDFComponentsFunc, SPDF_COMPONENTS
 from openmnglab.functions.processing.windows import WindowDataAcceptor
 from openmnglab.model.planning.interface import IDataReference
 
