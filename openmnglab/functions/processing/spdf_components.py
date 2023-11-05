@@ -4,7 +4,7 @@ from pandas import DataFrame
 from openmnglab.datamodel.pandas.model import PanderaSchemaAcceptor, PandasDataSchema
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.spdf_components import SPDFComponentsFunc, SPDF_COMPONENTS
-from openmnglab.functions.processing.interval_data import IntervalDataAcceptor
+from openmnglab.functions.processing.windows import WindowDataAcceptor
 from openmnglab.model.planning.interface import IDataReference
 
 
@@ -42,8 +42,8 @@ class SPDFComponents(FunctionDefinitionBase[IDataReference[DataFrame]]):
         return bytes()
 
     @property
-    def slot_acceptors(self) -> IntervalDataAcceptor:
-        return IntervalDataAcceptor(0, 1)
+    def slot_acceptors(self) -> WindowDataAcceptor:
+        return WindowDataAcceptor(0, 1)
 
     @staticmethod
     def output_for(diffs: PandasDataSchema[pa.DataFrameSchema]) -> SPDFComponentsDynamicSchema:

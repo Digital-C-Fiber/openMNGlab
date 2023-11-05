@@ -11,7 +11,7 @@ from openmnglab.functions.helpers.general import get_index_quantities
 from openmnglab.functions.helpers.quantity_helpers import magnitudes, rescale_pq
 
 
-class WindowingFunc(FunctionBase):
+class StaticIntervalsFunc(FunctionBase):
     def __init__(self, lo: pq.Quantity, hi: pq.Quantity, name: str, closed="right"):
         assert (isinstance(lo, pq.Quantity))
         assert (isinstance(hi, pq.Quantity))
@@ -32,7 +32,7 @@ class WindowingFunc(FunctionBase):
         # window_series: Series = origin_series.transform(to_interval)
 
         if len(origin_series) > 0:
-            window_series: Series = origin_series.transform(to_interval)
+            interval_series: Series = origin_series.transform(to_interval)
         else:
             if isinstance(origin_series.index, pandas.MultiIndex):
                 idx = pandas.MultiIndex.from_arrays(
@@ -40,11 +40,11 @@ class WindowingFunc(FunctionBase):
                     names=[lvl.name for lvl in origin_series.index.levels])
             elif isinstance(origin_series.index, pandas.Index):
                 idx = pandas.Index(np.empty(0, dtype=origin_series.index.dtype), name=origin_series.index.name)
-            window_series = Series(data=[], dtype=IntervalDtype(), index=idx)
-        window_series.name = self._name
+            interval_series = Series(data=[], dtype=IntervalDtype(), index=idx)
+        interval_series.name = self._name
         q_dict = get_index_quantities(self._target_series_container)
-        q_dict[window_series.name] = series_quantity
-        return PandasContainer(window_series, q_dict)
+        q_dict[interval_series.name] = series_quantity
+        return PandasContainer(interval_series, q_dict)
 
     def set_input(self, series: PandasContainer[Series]):
         self._target_series_container = series

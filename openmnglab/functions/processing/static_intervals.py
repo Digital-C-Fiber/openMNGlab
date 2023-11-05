@@ -10,14 +10,14 @@ from pandera import SeriesSchema
 from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
 from openmnglab.datamodel.pandas.model import PandasDataSchema
 from openmnglab.functions.base import FunctionDefinitionBase
-from openmnglab.functions.processing.funcs.windowing import WindowingFunc
+from openmnglab.functions.processing.funcs.static_intervals import StaticIntervalsFunc
 from openmnglab.model.datamodel.interface import ISchemaAcceptor, IDataSchema
 from openmnglab.model.functions.interface import IFunction
 from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
 
 
-class WindowingSchemaAcceptor(ISchemaAcceptor):
+class IntervalSchemaAcceptor(ISchemaAcceptor):
 
     def accepts(self, output_data_scheme: IDataSchema) -> bool:
         if not isinstance(output_data_scheme, PandasDataSchema):
@@ -38,8 +38,8 @@ class DynamicIndexIntervalSchema(PandasDataSchema[SeriesSchema]):
         return DynamicIndexIntervalSchema(SeriesSchema(IntervalDtype, index=inp.pandera_schema.index, name=name))
 
 
-class Windowing(FunctionDefinitionBase[IDataReference[DataFrame]]):
-    """Takes a set of values and transforms them based on a fixed window.
+class StaticIntervals(FunctionDefinitionBase[IDataReference[DataFrame]]):
+    """Creates intervals based on a low and high offset
 
     In: series of numbers
 
@@ -74,12 +74,12 @@ class Windowing(FunctionDefinitionBase[IDataReference[DataFrame]]):
             .digest()
 
     @property
-    def slot_acceptors(self) -> WindowingSchemaAcceptor:
-        return WindowingSchemaAcceptor()
+    def slot_acceptors(self) -> IntervalSchemaAcceptor:
+        return IntervalSchemaAcceptor()
 
     def output_for(self, inp: PandasDataSchema) -> DynamicIndexIntervalSchema:
         assert isinstance(inp, PandasDataSchema)
         return DynamicIndexIntervalSchema.for_input(inp, self._name)
 
     def new_function(self) -> IFunction:
-        return WindowingFunc(self._lo, self._hi, self._name, closed=self._closed)
+        return StaticIntervalsFunc(self._lo, self._hi, self._name, closed=self._closed)

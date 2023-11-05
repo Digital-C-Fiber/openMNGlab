@@ -9,7 +9,7 @@ from openmnglab.datamodel.matplot.model import MatPlotlibSchema
 from openmnglab.datamodel.pandas.model import PanderaSchemaAcceptor
 from openmnglab.functions.base import StaticFunctionDefinitionBase
 from openmnglab.functions.plot.funcs.waveforms import WaveformPlotMode, WaveformPlotFunc
-from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
+from openmnglab.functions.processing.funcs.windows import LEVEL_COLUMN
 from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
 from openmnglab.util.seaborn import Theme

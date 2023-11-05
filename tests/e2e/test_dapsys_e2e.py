@@ -7,14 +7,13 @@ import quantities as pq
 
 
 from openmnglab.execution import SingleThreadedExecutor
-from openmnglab.functions import DapsysReader, Windowing, IntervalData, SPDFComponents, SPDFFeatures, WaveformPlot, \
+from openmnglab.functions import DapsysReader, StaticIntervals, Windows, SPDFComponents, SPDFFeatures, WaveformPlot, \
     WaveformPlotMode
 from openmnglab.planning import DefaultPlanner
 import openmnglab.datamodel.pandas.schemas as schema
 
 
 class TestDapsysE2E:
-
     @pytest.fixture(scope='class')
     def planner(self) -> DefaultPlanner:
         return DefaultPlanner()
@@ -52,12 +51,12 @@ class TestDapsysE2E:
         return dapsys_data[4]
 
     @pytest.fixture(scope='class')
-    def window_intervals(self, planner, tracks):
-        return planner.add_stage(Windowing(-2 * pq.ms, 3 * pq.ms, "spike_windows"), tracks)
+    def static_intervals(self, planner, tracks):
+        return planner.add_stage(StaticIntervals(-2 * pq.ms, 3 * pq.ms, "spike_windows"), tracks)
 
     @pytest.fixture(scope='class')
-    def windows(self, planner, window_intervals, signal):
-        return planner.add_stage(IntervalData(0, 1, 2, derivative_base=pq.ms), window_intervals, signal)
+    def windows(self, planner, static_intervals, signal):
+        return planner.add_stage(Windows(0, 1, 2, derivative_base=pq.ms), static_intervals, signal)
 
     @pytest.fixture(scope='class')
     def spdf_components(self, planner, windows):
