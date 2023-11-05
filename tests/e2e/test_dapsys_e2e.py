@@ -7,7 +7,7 @@ import quantities as pq
 
 
 from openmnglab.execution import SingleThreadedExecutor
-from openmnglab.functions import DapsysReader, Windowing, IntervalData, SPDFComponents, SPDFFeatures, WaveformPlot, \
+from openmnglab.functions import DapsysReader, StaticIntervals, IntervalData, SPDFComponents, SPDFFeatures, WaveformPlot, \
     WaveformPlotMode
 from openmnglab.planning import DefaultPlanner
 import openmnglab.datamodel.pandas.schemas as schema
@@ -53,7 +53,7 @@ class TestDapsysE2E:
 
     @pytest.fixture(scope='class')
     def window_intervals(self, planner, tracks):
-        return planner.add_stage(Windowing(-2 * pq.ms, 3 * pq.ms, "spike_windows"), tracks)
+        return planner.add_stage(StaticIntervals(-2 * pq.ms, 3 * pq.ms, "spike_windows"), tracks)
 
     @pytest.fixture(scope='class')
     def windows(self, planner, window_intervals, signal):
