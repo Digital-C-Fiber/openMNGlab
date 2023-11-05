@@ -39,7 +39,7 @@ class DynamicIndexIntervalSchema(PandasDataSchema[SeriesSchema]):
 
 
 class StaticIntervals(FunctionDefinitionBase[IDataReference[DataFrame]]):
-    """Takes a set of values and transforms them based on a fixed window.
+    """Creates intervals based on a low and high offset
 
     In: series of numbers
 
