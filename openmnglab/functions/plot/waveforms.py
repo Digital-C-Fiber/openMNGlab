@@ -76,6 +76,8 @@ class WaveformPlot(StaticFunctionDefinitionBase[IDataReference[plt.Figure]]):
             h.dict(self.fig_args, fail=False)
         if self.row is not None:
             h.str(self.row)
+        if self.col is not None:
+            h.str(self.col)
         if self.theme is not None:
             h.dynamic(self.theme.context, fail=False)
             h.dynamic(self.theme.style, fail=False)
@@ -97,7 +99,7 @@ class WaveformPlot(StaticFunctionDefinitionBase[IDataReference[plt.Figure]]):
 
     def new_function(self) -> WaveformPlotFunc:
         return WaveformPlotFunc(mode=self.mode, selector=self.selector, column=self.column, fig_args=self.fig_args,
-                                alpha=self.alpha, row=self.row, theme=self.theme, col=self.col, color_dict=self.col,
+                                alpha=self.alpha, row=self.row, theme=self.theme, col=self.col, color_dict=self.color_dict,
                                 time_col=self.time_col, stim_idx=self.stim_idx, **self.sns_args)
 
     @property
