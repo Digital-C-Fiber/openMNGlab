@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 from openmnglab.model.datamodel.interface import IDataSchema
 from openmnglab.model.functions.interface import IFunctionDefinition, ProxyRet
 from openmnglab.model.planning.plan.interface import IStage, IVirtualData
@@ -76,6 +78,7 @@ class VirtualData(IVirtualData):
 class DefaultPlanner(PlannerBase[Stage, VirtualData]):
 
     def _add_function(self, function: IFunctionDefinition[ProxyRet], *inp_data: VirtualData) -> ProxyRet:
+        function = deepcopy(function)
         check_input(function.slot_acceptors, tuple(d.schema for d in inp_data))
         stage = Stage(function, *inp_data)
         if stage.planning_id in self._functions:
