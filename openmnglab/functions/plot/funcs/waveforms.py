@@ -74,8 +74,7 @@ class WaveformPlotFunc(FunctionBase):
     def _plot_rel(self, **lineplot_kwargs) -> plt.Figure:
         facet: sns.FacetGrid
         facet = sns.relplot(data=self.data, x=self.time_col, y=self.column, palette=self.colors, hue=self.track_index,
-                            row=self.row,
-                            col=self.col, kind="line", **lineplot_kwargs)
+                            row=self.row,col=self.col,  kind="line", **lineplot_kwargs)
         for axs_row in facet.axes:
             if axs_row[0].get_ylabel() != '':
                 axs_row[0].set_ylabel(f"{self.column} [{self.data_container.units[self.column].dimensionality.latex}]")
@@ -90,9 +89,10 @@ class WaveformPlotFunc(FunctionBase):
         return self._plot_line(**plot_kwargs)
 
     def _plot_avg(self) -> plt.Figure:
+        args = dict(errorbar="sd")
         if self._relplot:
-            return self._plot_rel()
-        return self._plot_line(errorbar="sd")
+            return self._plot_rel(**args)
+        return self._plot_line(**args)
 
     def _plot_overlap(self) -> plt.Figure:
         universal_kwargs = dict(estimator=None, units=self.stim_idx, alpha=self.alpha)
