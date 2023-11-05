@@ -9,3 +9,6 @@ The test-suites here construct an analysis flow with each reader function and al
 
 ## Run the tests
 Run the tests with pytest: `pytest -k e2e` (note that you may have to switch into the poetry environment with `poetry shell`)
+
+To only run DAPSYS e2e tests use `pytest -k "e2e and dapsys"`.
+

@@ -23,6 +23,6 @@ def pytest_generate_tests(metafunc):
                 metafunc.parametrize(fixture, tests, scope="class")
             elif 'spike2' in fixture:
                 tests = list(SPIKE2_TESTDATA_ROOT.rglob(SPIKE2_TESTDATA_GLOB))
-                metafunc.parametrize(fixture, tests , scope="class")
+                metafunc.parametrize(fixture, tests, scope="class")
 
 
