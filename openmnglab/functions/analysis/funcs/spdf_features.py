@@ -9,7 +9,7 @@ from pandas import Series, DataFrame
 from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.functions.base import FunctionBase
 from openmnglab.functions.processing.funcs.windows import LEVEL_COLUMN
-from openmnglab.functions.processing.funcs.spdf_components import SPDF_COMPONENTS
+from openmnglab.functions.analysis.funcs.spdf_components import SPDF_COMPONENTS
 from openmnglab.util.pandas import index_names
 
 SPDF_FEATURES = tuple((f"F{i + 1}" for i in range(24)))
