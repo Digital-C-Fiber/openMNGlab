@@ -14,3 +14,7 @@ The package is distributed via PyPI as "[openmnglab](https://pypi.org/project/op
 
 ## Quickstart
 For a quickstart see the [quickstart.ipynb](quickstart/quickstart.ipynb)
+
+## Citing
+The repository in general can be cited using the Zenodo-DOI [10.5281/zenodo.8331924](https://doi.org/10.5281/zenodo.8331924).
+On the [Zenodo project page](https://zenodo.org/records/8341948) you will find additional DOIs to cite specific versions of the library. 
