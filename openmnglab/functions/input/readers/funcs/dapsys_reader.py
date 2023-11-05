@@ -19,8 +19,8 @@ from openmnglab.util.dicts import get_and_incr
 DPS_STIMDEFS = "stimulus definitions"
 
 @njit
-def _kernel_offset_assign(target: np.array, calc_add, calc_mul, pos_offset, n):
-    for i in range(n):
+def _kernel_offset_assign(target: np.array, calc_add, calc_mul, pos_offset: int, num_points: int):
+    for i in range(num_points):
         target[pos_offset + i] = calc_add + i * calc_mul
 
 @njit
@@ -140,7 +140,7 @@ class DapsysReaderFunc(SourceFunctionBase):
         """Stores the next number for each label (see lbl_num)"""
         self._log.debug("reading stimuli")
         timestamp_to_stimid = dict()
-        """Maps the timestamp of the pulse to the trace that has triggered it"""
+        """Maps the timestamp of the pulse to the trace index that has triggered it"""
         for i, page in enumerate(
                 file.pages[page_id] for page_id in page_ids):
             page: TextPage
@@ -183,7 +183,6 @@ class DapsysReaderFunc(SourceFunctionBase):
             n = 0
             self._log.info(f"processing streams ({n_responses} responses total)")
             sorted_ids = np.sort(np.fromiter(idmap.keys(), dtype=float))
-
             for stream in streams:
                 track_labels.extend(stream.name for _ in range(len(stream.page_ids)))
                 sorted_idx_offset, sorted_ids_slice = 0, sorted_ids
