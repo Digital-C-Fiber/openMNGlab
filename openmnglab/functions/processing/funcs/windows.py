@@ -67,7 +67,7 @@ def extend_multiindex(base: list[np.ndarray], ranges: np.ndarray):
     return multiidx
 
 
-class IntervalDataFunc(FunctionBase):
+class WindowsFunc(FunctionBase):
     def __init__(self, levels: tuple[int, ...],
                  derivatives: bool,
                  derivative_change: Optional[pq.Quantity], interval: Optional[float] = None, use_time_offsets=True):

@@ -5,7 +5,7 @@ from openmnglab.datamodel.pandas.model import PandasDataSchema, PanderaSchemaAcc
 from openmnglab.datamodel.pandas.verification import compare_index
 from openmnglab.functions.base import FunctionDefinitionBase
 from openmnglab.functions.processing.funcs.spdf_features import SPDF_FEATURES, FeatureFunc
-from openmnglab.functions.processing.interval_data import IntervalDataAcceptor, IntervalDataDynamicSchema
+from openmnglab.functions.processing.windows import WindowDataAcceptor, WindowDataDynamicSchema
 from openmnglab.functions.processing.spdf_components import SPDFComponentsDynamicSchema, \
     SPDFComponentsAcceptor
 from openmnglab.model.planning.interface import IDataReference
@@ -40,11 +40,11 @@ class SPDFFeatures(FunctionDefinitionBase[IDataReference[DataFrame]]):
         return bytes()
 
     @property
-    def slot_acceptors(self) -> tuple[SPDFComponentsAcceptor, IntervalDataAcceptor]:
-        return SPDFComponentsAcceptor(), IntervalDataAcceptor(0, 1, 2)
+    def slot_acceptors(self) -> tuple[SPDFComponentsAcceptor, WindowDataAcceptor]:
+        return SPDFComponentsAcceptor(), WindowDataAcceptor(0, 1, 2)
 
     def output_for(self, principle_compo: SPDFComponentsDynamicSchema,
-                   diffs: IntervalDataDynamicSchema) -> SPDFFeaturesDynamicSchema:
+                   diffs: WindowDataDynamicSchema) -> SPDFFeaturesDynamicSchema:
         compare_index(principle_compo.pandera_schema.index, pa.MultiIndex(diffs.pandera_schema.index.indexes[:-1]))
         return SPDFFeaturesDynamicSchema(principle_compo.pandera_schema.index)
 

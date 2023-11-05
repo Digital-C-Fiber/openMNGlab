@@ -9,7 +9,7 @@ from pandas import DataFrame, IntervalDtype
 from openmnglab.datamodel.exceptions import DataSchemaCompatibilityError
 from openmnglab.datamodel.pandas.model import PandasDataSchema, PanderaSchemaAcceptor
 from openmnglab.functions.base import FunctionDefinitionBase
-from openmnglab.functions.processing.funcs.interval_data import IntervalDataFunc, LEVEL_COLUMN
+from openmnglab.functions.processing.funcs.windows import WindowsFunc, LEVEL_COLUMN
 from openmnglab.model.datamodel.interface import IDataSchema
 from openmnglab.model.planning.interface import IDataReference
 from openmnglab.util.hashing import HashBuilder
@@ -28,7 +28,7 @@ class NumericIndexedListAcceptor(PanderaSchemaAcceptor[pa.SeriesSchema]):
         return super_accepts
 
 
-class IntervalDataAcceptor(PanderaSchemaAcceptor[pa.DataFrameSchema]):
+class WindowDataAcceptor(PanderaSchemaAcceptor[pa.DataFrameSchema]):
     def __init__(self, first_level: int, *levels: int, idx=None):
         super().__init__(
             pa.DataFrameSchema({LEVEL_COLUMN[i]: pa.Column(float) for i in sorted([first_level, *levels])}, index=idx))
@@ -46,14 +46,15 @@ class IntervalDataAcceptor(PanderaSchemaAcceptor[pa.DataFrameSchema]):
         return super_accepts
 
 
-class IntervalDataDynamicSchema(IntervalDataAcceptor, PandasDataSchema):
+class WindowDataDynamicSchema(WindowDataAcceptor, PandasDataSchema):
     def __init__(self, idx: pa.Index | pa.MultiIndex, first_level: int, *levels: int):
         super().__init__(first_level, *levels, idx=idx)
 
 
-class IntervalData(FunctionDefinitionBase[IDataReference[DataFrame]]):
-    """Extracts the data of intervals from a continuous series. Also calculates derivatives or differences between the values.
-    Can re-base the timestamps to their relative offset. A derivative is a diff divided by the change of time.
+class Windows(FunctionDefinitionBase[IDataReference[DataFrame]]):
+    """Computes windows from a series of numbers based on a list of intervals. Can also compute the change(rate)
+    for the windows, optionally relative to their time delta.
+    Can re-base the timestamps to their relative offset.
 
     In: [Intervals, Continuous Series]
 
@@ -72,7 +73,7 @@ class IntervalData(FunctionDefinitionBase[IDataReference[DataFrame]]):
 
     :param first_level: first level (diff or derivative) to include in the output data frame
     :param levels: additional levels to include in the output data frame
-    :param derivative_base: quantity to base the time of the derivative on. If None, will calculate the diffs
+    :param derivative_base: quantity to base the time of the derivative on. If None, it will only calculate the absolute changes between consecutive values.
     :param interval: The sampling interval of the signal. If this is not given, the interval will be approximated by calculating the diff of the first two samples.
     :param use_time_offsets: if True, will use the offset the index timestamps to the start of each interval. USE ONLY WITH REGULARLY SAMPLED SGINALS!
         """
@@ -103,7 +104,7 @@ class IntervalData(FunctionDefinitionBase[IDataReference[DataFrame]]):
         return PanderaSchemaAcceptor(pa.SeriesSchema(IntervalDtype)), NumericIndexedListAcceptor()
 
     def output_for(self, window_intervals: IDataSchema[pa.SeriesSchema],
-                   data: IDataSchema[pa.SeriesSchema]) -> IntervalDataDynamicSchema:
+                   data: IDataSchema[pa.SeriesSchema]) -> WindowDataDynamicSchema:
         window_scheme, data_scheme = self.slot_acceptors
         assert (window_scheme.accepts(window_intervals))
         assert (data_scheme.accepts(data))
@@ -113,10 +114,10 @@ class IntervalData(FunctionDefinitionBase[IDataReference[DataFrame]]):
             idx = pa.MultiIndex([window_intervals.pandera_schema.index, data.pandera_schema.index])
         else:
             idx = pa.MultiIndex([*window_intervals.pandera_schema.index.indexes, data.pandera_schema.index])
-        return IntervalDataDynamicSchema(idx, *self._levels)
+        return WindowDataDynamicSchema(idx, *self._levels)
 
-    def new_function(self) -> IntervalDataFunc:
-        return IntervalDataFunc(self._levels,
-                                derivatives=self._derivatives,
-                                derivative_change=self._derivate_change, use_time_offsets=self._use_time_offsets,
-                                interval=self._interval)
+    def new_function(self) -> WindowsFunc:
+        return WindowsFunc(self._levels,
+                           derivatives=self._derivatives,
+                           derivative_change=self._derivate_change, use_time_offsets=self._use_time_offsets,
+                           interval=self._interval)

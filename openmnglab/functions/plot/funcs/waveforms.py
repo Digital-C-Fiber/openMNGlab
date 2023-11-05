@@ -10,7 +10,7 @@ from openmnglab.datamodel.matplot.model import MatPlotLibContainer
 from openmnglab.datamodel.pandas.model import PandasContainer
 import openmnglab.datamodel.pandas.schemas as schema
 from openmnglab.functions.base import FunctionBase
-from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
+from openmnglab.functions.processing.funcs.windows import LEVEL_COLUMN
 from openmnglab.util.seaborn import Theme
 
 

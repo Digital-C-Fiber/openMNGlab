@@ -6,7 +6,7 @@ from pandas import DataFrame
 
 from openmnglab.datamodel.pandas.model import PandasContainer
 from openmnglab.functions.base import FunctionBase
-from openmnglab.functions.processing.funcs.interval_data import LEVEL_COLUMN
+from openmnglab.functions.processing.funcs.windows import LEVEL_COLUMN
 
 
 def get_zerocorssings(vals: np.ndarray) -> np.ndarray:
